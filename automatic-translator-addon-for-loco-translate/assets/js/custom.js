@@ -436,7 +436,7 @@ const AutoTranslator = (function (window, $) {
         const dplPreviewImg = ATLT_URL + 'assets/images/' + extradata['dpl_preview'];
         const chatGPTPreviewImg = ATLT_URL + 'assets/images/' + extradata['chatGPT_preview'];
         const geminiAIPreviewImg = ATLT_URL + 'assets/images/' + extradata['geminiAI_preview'];
-        const getProLink = 'https://locoaddon.com/plugin/automatic-translate-addon-for-loco-translate-pro/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_buy_pro';
+        const getProLink = 'https://locoaddon.com/plugin/automatic-translate-addon-for-loco-translate-pro/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=';
 
         const modelHTML = `
             <div id="atlt-dialog" title="Step 1 - Select Translation Provider" style="display:none;">
@@ -452,7 +452,7 @@ const AutoTranslator = (function (window, $) {
                     <strong class="atlt-heading">Translate Using Google Page Translate Widget</strong>
                     <div class="inputGroup">
                         <button id="atlt_gtranslate_btn" disabled="disabled" class="notranslate button button-primary">Google Translate</button>
-                        <span class="proonly-button"><a href="${getProLink}" target="_blank" title="Buy Pro">PRO Only</a></span>
+                        <span class="proonly-button"><a href="${getProLink+'google_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
                         <br/><a href="https://translate.google.com/" target="_blank"><img  class="pro-features-img" src="${gtPreviewImg}" alt="powered by Google Translate Widget"></a>
                     </div>
                     <hr/>
@@ -460,7 +460,7 @@ const AutoTranslator = (function (window, $) {
                     <strong class="atlt-heading">Translate Using Deepl Doc Translator</strong>
                     <div class="inputGroup">
                         <button  disabled="disabled" id="atlt_deepl_btn" class="notranslate button button-primary">DeepL Translate</button>
-                        <span class="proonly-button"><a href="${getProLink}" target="_blank" title="Buy Pro">PRO Only</a></span>
+                        <span class="proonly-button"><a href="${getProLink+'deepl_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
                         <br/><a href="https://www.deepl.com/en/translator" target="_blank"><img class="pro-features-img" src="${dplPreviewImg}" alt="powered by DeepL Translate"></a>
                     </div>
                     <hr/>
@@ -468,7 +468,7 @@ const AutoTranslator = (function (window, $) {
                     <strong class="atlt-heading">Translate Using AI</strong>
                     <div class="inputGroup">
                         <button  disabled="disabled" id="atlt_chatGPT_btn" class="notranslate button button-primary">ChatGPT Translate</button>
-                        <span class="proonly-button"><a href="${getProLink}" target="_blank" title="Buy Pro">PRO Only</a></span>
+                        <span class="proonly-button"><a href="${getProLink+'chatgpt_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
                         <br/><a href="https://chat.openai.com/" target="_blank"><img class="pro-features-img" src="${chatGPTPreviewImg}" alt="powered by ChatGPT"></a>
                     </div>
                     <hr/>
@@ -476,7 +476,7 @@ const AutoTranslator = (function (window, $) {
                     <strong class="atlt-heading">Translate Using GeminiAI API</strong>
                     <div class="inputGroup">
                         <button id="atlt_openAI_btn" disabled="disabled" class="notranslate button button-primary">GeminiAI Translate</button>
-                        <span class="proonly-button"><a href="${getProLink}" target="_blank" title="Buy Pro">PRO Only</a></span>
+                        <span class="proonly-button"><a href="${getProLink+'geminiAI_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
                         <br/><a href="https://gemini.google.com/" target="_blank"><img  class="pro-features-img" src="${geminiAIPreviewImg}" alt="powered by GeminiAI Translate"></a>
                     </div>
                 </div>

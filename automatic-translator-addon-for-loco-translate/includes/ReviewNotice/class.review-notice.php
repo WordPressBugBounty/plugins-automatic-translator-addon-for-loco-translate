@@ -20,6 +20,7 @@ if (!class_exists('ALTLReviewNotice')) {
     
     // ajax callback for review notice
     public function atlt_dismiss_review_notice(){
+        check_ajax_referer( 'atlt_dismiss_notice', 'security' );
         $rs=update_option( 'atlt-already-rated','yes' );
         echo  json_encode( array("success"=>"true") );
         exit;
@@ -103,7 +104,7 @@ if (!class_exists('ALTLReviewNotice')) {
             var ajaxURL=wrapper.data("ajax-url");
             var ajaxCallback=wrapper.data("ajax-callback");
             
-            $.post(ajaxURL, { "action":ajaxCallback }, function( data ) {
+            $.post(ajaxURL, { "action":ajaxCallback, "security": "'. wp_create_nonce( 'atlt_dismiss_notice' ) .'" }, function( data ) {
                 wrapper.slideUp("fast");
               }, "json");
     

@@ -1,16 +1,16 @@
 === Automatic Translate Addon For Loco Translate ===
-Contributors: narinder-singh, satindersingh
+Contributors: narinder-singh, satindersingh, coolplugins
 Donate link: https://paypal.me/CoolPlugins/10USD/
 Tags: translate, AI Translation, Loco Translate Addon, google translate,ChatGPT Integration
 Requires at least:5.0
-Tested up to:6.6
-Requires PHP: 5.6
+Tested up to:6.6.2
+Requires PHP: 7.2
 Loco Translate Tested Up to: 2.6.11
-Stable tag: 2.4.4
+Stable tag: 2.4.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Automatic language translator addon for Loco Translate to translate WordPress plugins and themes translation / PO files automatically.
+The Automatic Translate Addon for Loco Translate is a powerful tool for developers looking to quickly translate their WordPress plugins and themes.
 
 == Description ==
 
@@ -148,6 +148,12 @@ All automatic translations will be machine translations, powered by third-party 
 
 == Frequently Asked Questions ==
 
+= Can this plugin automatically translate page content ❔ =
+ No, this plugin only translates plugins and themes strings automatically. To translate page content automatically, you can try the 
+[Automatic Translate Addon For TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=check_out)
+Or
+[Automatic Translations For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=cross_promotion&utm_content=check_out)
+
 = How it works❔ =
 This plugin works as an add-on for **Loco Translate** official plugin. First, you need to install and activate the free version of "Loco Translate" then install this addon and use one-click machine translations (supported by Yandex Translate Widget).
 
@@ -177,7 +183,34 @@ Yes, to access Gemini AI translations, you will need to obtain Free API keys and
 
 = Do I need any API key to use ChatGPT translations?❔ =
  No, you can use ChatGPT translations for free by visiting the [ChatGPT website](https://chatgpt.com/).
- 
+
+= How can this addon make my translations easier?
+With one-click machine translations, this addon allows you to quickly and efficiently translate your plugins and themes, saving time and effort on multilingual projects!
+
+= Will I get accurate translations?
+Yes! With ChatGPT and Gemini AI in the premium version, translations are contextually accurate and natural, ideal for professional-grade results.
+
+= What makes the premium version worth it?
+Premium users can use Google, DeepL, ChatGPT, and Gemini AI for translations, with no character limits! Plus, priority support ensures you get help fast if you need it.
+
+= Can I edit translations easily?
+Absolutely! You can refine any translated strings in Loco Translate’s editor, allowing you to perfect your content’s tone and accuracy.
+
+= Do I need to worry about translation limits?
+No limits here! Free users can translate unlimited characters with Yandex, while premium users enjoy the same freedom with additional high-quality translation options.
+
+= Is any technical setup required?
+Not at all! Just install the addon alongside Loco Translate, and you’re ready to start translating. No API keys required for free users!
+
+= Will my content’s original style and meaning be preserved?
+Yes, both ChatGPT and Gemini AI are designed to maintain the original tone and meaning, resulting in natural, coherent translations that match your content perfectly.
+
+= Can I rely on these translations for professional use?
+Definitely! The advanced AI in ChatGPT and Gemini AI ensures that your translations are accurate and polished, ideal for professional multilingual sites.
+
+= How can I report security bugs? =
+
+You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/automatic-translator-addon-for-loco-translate)
 == Screenshots ==
 
 1. Automatic Translate (No paid API Required)
@@ -186,9 +219,15 @@ Yes, to access Gemini AI translations, you will need to obtain Free API keys and
 4. DeepL Doc Translator (Premium)
 
 == Changelog ==
+<strong>Version 2.4.5 |09/10/2024 </strong>
+<pre>
+Improved: updated utm content in urls
+Improved: updated pro features images and add css
+Fixed: Fixed security issues
+</pre>
 <strong>Version 2.4.4 |21/08/2024 </strong>
 <pre>
-Tweaks:Textual changes on dashboard page and readme file.
+Tweaks:Textual changes in dashboard page and readme file.
 </pre>
 <strong>Version 2.4.3 |22/07/2024 </strong>
 <pre>

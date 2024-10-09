@@ -30,6 +30,10 @@
   margin-top: 5px;
 }
 
+.pro-features-img{
+  width: 50%;
+}
+
 span.proonly-button {
   background: #555;
   color: #fff;
