@@ -3,10 +3,10 @@ Contributors: narinder-singh, satindersingh, coolplugins
 Donate link: https://paypal.me/CoolPlugins/10USD/
 Tags: translate, AI Translation, Loco Translate Addon, google translate,ChatGPT Integration
 Requires at least:5.0
-Tested up to:6.6.2
+Tested up to:6.7.1
 Requires PHP: 7.2
-Loco Translate Tested Up to: 2.6.11
-Stable tag: 2.4.5
+Loco Translate Tested Up to: 2.6.14
+Stable tag: 2.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,7 +16,8 @@ The Automatic Translate Addon for Loco Translate is a powerful tool for develope
 
 ### Automatic Translate Addon For Loco Translate
 
-The Automatic Translate Addon for Loco Translate is a powerful tool for website owners and developers looking to quickly **translate** their WordPress **plugins and themes**. 
+The Automatic Translate Addon for Loco Translate is a powerful tool for website owners and developers looking to quickly **translate** their WordPress **plugins and themes**
+
 The plugin integrates with the **Loco Translate** plugin to provide a seamless experience for users. The addon uses **machine translation** to **automatically translate** the plugin and theme strings into the desired language, **saving time and effort** for website owners who need to quickly translate their content into multiple languages.
 
 [How It Works ⇗](https://locoaddon.com/how-it-works/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=how_it_works) | [Buy Pro ⇗](https://locoaddon.com/plugin/automatic-translate-addon-for-loco-translate-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=buy_now)
@@ -219,6 +220,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 4. DeepL Doc Translator (Premium)
 
 == Changelog ==
+<strong>Version 2.4.6 |27/01/2025 </strong>
+<pre>
+Fixed: Fixed string merging issue with Loco Translate 2.7 latest version.
+Fixed: Fixed load textdomain issues
+</pre>
 <strong>Version 2.4.5 |09/10/2024 </strong>
 <pre>
 Improved: updated utm content in urls

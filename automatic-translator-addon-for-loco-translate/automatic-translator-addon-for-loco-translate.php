@@ -2,7 +2,7 @@
 /*
 Plugin Name: Automatic Translate Addon For Loco Translate
 Description: Loco Translate plugin addon to automatic translate plugins and themes translatable string with one click in any language.
-Version: 2.4.5
+Version: 2.4.6
 License: GPL2
 Text Domain: loco-auto-translate
 Domain Path: languages
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'ATLT_FILE', __FILE__ );
 define( 'ATLT_URL', plugin_dir_url( ATLT_FILE ) );
 define( 'ATLT_PATH', plugin_dir_path( ATLT_FILE ) );
-define( 'ATLT_VERSION', '2.4.5' );
+define( 'ATLT_VERSION', '2.4.6' );
 
 /**
  * @package Loco Automatic Translate Addon
@@ -68,6 +68,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			// run actions and filter only at admin end.
 			if ( is_admin() ) {
 				add_action( 'plugins_loaded', array( $thisPlugin, 'atlt_check_required_loco_plugin' ) );
+				add_action( 'init', array( $thisPlugin, 'atlt_load_textdomain' ) );
 				// add notice to use latest loco translate addon
 				add_action( 'init', array( $thisPlugin, 'atlt_verify_loco_version' ) );
 
@@ -121,7 +122,20 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		|----------------------------------------------------------------------
 		*/
 		function atlt_ajax_init() {
-			 add_filter( 'loco_api_translate_loco_auto', array( self::$instance, 'loco_auto_translator_process_batch' ), 0, 3 );
+			if( version_compare( loco_plugin_version(), '2.7', '>=' ) ){
+				add_filter( 'loco_api_translate_loco_auto', array( self::$instance, 'loco_auto_translator_process_batch' ), 0, 4 );
+			}
+			else {
+				add_filter('loco_api_translate_loco_auto',array( self::$instance, 'loco_auto_translator_process_batch_legacy' ), 0,3);
+			}
+		}
+		
+		public function loco_auto_translator_process_batch_legacy( array $sources, Loco_Locale $locale, array $config ) {
+			$items = [];
+			foreach( $sources as $text ){
+				$items[] = [ 'source' => $text ];
+			}
+			return $this->loco_auto_translator_process_batch( [], $items, $locale, $config );
 		}
 
 		/**
@@ -132,13 +146,12 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		 * @param array our own api configuration
 		 * @return string[] output strings
 		 */
-		function loco_auto_translator_process_batch( array $sources, Loco_Locale $Locale, array $config ) {
-			$targets = array();
+		function loco_auto_translator_process_batch(array $targets, array $items, Loco_Locale $locale, array $config) {
 			// Extract domain from the referrer URL
 			$url_data   = self::$instance->atlt_parse_query( $_SERVER['HTTP_REFERER'] );
 			$domain     = isset( $url_data['domain'] ) && ! empty( $url_data['domain'] ) ? sanitize_text_field( $url_data['domain'] ) : 'temp';
-			$lang       = sanitize_text_field( $Locale->lang );
-			$region     = sanitize_text_field( $Locale->region );
+			$lang       = sanitize_text_field( $locale->lang );
+			$region     = sanitize_text_field( $locale->region );
 			$project_id = $domain . '-' . $lang . '-' . $region;
 
 			// Combine transient parts if available
@@ -151,9 +164,9 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				}
 			}
 			if ( ! empty( $allString ) ) {
-				foreach ( $sources as $i => $source ) {
+				foreach ( $items as $i => $item ) {
 					// Find the index of the source string in the cached strings
-					$index = array_search( $source, array_column( $allString, 'source' ) );
+					$index = array_search( $item['source'], array_column( $allString, 'source' ) );
 
 					if ( is_numeric( $index ) && isset( $allString[ $index ]['target'] ) ) {
 						$targets[ $i ] = sanitize_text_field( $allString[ $index ]['target'] );
@@ -252,12 +265,16 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		| also register the plugin text domain
 		|----------------------------------------------------------------------
 		*/
+
+		public function atlt_load_textdomain() {
+			// load language files
+			load_plugin_textdomain( 'loco-auto-translate', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+		}
+		
 		public function atlt_check_required_loco_plugin() {
 			if ( ! function_exists( 'loco_plugin_self' ) ) {
 				add_action( 'admin_notices', array( self::$instance, 'atlt_plugin_required_admin_notice' ) );
 			}
-			// load language files
-			load_plugin_textdomain( 'loco-auto-translate', false, basename( dirname( __FILE__ ) ) . '/languages/' );
 		}
 		/*
 		|----------------------------------------------------------------------
