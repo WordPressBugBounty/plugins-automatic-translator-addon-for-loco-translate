@@ -47,6 +47,26 @@ const AutoTranslator = (function (window, $) {
 
         // save string inside cache for later use
         $(".atlt_save_strings").on("click", onSaveClick);
+
+        
+        // Open String translation modal on translate wrapper click
+        $(".atlt-translater").on("click", (e)=>{
+            if(!["BUTTON", "IMG", "A"].includes(e.target.tagName)){
+                jQuery(e.delegateTarget).find(".inputGroup button.button[id]").trigger("click");
+            }
+        });
+    }
+
+    function destroyYandexTranslator() {
+        translationPerformed = false;
+        $('.yt-button__icon.yt-button__icon_type_right').trigger('click');
+        $('.atlt_custom_model.yandex-widget-container').find('.atlt_string_container').scrollTop(0);
+    
+        const progressContainer = $('.modal-body.yandex-widget-body').find('.atlt_translate_progress');
+        progressContainer.hide();
+        progressContainer.find('.progress-wrapper').hide();
+        progressContainer.find('#myProgressBar').css('width', '0');
+        progressContainer.find('#progressText').text('0%');
     }
 
     function addStringsInModal(allStrings) {
@@ -110,6 +130,35 @@ const AutoTranslator = (function (window, $) {
     }
     // parse all translated strings and pass to save function
     function onSaveClick() {
+        const container = $(this).closest('.atlt_custom_model');
+        const time_taken = container.data('translation-time') || 0;
+        const translation_provider = container.data('translation-provider');
+        const character_count = container.data('character-count') || 0;
+        const word_count = container.data('word-count') || 0;
+        
+        // Safely access nested properties without optional chaining
+        let pluginOrTheme = '';
+        let pluginOrThemeName = '';
+        
+        if (locoConf && locoConf.conf && locoConf.conf.project && locoConf.conf.project.bundle) {
+            pluginOrTheme = locoConf.conf.project.bundle.split('.')[0];
+            
+            if (pluginOrTheme === 'theme') {
+                pluginOrThemeName = locoConf.conf.project.domain || '';
+            } else {
+                const match = locoConf.conf.project.bundle.match(/^[^.]+\.(.*?)(?=\/)/);
+                pluginOrThemeName = match ? match[1] : '';
+            }
+        }
+
+        const translationData = {
+            time_taken: time_taken,
+            translation_provider: translation_provider,
+            character_count: character_count,
+            string_count: word_count,
+            pluginORthemeName: pluginOrThemeName,
+            pluginORtheme: pluginOrTheme
+        }
         let translatedObj = [];
 
         const rpl = {
@@ -156,7 +205,7 @@ const AutoTranslator = (function (window, $) {
         var projectId = $(this).parents("#atlt_strings_model").find("#project_id").val();
 
         //  Save Translated Strings
-        saveTranslatedStrings(translatedObj, projectId);
+        saveTranslatedStrings(translatedObj, projectId, translationData);
 
         $(".atlt_custom_model").fadeOut("slow");
 
@@ -290,7 +339,7 @@ const AutoTranslator = (function (window, $) {
     }
 
     // Save translated strings in the cache using ajax requests in parts.
-    function saveTranslatedStrings(translatedStrings, projectId) {
+    function saveTranslatedStrings(translatedStrings, projectId, translationData) {
         // Check if translatedStrings is not empty and has data
         if (translatedStrings && translatedStrings.length > 0) {
             // Define the batch size for ajax requests
@@ -303,7 +352,7 @@ const AutoTranslator = (function (window, $) {
                 // Determine the part based on the batch position
                 const part = `-part-${Math.ceil(i / batchSize)}`;
                 // Send ajax request for the current batch
-                sendBatchRequest(batch, projectId, part);
+                sendBatchRequest(batch, projectId, part, translationData);
 
             }
 
@@ -312,13 +361,14 @@ const AutoTranslator = (function (window, $) {
 
 
     // send ajax request and save data.
-    function sendBatchRequest(stringData, projectId, part) {
+    function sendBatchRequest(stringData, projectId, part, translationData) {
         const data = {
             'action': 'save_all_translations',
             'data': JSON.stringify(stringData),
             'part': part,
             'project-id': projectId,
-            'wpnonce': nonce
+            'wpnonce': nonce,
+            'translation_data': JSON.stringify(translationData)
         };
 
         jQuery.post(ajaxUrl, data, function (response) {
@@ -352,6 +402,7 @@ const AutoTranslator = (function (window, $) {
             dialogClass: rtlClass,
             resizable: false,
             height: "auto",
+            draggable: false,
             width: 400,
             modal: true,
             buttons: {
@@ -367,12 +418,16 @@ const AutoTranslator = (function (window, $) {
     var gModal = document.getElementById("atlt_strings_model");
     // When the user clicks anywhere outside of the modal, close it
     $(window).click(function (event) {
+        if (!event.target.closest(".modal-content")) {
+            destroyYandexTranslator();  
+        }
         if (event.target == gModal) {
             gModal.style.display = "none";
         }
     });
     // Get the <span> element that closes the modal
     $("#atlt_strings_model").find(".close").on("click", function () {
+        destroyYandexTranslator();
         $("#atlt_strings_model").fadeOut("slow");
     });
 
@@ -399,10 +454,12 @@ const AutoTranslator = (function (window, $) {
         let index = 1;
 
         if (jsonObj) {
+            let wordCount = 0;
             for (const key in jsonObj) {
                 if (jsonObj.hasOwnProperty(key)) {
                     const element = jsonObj[key];
                     const sourceText = element.source.trim();
+                    wordCount += sourceText.trim().split(/\s+/).length;
 
                     if (sourceText !== '') {
                         if ((type === "yandex") || (key <= 2500)) {
@@ -420,6 +477,8 @@ const AutoTranslator = (function (window, $) {
                     }
                 }
             }
+            $(".atlt_custom_model").data('character-count', totalTChars);
+            $(".atlt_custom_model").data('word-count', wordCount);
             
             $(".atlt_stats").each(function () {                
                 $(this).find(".totalChars").html(totalTChars);
@@ -436,49 +495,94 @@ const AutoTranslator = (function (window, $) {
         const dplPreviewImg = ATLT_URL + 'assets/images/' + extradata['dpl_preview'];
         const chatGPTPreviewImg = ATLT_URL + 'assets/images/' + extradata['chatGPT_preview'];
         const geminiAIPreviewImg = ATLT_URL + 'assets/images/' + extradata['geminiAI_preview'];
-        const getProLink = 'https://locoaddon.com/plugin/automatic-translate-addon-for-loco-translate-pro/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=';
+        const chromeAiPreviewImg = ATLT_URL + 'assets/images/' + extradata['chromeAi_preview'];
+        const documentPreviewImg = ATLT_URL + 'assets/images/' + extradata['document_preview'];
+        const informationPreviewImg = ATLT_URL + 'assets/images/' + extradata['information_preview'];
 
         const modelHTML = `
             <div id="atlt-dialog" title="Step 1 - Select Translation Provider" style="display:none;">
                 <div class="atlt-settings">
-                    <strong class="atlt-heading">Translate Using Yandex Page Translate Widget</strong>
-                    <div class="inputGroup">
-                        <button id="atlt_yandex_translate_btn" class="notranslate button button-primary">Yandex Translate</button>
-                        <span class="proonly-button alsofree">✔ Available</span>
-                        <br/><a href="https://translate.yandex.com/" target="_blank"><img  class="pro-features-img" src="${ytPreviewImg}" alt="powered by Yandex Translate Widget"></a>
-                    </div>
-                    <hr/>
-    
-                    <strong class="atlt-heading">Translate Using Google Page Translate Widget</strong>
-                    <div class="inputGroup">
-                        <button id="atlt_gtranslate_btn" disabled="disabled" class="notranslate button button-primary">Google Translate</button>
-                        <span class="proonly-button"><a href="${getProLink+'google_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
-                        <br/><a href="https://translate.google.com/" target="_blank"><img  class="pro-features-img" src="${gtPreviewImg}" alt="powered by Google Translate Widget"></a>
-                    </div>
-                    <hr/>
-    
-                    <strong class="atlt-heading">Translate Using Deepl Doc Translator</strong>
-                    <div class="inputGroup">
-                        <button  disabled="disabled" id="atlt_deepl_btn" class="notranslate button button-primary">DeepL Translate</button>
-                        <span class="proonly-button"><a href="${getProLink+'deepl_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
-                        <br/><a href="https://www.deepl.com/en/translator" target="_blank"><img class="pro-features-img" src="${dplPreviewImg}" alt="powered by DeepL Translate"></a>
-                    </div>
-                    <hr/>
+                    <div class="atlt-translater-row">
+                        <div class="atlt-translater">
+                            <div class="atlt-translater-icon">
+                                <a href="https://locoaddon.com/docs/translate-plugin-theme-via-yandex-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_yandex" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
+                                <a href="https://translate.yandex.com/" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
+                            </div>
+                            <strong class="atlt-heading">Translate Using Yandex Page Translate Widget</strong>
+                            <div class="inputGroup">
+                                <img  class="pro-features-img" src="${ytPreviewImg}" alt="powered by Yandex Translate Widget">
+                                <br/><button id="atlt_yandex_translate_btn" class="notranslate button button-primary">Yandex Translate</button>
+                                <span class="proonly-button alsofree">✔ Available</span>
+                            </div>
+                        </div>
 
-                    <strong class="atlt-heading">Translate Using AI</strong>
-                    <div class="inputGroup">
-                        <button  disabled="disabled" id="atlt_chatGPT_btn" class="notranslate button button-primary">ChatGPT Translate</button>
-                        <span class="proonly-button"><a href="${getProLink+'chatgpt_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
-                        <br/><a href="https://chat.openai.com/" target="_blank"><img class="pro-features-img" src="${chatGPTPreviewImg}" alt="powered by ChatGPT"></a>
+                        <div class="atlt-translater">
+                            <div class="atlt-translater-icon">
+                                <a href="https://locoaddon.com/docs/how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chrome" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
+                                <a href="https://developer.chrome.com/docs/ai/translator-api" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
+                            </div>
+                            <strong class="atlt-heading">Translate Using Chrome Built-in AI</strong>
+                            <div class="inputGroup">
+                                <img  class="pro-features-img" src="${chromeAiPreviewImg}" width="100" alt="powered by Chrome built-in API">
+                                <br/><button id="ChromeAiTranslator_settings_btn" disabled="disabled" class="notranslate button button-primary">Chrome AI Translator (Beta)</button>
+                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome" target="_blank" title="Buy Pro">PRO Only</a></span>
+                            </div>
+                        </div>
+
+                        <div class="atlt-translater">
+                            <div class="atlt-translater-icon">
+                                <a href="https://locoaddon.com/docs/auto-translations-via-google-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_google" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
+                                <a href="https://translate.google.com/" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
+                            </div>
+                            <strong class="atlt-heading">Translate Using Google Page Translate Widget</strong>
+                            <div class="inputGroup">
+                                <img  class="pro-features-img" src="${gtPreviewImg}" alt="powered by Google Translate Widget">
+                                <br/><button id="atlt_gtranslate_btn" disabled="disabled" class="notranslate button button-primary">Google Translate</button>
+                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_google" target="_blank" title="Buy Pro">PRO Only</a></span>
+                            </div>
+                        </div>
                     </div>
-                    <hr/>
-    
-                    <strong class="atlt-heading">Translate Using GeminiAI API</strong>
-                    <div class="inputGroup">
-                        <button id="atlt_openAI_btn" disabled="disabled" class="notranslate button button-primary">GeminiAI Translate</button>
-                        <span class="proonly-button"><a href="${getProLink+'geminiAI_translate'}" target="_blank" title="Buy Pro">PRO Only</a></span>
-                        <br/><a href="https://gemini.google.com/" target="_blank"><img  class="pro-features-img" src="${geminiAIPreviewImg}" alt="powered by GeminiAI Translate"></a>
-                    </div>
+                        
+                    <div class="atlt-translater-row">
+                        <div class="atlt-translater">
+                            <div class="atlt-translater-icon">
+                                <a href="https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
+                                <a href="https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/?utm_source=atlt_plugin&utm_medium=popup&utm_campaign=docs&utm_content=gemini_ai_translation" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
+                            </div>
+                            <strong class="atlt-heading">Translate Using AI APIs</strong>
+                            <div class="inputGroup">
+                                <img  class="pro-features-img" src="${geminiAIPreviewImg}" alt="powered by GeminiAI Translate">
+                                <br/><button id="atlt_openAI_btn" disabled="disabled" class="notranslate button button-primary">AI Translate (GeminiAI / OpenAI)</button>
+                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_gemini" target="_blank" title="Buy Pro">PRO Only</a></span>
+                            </div>
+                        </div>
+                        
+                        <div class="atlt-translater">
+                            <div class="atlt-translater-icon">
+                                <a href="https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chatgpt" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
+                                <a href="https://chat.openai.com/" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
+                            </div>
+                            <strong class="atlt-heading">Translate Using ChatGPT Translator</strong>
+                            <div class="inputGroup">
+                                <img  class="pro-features-img" src="${chatGPTPreviewImg}" alt="powered by ChatGPT Translate">
+                                <br/><button id="atlt_chatGPT_btn" disabled="disabled" class="notranslate button button-primary">ChatGPT Translate</button>
+                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank" title="Buy Pro">PRO Only</a></span>
+                            </div>
+                        </div>
+
+                        <div class="atlt-translater">
+                            <div class="atlt-translater-icon">
+                                <a href="https://locoaddon.com/docs/translate-via-deepl-doc-translator/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_deepl" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
+                                <a href="https://www.deepl.com/en/translator" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
+                            </div>
+                            <strong class="atlt-heading">Translate Using Deepl Doc Translator</strong>
+                            <div class="inputGroup">
+                                <img class="pro-features-img" src="${dplPreviewImg}" alt="powered by DeepL Translate">
+                                <br/><button  disabled="disabled" id="atlt_deepl_btn" class="notranslate button button-primary">DeepL Translate</button>
+                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_deepl" target="_blank" title="Buy Pro">PRO Only</a></span>
+                            </div>
+                        </div>
+                    </div> 
                 </div>
             </div>
         `;
@@ -533,6 +637,14 @@ const AutoTranslator = (function (window, $) {
                 Automatic translation is in progress....<br/>
                 It will take a few minutes, enjoy ☕ coffee in this time!<br/><br/>
                 Please do not leave this window or browser tab while the translation is in progress...
+
+                 <div class="progress-wrapper">
+                    <div class="progress-container">
+                        <div class="progress-bar" id="myProgressBar">
+                            <span id="progressText">0%</span>
+                        </div>
+                    </div>
+                </div>
             </div>
             ${translatorWidget(widgetType)}
             <div class="atlt_string_container">

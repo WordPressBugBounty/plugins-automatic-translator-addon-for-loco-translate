@@ -263,8 +263,11 @@
         });
 
         // Custom code to update popup settings
+        var translationStartTime; // Declare at a higher scope
+
         function updatePopupSettings() {
-            var container = $("#atlt_strings_model");
+            var container = $(".yandex-widget-container");
+            translationStartTime = new Date(); // Set the start time
 
             // Scroll to the top of the string container
             container.find(".atlt_string_container").scrollTop(0);
@@ -283,19 +286,45 @@
             if (scrollHeight !== undefined && scrollHeight > 100) {
                 // Show translation progress indicator
                 container.find(".atlt_translate_progress").fadeIn("slow");
+                container.find(".progress-wrapper").show();
+                const progressBar = container.find(".progress-wrapper .progress-bar");
 
                 // Animate scrolling down to the end of the container
                 setTimeout(() => {
+                    container = $(".yandex-widget-container");
+                    if (container.css('display') === 'block') {
                     container.find(".atlt_string_container").animate({
                         scrollTop: scrollHeight + 2000
                     }, scrollSpeed * 2, 'linear');
+                } else {
+                    container.find(".atlt_translate_progress").fadeOut();
+                }
                 }, 1500);
 
                 // Add a scroll event listener
-                container.find('.atlt_string_container').on('scroll', function () {
+                container.find('.atlt_string_container').on('scroll', function (e) {
+                    container = $(".yandex-widget-container");
+
+                    if (container.css('display') === 'none') {
+                        container.find(".atlt_translate_progress").fadeOut("slow");
+                        jQuery(this).stop();
+                        jQuery(this).scrollTop(0);
+                        return;
+                    }
+
+                    var scrollTop = e.target.scrollTop;
+                    var scrollHeight = e.target.scrollHeight;
+                    var clientHeight = e.target.clientHeight;
+                    var scrollPercentage = (scrollTop / (scrollHeight - clientHeight)) * 100;
+                    progressBar.css('width', scrollPercentage + '%');
+                    progressBar.find('#progressText').text((Math.round(scrollPercentage * 10) / 10).toFixed(1) + '%');
+                
                     if ($(this).scrollTop() + $(this).innerHeight() + 50 >= $(this)[0].scrollHeight) {
                         // Enable save button, show stats, and hide progress when scrolled to the bottom
-                        handleScrollEnd(container);
+                        setTimeout(()=>{
+                            handleScrollEnd(container);
+                        },2000)
+
                     }
                 });
 
@@ -315,13 +344,25 @@
 
         // Function to handle actions when scrolled to the bottom
         function handleScrollEnd(container) {
+
             setTimeout(() => {
-                container.find(".atlt_save_strings ").prop("disabled", false);
-                container.find(".atlt_stats").fadeIn("slow");
-                container.find(".atlt_translate_progress").fadeOut("slow");
-                container.find(".atlt_string_container").stop();
-                $('body').css('top', '0');
-            }, 2000);
+                const isTranslationCompleted = $("#yt-widget").hasClass('yt-state_done');
+                if(isTranslationCompleted){
+                    const endTime = new Date();
+                    const timeTaken = Math.round((endTime - translationStartTime) / 1000); // Use shared variable
+                    
+                    container.find(".atlt_save_strings ").prop("disabled", false);
+                    container.find(".atlt_stats").fadeIn("slow");
+                    container.find(".atlt_translate_progress").fadeOut("slow");
+                    container.find(".atlt_string_container").stop();
+                    $('body').css('top', '0');
+                    
+                    container.data('translation-time', timeTaken);
+                    container.data('translation-provider', 'yandex');    
+                }else{
+                    jQuery('.atlt_custom_model.yandex-widget-container').find('.atlt_string_container').scrollTop(0);
+                }
+            }, 2000)
         }
 
 
