@@ -58,7 +58,6 @@ const AutoTranslator = (function (window, $) {
     }
 
     function destroyYandexTranslator() {
-        translationPerformed = false;
         $('.yt-button__icon.yt-button__icon_type_right').trigger('click');
         $('.atlt_custom_model.yandex-widget-container').find('.atlt_string_container').scrollTop(0);
     
@@ -130,12 +129,6 @@ const AutoTranslator = (function (window, $) {
     }
     // parse all translated strings and pass to save function
     function onSaveClick() {
-        const container = $(this).closest('.atlt_custom_model');
-        const time_taken = container.data('translation-time') || 0;
-        const translation_provider = container.data('translation-provider');
-        const character_count = container.data('character-count') || 0;
-        const word_count = container.data('word-count') || 0;
-        
         // Safely access nested properties without optional chaining
         let pluginOrTheme = '';
         let pluginOrThemeName = '';
@@ -151,14 +144,6 @@ const AutoTranslator = (function (window, $) {
             }
         }
 
-        const translationData = {
-            time_taken: time_taken,
-            translation_provider: translation_provider,
-            character_count: character_count,
-            string_count: word_count,
-            pluginORthemeName: pluginOrThemeName,
-            pluginORtheme: pluginOrTheme
-        }
         let translatedObj = [];
 
         const rpl = {
@@ -201,6 +186,22 @@ const AutoTranslator = (function (window, $) {
                 "target": improvedTarget
             });
         });
+        const container = $(this).closest('.atlt_custom_model');
+        const time_taken = container.data('translation-time') || 0;
+        const translation_provider = container.data('translation-provider');
+        const { lang, region } = locoConf.conf.locale;
+        const target_language = region ? `${lang}_${region}` : lang;
+        const totalCharacters = translatedObj.reduce((sum, item) => sum + item.source.length, 0);
+        const totalStrings = translatedObj.length;
+
+        const translationData = {
+            time_taken: time_taken,
+            translation_provider: translation_provider,
+            pluginORthemeName: pluginOrThemeName,
+            target_language: target_language,
+            total_characters: totalCharacters,
+            total_strings: totalStrings,
+        }
 
         var projectId = $(this).parents("#atlt_strings_model").find("#project_id").val();
 
@@ -375,10 +376,11 @@ const AutoTranslator = (function (window, $) {
             $('#loco-editor nav').find('button').each(function (i, el) {
                 var id = el.getAttribute('data-loco');
                 if (id == "auto") {
-                    if (!$(el).hasClass('model-opened')) {
-                        $(el).addClass('model-opened');
-                        $(el).trigger("click");
+                    if ($(el).hasClass('model-opened')) {
+                        $(el).removeClass('model-opened'); 
                     }
+                    $(el).addClass('model-opened');
+                    $(el).trigger("click");
                 }
             });
         });
@@ -477,8 +479,6 @@ const AutoTranslator = (function (window, $) {
                     }
                 }
             }
-            $(".atlt_custom_model").data('character-count', totalTChars);
-            $(".atlt_custom_model").data('word-count', wordCount);
             
             $(".atlt_stats").each(function () {                
                 $(this).find(".totalChars").html(totalTChars);

@@ -483,6 +483,13 @@
                     if (params.widgetTheme) {
                         element.setAttribute('data-theme', params.widgetTheme);
                     }
+                    
+                    $('.yandex-widget-container').on('click', '.yt-button__icon.yt-button__icon_type_right', function() {
+                        const $container = $(this).closest('.yandex-widget-container');
+                        $container.find(".atlt_actions > .atlt_save_strings").prop("disabled", true);
+                        $container.find(".atlt_stats").hide();
+                    });
+
                     new Widget({
                         select: new Select(element.querySelector('.yt-listbox'), 'yt-lang'),
                         element: element,

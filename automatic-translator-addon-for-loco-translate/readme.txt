@@ -6,7 +6,7 @@ Requires at least:5.0
 Tested up to: 6.7.2
 Requires PHP: 7.2
 Loco Translate Tested Up to: 2.7.1
-Stable tag: 2.4.7
+Stable tag: 2.4.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -226,6 +226,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
+<strong>Version 2.4.8 |31/03/2025 </strong>
+<pre>
+Added: New Dashboard.
+Fixed: Bug Fixes.
+</pre>
 <strong>Version 2.4.7 |27/02/2025 </strong>
 <pre>
 Added: Review Notice.
@@ -233,7 +238,6 @@ Fixed: Fixed Popup issue.
 Fixed: Bug Fixes.
 Improvements: Translator popup.
 </pre>
-
 <strong>Version 2.4.6 |27/01/2025 </strong>
 <pre>
 Fixed: Fixed string merging issue with Loco Translate 2.7 latest version.
