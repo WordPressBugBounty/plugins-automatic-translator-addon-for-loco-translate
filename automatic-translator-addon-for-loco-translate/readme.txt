@@ -3,10 +3,10 @@ Contributors: narinder-singh, satindersingh, coolplugins
 Donate link: https://paypal.me/CoolPlugins/10USD/
 Tags:ai translation, google translate, translate, chatgpt, multilingual
 Requires at least:5.0
-Tested up to: 6.7.2
+Tested up to: 6.8
 Requires PHP: 7.2
-Loco Translate Tested Up to: 2.7.1
-Stable tag: 2.4.8
+Loco Translate Tested Up to: 2.7.2
+Stable tag: 2.4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -226,6 +226,13 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
+<strong>Version 2.4.9 |16/04/2025 </strong>
+<pre>
+Updated: Review notice logo for improved branding.
+Updated: Open AI video link.
+Fixed: Compatibility conflict with the CMC plugin.
+Tested up to: WordPress 6.8
+</pre>
 <strong>Version 2.4.8 |31/03/2025 </strong>
 <pre>
 Added: New Dashboard.

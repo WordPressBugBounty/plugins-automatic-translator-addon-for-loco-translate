@@ -8,10 +8,11 @@
 }
 .cool-plugins-deactivation-response{
     position: fixed;
-    left: 35%;
-    top: 22%;
+    left: 50%;
+    top: 50%;
     z-index: 9999;
-    color:white;
+    color: white;
+    transform: translate(-50%, -50%);
 }
 .cool-plugins-button{
     border: none;

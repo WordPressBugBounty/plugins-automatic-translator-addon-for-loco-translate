@@ -18,24 +18,41 @@
 
     <div class="atlt-dashboard-api-settings-container">
         <div class="atlt-dashboard-api-settings">
-            <?php 
-            $apis = [
-                'gemini' => 'Gemini',
-                'openai' => 'OpenAI'
+            <?php
+            // Define all API-related settings in a single configuration array
+            $api_settings = [
+                'gemini' => [
+                    'name' => 'Gemini',
+                    'doc_url' => 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/generate-gemini-api-key/',
+                    'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                ],
+                'openai' => [
+                    'name' => 'OpenAI',
+                    'doc_url' => 'https://locoaddon.com/docs/how-to-generate-open-api-key/',
+                    'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+                ]
             ];
-            foreach ($apis as $key => $name): ?>
-                <label for="<?php echo esc_attr($key); ?>-api"><?php printf(__('Add %s API key', $text_domain), esc_html($name)); ?></label>
-                <input type="text" id="<?php echo esc_attr($key); ?>-api" placeholder="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" disabled>
-             <?php
-                    printf(
-            __('%s to See How to Generate %s API Key', $text_domain),
-            '<a href="https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/generate-gemini-api-key/" target="_blank">' . esc_html__('Click Here', $text_domain) . '</a>',
-            esc_html($name)
-        );
-             endforeach; ?>
+
+            foreach ($api_settings as $key => $settings): ?>
+                <label for="<?php echo esc_attr($key); ?>-api">
+                    <?php printf(__('Add %s API key', $text_domain), esc_html($settings['name'])); ?>
+                </label>
+                <input 
+                    type="text" 
+                    id="<?php echo esc_attr($key); ?>-api" 
+                    placeholder="<?php echo esc_attr($settings['placeholder']); ?>" 
+                    disabled
+                >
+                <?php
+                printf(
+                    __('%s to See How to Generate %s API Key', $text_domain),
+                    '<a href="' . esc_url($settings['doc_url']) . '" target="_blank">' . esc_html__('Click Here', $text_domain) . '</a>',
+                    esc_html($settings['name'])
+                );
+            endforeach; ?>
 
             <div class="atlt-dashboard-save-btn-container">
-                <button class="atlt-dashboard-save-btn"><?php _e('Save', $text_domain); ?></button>
+                <button disabled class="button button-primary"><?php _e('Save', $text_domain); ?></button>
             </div>
         </div>
     </div>

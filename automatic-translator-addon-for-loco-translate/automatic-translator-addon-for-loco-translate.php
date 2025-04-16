@@ -2,7 +2,7 @@
 /*
 Plugin Name: Automatic Translate Addon For Loco Translate
 Description: Loco Translate plugin addon to automatic translate plugins and themes translatable string with one click in any language.
-Version: 2.4.8
+Version: 2.4.9
 License: GPL2
 Text Domain: loco-auto-translate
 Domain Path: languages
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'ATLT_FILE', __FILE__ );
 define( 'ATLT_URL', plugin_dir_url( ATLT_FILE ) );
 define( 'ATLT_PATH', plugin_dir_path( ATLT_FILE ) );
-define( 'ATLT_VERSION', '2.4.8' );
+define( 'ATLT_VERSION', '2.4.9' );
 
 /**
  * @package Loco Automatic Translate Addon
@@ -182,16 +182,12 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			}
 
 			if ( ! empty( $allStrings ) ) {
-				$character_count = 0;
-				$string_count = 0;
 				foreach ( $items as $i => $item ) {
 					// Find the index of the source string in the cached strings
 					$index = array_search( $item['source'], array_column( $allStrings, 'source' ) );
 
 					if (is_numeric($index) && isset($allStrings[$index]['target'])) {
 						$targets[$i] = sanitize_text_field($allStrings[$index]['target']);
-						$character_count += strlen($item['source']);
-						$string_count++;
 					} else {
 						$targets[$i] = '';
 					}
@@ -623,6 +619,9 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			update_option( 'atlt-version', ATLT_VERSION );
 			update_option( 'atlt-installDate', gmdate( 'Y-m-d h:i:s' ) );
 			update_option( 'atlt-type', 'free' );
+			if (!get_option( 'atlt_initial_save_version' ) ) {
+                add_option( 'atlt_initial_save_version', ATLT_VERSION );
+            }
 		}
 
 		/*

@@ -699,17 +699,6 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     margin-top: 15px;
 }
 
-
-.atlt-dashboard-save-btn {
-    display: inline-block;
-    background:#b9b9b9;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
 /* ================================================
    Info
 ================================================ */
