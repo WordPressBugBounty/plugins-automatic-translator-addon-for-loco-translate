@@ -394,6 +394,12 @@
             var region = window.locoConf.conf.locale.region ? window.locoConf.conf.locale.region : null;
         }
         switch (defaultcode) {
+            case 'kir':
+                defaultLang = 'ky';
+                break;
+            case 'bel':
+                defaultLang = 'be';
+                break; 
             case 'nb':
                 defaultLang = 'no';
                 break;

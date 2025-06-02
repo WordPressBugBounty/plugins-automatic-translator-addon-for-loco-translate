@@ -11,7 +11,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 		private $plugin_version = ATLT_VERSION;
 		private $plugin_name    = 'Loco Automatic Translate Addon';
 		private $plugin_slug    = 'atlt';
-		private $feedback_url   = 'http://feedback.coolplugins.net/wp-json/coolplugins-feedback/v1/feedback';
+		private $feedback_url   = ATLT_FEEDBACK_API.'wp-json/coolplugins-feedback/v1/feedback';
 
 		/*
 		|-----------------------------------------------------------------|
@@ -146,11 +146,16 @@ function cpfm_get_user_info() {
         $active_plugins = get_option('active_plugins', []);
         $plugin_data = [];
         foreach ( $active_plugins as $plugin_path ) {
+			
             $plugin_info = get_plugin_data(WP_PLUGIN_DIR . '/' . sanitize_text_field($plugin_path));
+			
+			$author_url = ( isset( $plugin_info['AuthorURI'] ) && !empty( $plugin_info['AuthorURI'] ) ) ? esc_url( $plugin_info['AuthorURI'] ) : 'N/A';
+			$plugin_url = ( isset( $plugin_info['PluginURI'] ) && !empty( $plugin_info['PluginURI'] ) ) ? esc_url( $plugin_info['PluginURI'] ) : '';
+
             $plugin_data[] = [
                 'name'       => sanitize_text_field($plugin_info['Name']),
                 'version'    => sanitize_text_field($plugin_info['Version']),
-               'plugin_uri' => esc_url( !empty($plugin_info['PluginURI']) ? $plugin_info['PluginURI'] : $plugin_info['AuthorURI'] ),
+               'plugin_uri' => !empty($plugin_url) ? $plugin_url : $author_url,
             ];
         }
         return [
@@ -197,12 +202,17 @@ function cpfm_get_user_info() {
 
 				$sanitized_message = sanitize_text_field( $_POST['message'] ) == '' ? 'N/A' : sanitize_text_field( $_POST['message'] );
 				$admin_email       = sanitize_email( get_option( 'admin_email' ) );
+				$site_url       = get_site_url();
+				$install_date   = get_option('atlt-install-date');
+				$unique_key     = '8';  // Ensure this key is unique per plugin to prevent collisions when site URL and install date are the same across plugins
+				$site_id        = $site_url . '-' . $install_date . '-' . $unique_key;
 				$site_url          = esc_url( site_url() );
 				$response          = wp_remote_post(
 					$this->feedback_url,
 					array(
 						'timeout' => 30,
 							'body'    => array(
+							'site_id' => md5($site_id),
 							'server_info' => serialize($this->cpfm_get_user_info()['server_info']),
 							'extra_details' => serialize($this->cpfm_get_user_info()['extra_details']),
 							'plugin_initial'  => isset($plugin_initial) ? sanitize_text_field($plugin_initial) : 'N/A',

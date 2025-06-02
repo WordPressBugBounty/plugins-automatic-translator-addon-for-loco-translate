@@ -672,6 +672,10 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 }
 
 .atlt-dashboard-api-settings {
+    width: 100%;
+}
+
+.atlt-dashboard-api-settings-form {
     width: 55%;
 }
 
@@ -684,17 +688,23 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 .atlt-dashboard-api-settings input {
     width: 100%;
     padding: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
-.atlt-dashboard-api-settings a {
+.atlt-dashboard-api-settings-form a { 
     display: inline-block;
     font-size: 14px;
     color: #0073aa;
     text-decoration: none;
+    margin-bottom: 18px;
 }
+
+.atlt-dashboard-api-settings p{
+    margin:0px 0px 24px 0px;
+}
+
 .atlt-dashboard-api-settings .atlt-dashboard-save-btn-container{
     margin-top: 15px;
 }
@@ -825,3 +835,27 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     gap: 7px;
 }
 }
+
+/* ================================================
+   Feedback
+================================================ */
+.atlt-dashboard-feedback-container {
+    margin: 25px 0px 18px 0px;
+}
+
+.feedback-row {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* space between checkbox and message */
+}
+
+.feedback-row p {
+    margin: 0;
+}
+
+input#atlt-dashboard-feedback-checkbox {
+    width: auto;
+    align-items: center;
+    margin-top: 3px;
+}
+
