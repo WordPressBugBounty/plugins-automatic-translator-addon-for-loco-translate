@@ -1,0 +1,55 @@
+{
+  "landingPage": "/wp-admin/admin.php?path=themes%2Ftwentytwentythree%2Flanguages%2Ffr_CA.po&bundle=twentytwentythree&domain=twentytwentythree&page=loco-theme&action=file-edit",
+    "preferredVersions": {
+      "php": "8.2",
+      "wp": "latest"
+    },
+    "phpExtensionBundles": [
+      "kitchen-sink"
+    ],
+    "features": {
+      "networking": true
+    },
+    "steps": [
+      {
+        "step": "login",
+        "username": "admin",
+        "password": "password"
+      },
+      {
+        "step": "installTheme",
+        "themeData": {
+          "resource": "url",
+          "url": "https://raw.githubusercontent.com/CoolPluginsTeam/wp-playground-repo/main/twentytwentythree.zip"
+        },
+        "options": {
+          "activate": true
+        }
+      },
+      {
+        "step": "installPlugin",
+        "pluginData": {
+          "resource": "wordpress.org/plugins",
+          "slug": "loco-translate"
+        },
+        "options": {
+          "activate": true
+        }
+      },
+      {
+        "step": "installPlugin",
+        "pluginData": {
+          "resource": "wordpress.org/plugins",
+          "slug": "automatic-translator-addon-for-loco-translate"
+        },
+        "options": {
+          "activate": true
+        }
+      },
+     {
+  "step": "writeFile",
+  "path": "/wordpress/wp-content/mu-plugins/atlt-setup-guide.php",
+  "data": "<?php\nadd_action('admin_notices', function() {\n  echo '<div class=\"notice notice-info is-dismissible\" style=\"padding: 20px;\">';\n  echo '<div style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;\">';\n  echo '<p style=\"margin: 0;\"><strong>🌐Automatic Translate Addon For Loco Translate</strong></p>';\n  echo '<button id=\"toggleSteps\" style=\"background: #D63638;margin-top:10px; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;\">📋 Hide Setup Steps</button>';\n  echo '</div>';\n  echo '<div id=\"stepsContainer\" style=\"display: flex;flex-wrap: wrap; margin-top: 15px; padding: 20px; background: #F9F9F9; gap: 30px; align-items: flex-start;\">';\n  echo '<div style=\"flex: 1\">';\n  echo '<h4 style=\"margin-top: 0; color: #0073AA;\">How to Use:</h4>';\n  echo '<ol style=\"line-height: 1.6; margin: 0px;\">';\n  echo '<li style=\"list-style: none;\"><strong><h2>Step 1:</h2></strong><ul style=\"margin-top: 8px;\">';\n  echo '<li style=\"list-style: none;\">Select the theme or plugin to translate.</li>';\n  echo '<li style=\"list-style: none;\">After selecting, choose the language you wish to translate to, or add a new language.</li>';\n  echo '<li style=\"list-style: none;\">Choose a location to save translations, avoiding theme or plugin folders to prevent loss during updates.</li>';\n  echo '</ul></li>';\n  echo '<li style=\"margin-top: 15px; list-style: none;\"><strong><h2>Step 2:</h2></strong><ul style=\"margin-top: 8px;\">';\n  echo '<li style=\"list-style: none;\">After selecting the language, a translation editor will appear, containing an <strong>Auto Translate</strong> button.</li>';\n  echo '<li style=\"list-style: none;\">Click the <strong>Auto Translate</strong> button, select <strong>Yandex</strong> as the translation service provider, and then click the <strong>Translate</strong> button.</li>';\n  echo '</ul></li>';\n  echo '<li style=\"margin-top: 15px; list-style: none;\"><strong><h2>Step 3:</h2></strong><ul style=\"margin-top: 8px;\">';\n  echo '<li style=\"list-style: none;\">The translation service will automatically translate all strings within 1–2 minutes. Now, click <strong>Merge Translations</strong>.</li>';\n  echo '<li style=\"list-style: none;\">Add translations in your editor by clicking <strong>Start Adding Process</strong> button & Save!</li>';\n  echo '<li style=\"list-style: none;\">That’s it! 🎉 You’ve translated thousands of strings of a plugin or theme in just 1–2 minutes.</li>';\n  echo '</ul></li>';\n  echo '</ol>';\n  echo '<div style=\"margin-top: 20px; background: #E7F3FF; padding: 10px; border-radius: 5px;\">';\n  echo '<strong>AI Translation Providers:</strong> <a href=\"admin.php?page=loco-atlt-dashboard\">Explore more AI translation providers in the Loco Translate dashboard</a>.';\n  echo '</div>';\n  echo '<div style=\"margin-top: 20px;\">';\n  echo '<a href=\"https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=wp_preview_notice_steps\" target=\"_blank\" style=\"background: #28a745; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;\">🛒 Buy Now</a>';\n  echo '</div>';\n  echo '</div>';\n  echo '<div><iframe width=\"900\" height=\"500\" src=\"https://www.youtube.com/embed/X_1RbSVgnOc?mute=1\" title=\"Translation Guide\" frameborder=\"0\" allow=\"encrypted-media\" allowfullscreen></iframe></div>';\n  echo '</div>';\n  echo '<script>\n    document.addEventListener(\"DOMContentLoaded\", function() {\n      const toggleBtn = document.getElementById(\"toggleSteps\");\n      const container = document.getElementById(\"stepsContainer\");\n      let isExpanded = true;\n      container.style.display = \"flex\";\n      if (toggleBtn && container) {\n        toggleBtn.addEventListener(\"click\", function() {\n          if (isExpanded) {\n            container.style.display = \"none\";\n            toggleBtn.innerHTML = \"📋 Show Setup Steps\";\n            toggleBtn.style.background = \"#0073AA\";\n          } else {\n            container.style.display = \"flex\";\n            toggleBtn.innerHTML = \"📋 Hide Setup Steps\";\n            toggleBtn.style.background = \"#D63638\";\n          }\n          isExpanded = !isExpanded;\n        });\n      }\n    });\n  </script>';\n  echo '</div>';\n});\n?>"
+}
+    ]
+  }

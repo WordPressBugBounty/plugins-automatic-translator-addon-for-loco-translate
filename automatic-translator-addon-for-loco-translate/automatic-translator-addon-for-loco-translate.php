@@ -2,7 +2,7 @@
 /*
 Plugin Name: Automatic Translate Addon For Loco Translate
 Description: Loco Translate plugin addon to automatic translate plugins and themes translatable string with one click in any language.
-Version: 2.4.10
+Version: 2.4.11
 License: GPL2
 Text Domain: loco-auto-translate
 Domain Path: languages
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'ATLT_FILE', __FILE__ );
 define( 'ATLT_URL', plugin_dir_url( ATLT_FILE ) );
 define( 'ATLT_PATH', plugin_dir_path( ATLT_FILE ) );
-define( 'ATLT_VERSION', '2.4.10' );
+define( 'ATLT_VERSION', '2.4.11' );
 define('ATLT_FEEDBACK_API',"https://feedback.coolplugins.net/");
 
 /**
@@ -77,6 +77,8 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			$thisPlugin = self::$instance;
 			register_activation_hook( ATLT_FILE, array( $thisPlugin, 'atlt_activate' ) );
 			register_deactivation_hook( ATLT_FILE, array( $thisPlugin, 'atlt_deactivate' ) );
+
+			add_action('admin_init', array($thisPlugin, 'atlt_do_activation_redirect'));
 
 			// run actions and filter only at admin end.
 			if ( is_admin() ) {
@@ -227,7 +229,9 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			$lang       = sanitize_text_field( $locale->lang );
 			$region     = sanitize_text_field( $locale->region );
 			$project_id = $domain . '-' . $lang . '-' . $region;
-
+			if($domain === 'temp' && !empty(get_transient('loco_current_translation'))){
+                $project_id = !empty(get_transient('loco_current_translation'))?get_transient('loco_current_translation'):'temp';
+            }
 
 
 
@@ -317,6 +321,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				);
 
 				// Save the combined data in transient
+				set_transient('loco_current_translation',$_POST['project-id'], 5 * MINUTE_IN_SECONDS);
 				$rs = set_transient( $projectId, $dataToStore, 5 * MINUTE_IN_SECONDS );
 				echo json_encode(
 					array(
@@ -583,6 +588,58 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			}
 		}
 
+		static function atlt_get_user_info() {
+			global $wpdb;
+			// Server and WP environment details
+			$server_info = [
+				'server_software'        => isset($_SERVER['SERVER_SOFTWARE']) ? sanitize_text_field($_SERVER['SERVER_SOFTWARE']) : 'N/A',
+				'mysql_version'          => $wpdb ? sanitize_text_field($wpdb->get_var("SELECT VERSION()")) : 'N/A',
+				'php_version'            => sanitize_text_field(phpversion() ?: 'N/A'),
+				'wp_version'             => sanitize_text_field(get_bloginfo('version') ?: 'N/A'),
+				'wp_debug'               => (defined('WP_DEBUG') && WP_DEBUG) ? 'Enabled' : 'Disabled',
+				'wp_memory_limit'        => sanitize_text_field(ini_get('memory_limit') ?: 'N/A'),
+				'wp_max_upload_size'     => sanitize_text_field(ini_get('upload_max_filesize') ?: 'N/A'),
+				'wp_permalink_structure' => sanitize_text_field(get_option('permalink_structure') ?: 'Default'),
+				'wp_multisite'           => is_multisite() ? 'Enabled' : 'Disabled',
+				'wp_language'            => sanitize_text_field(get_option('WPLANG') ?: get_locale()),
+				'wp_prefix'              => isset($wpdb->prefix) ? sanitize_key($wpdb->prefix) : 'N/A',
+			];
+			// Theme details
+			$theme = wp_get_theme();
+			$theme_data = [
+				'name'      => sanitize_text_field($theme->get('Name')),
+				'version'   => sanitize_text_field($theme->get('Version')),
+				'theme_uri' => esc_url($theme->get('ThemeURI')),
+			];
+			// Ensure plugin functions are loaded
+			if ( ! function_exists('get_plugins') ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			// Active plugins details
+			$active_plugins = get_option('active_plugins', []);
+			$plugin_data = [];
+			foreach ( $active_plugins as $plugin_path ) {
+				
+				$plugin_info = get_plugin_data(WP_PLUGIN_DIR . '/' . sanitize_text_field($plugin_path));
+				
+				$author_url = ( isset( $plugin_info['AuthorURI'] ) && !empty( $plugin_info['AuthorURI'] ) ) ? esc_url( $plugin_info['AuthorURI'] ) : 'N/A';
+				$plugin_url = ( isset( $plugin_info['PluginURI'] ) && !empty( $plugin_info['PluginURI'] ) ) ? esc_url( $plugin_info['PluginURI'] ) : '';
+	
+				$plugin_data[] = [
+					'name'       => sanitize_text_field($plugin_info['Name']),
+					'version'    => sanitize_text_field($plugin_info['Version']),
+				   'plugin_uri' => !empty($plugin_url) ? $plugin_url : $author_url,
+				];
+			}
+			return [
+				'server_info'   => $server_info,
+				'extra_details' => [
+					'wp_theme'       => $theme_data,
+					'active_plugins' => $plugin_data,
+				],
+			];
+		}
+
 		/*
 		|------------------------------------------------------------------------
 		|  Enqueue required JS file
@@ -690,6 +747,12 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		|------------------------------------------------------
 		*/
 		public function atlt_activate() {
+
+			$active_plugins = get_option('active_plugins', array());
+            if (!in_array("loco-automatic-translate-addon-pro/loco-automatic-translate-addon-pro.php", $active_plugins)) {
+                add_option('atlt_do_activation_redirect', true);
+            }
+
 			update_option( 'atlt-version', ATLT_VERSION );
 			update_option( 'atlt-installDate', gmdate( 'Y-m-d h:i:s' ) );
 			update_option( 'atlt-type', 'free' );
@@ -710,6 +773,28 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			}
 			
 		}
+
+		/*
+		|-------------------------------------------------------
+		|    Redirect to plugin page after activation
+		|-------------------------------------------------------
+		*/
+		public function atlt_do_activation_redirect() {
+			if (get_option('atlt_do_activation_redirect', false)) {
+                update_option('atlt_do_activation_redirect', false);
+				if (!isset($_GET['activate-multi'])) {
+					wp_safe_redirect(admin_url('admin.php?page=loco-atlt-dashboard'));
+					exit;
+				}
+			}
+			if(!get_option('atlt-install-date')) {
+				add_option('atlt-install-date', gmdate('Y-m-d h:i:s'));
+			}
+
+			if (!get_option('atlt_initial_save_version')) {
+				add_option('atlt_initial_save_version', ATLT_VERSION);
+			}
+		}	
 
 		/*
 		|-------------------------------------------------------

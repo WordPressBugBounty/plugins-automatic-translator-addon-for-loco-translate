@@ -65,7 +65,7 @@ if (!class_exists('ATLT_cronjob')) {
 
         static public function atlt_send_data() {
             $feedback_url = ATLT_FEEDBACK_API.'wp-json/coolplugins-feedback/v1/site';
-            $extra_data_details = Helpers::atlt_get_user_info();
+            $extra_data_details = LocoAutoTranslateAddon::atlt_get_user_info();
             $server_info    = $extra_data_details['server_info'];
             $extra_details  = $extra_data_details['extra_details'];
             $site_url       = get_site_url();

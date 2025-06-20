@@ -6,21 +6,20 @@
 
         var plugin_deactivate_link = $target.attr('href');
 
-        $($target).on('click', function(event){
+        $($target).on('click', function(event) {
             event.preventDefault();
-            $('#wpwrap').css('opacity','0.4');
-
-            $("#cool-plugins-deactivate-feedback-dialog-wrapper").animate({
-                opacity:1
-            },200,function(){
-                $("#cool-plugins-deactivate-feedback-dialog-wrapper").removeClass('hide-feedback-popup');
-                $("#cool-plugins-deactivate-feedback-dialog-wrapper").find('#atlt-cool-plugin-submitNdeactivate').addClass(plugin_slug);
-                $("#cool-plugins-deactivate-feedback-dialog-wrapper").find('#atlt-cool-plugin-skipNdeactivate').addClass(plugin_slug);
+            $('#wpwrap').css('opacity', '0.4');
+            $("#cool-plugins-deactivate-feedback-dialog-wrapper[data-slug='" + plugin_slug + "']").animate({
+                opacity: 1
+            }, 200, function() {
+                $("#cool-plugins-deactivate-feedback-dialog-wrapper[data-slug='" + plugin_slug + "']").removeClass('hide-feedback-popup');
+                $("#cool-plugins-deactivate-feedback-dialog-wrapper[data-slug='" + plugin_slug + "']").find('#cool-plugin-submitNdeactivate').addClass(plugin_slug);
+                $("#cool-plugins-deactivate-feedback-dialog-wrapper[data-slug='" + plugin_slug + "']").find('#cool-plugin-skipNdeactivate').addClass(plugin_slug);
             });
         });
 
         $('.cool-plugins-deactivate-feedback-dialog-input').on('click',function(){
-            if($('#cool-plugins-GDPR-data-notice').is(":checked") === true && $('.cool-plugins-deactivate-feedback-dialog-input').is(':checked') === true){ 
+            if($('#cool-plugins-GDPR-data-notice-'+plugin_slug).is(":checked") === true && $('.cool-plugins-deactivate-feedback-dialog-input').is(':checked') === true){ 
                 $('#atlt-cool-plugin-submitNdeactivate').removeClass('button-deactivate');
             }
             else{
@@ -29,9 +28,9 @@
 
         });
 
-        $('#cool-plugins-GDPR-data-notice').on('click', function(){
+        $('#cool-plugins-GDPR-data-notice-'+plugin_slug).on('click', function(){
 
-            if($('#cool-plugins-GDPR-data-notice').is(":checked") === true && $('.cool-plugins-deactivate-feedback-dialog-input').is(':checked') === true){ 
+            if($('#cool-plugins-GDPR-data-notice-'+plugin_slug).is(":checked") === true && $('.cool-plugins-deactivate-feedback-dialog-input').is(':checked') === true){ 
                 $('#atlt-cool-plugin-submitNdeactivate').removeClass('button-deactivate');
             }
             else{

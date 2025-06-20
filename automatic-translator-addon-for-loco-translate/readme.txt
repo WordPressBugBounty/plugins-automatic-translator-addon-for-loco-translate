@@ -6,7 +6,7 @@ Requires at least:5.0
 Tested up to: 6.8.1
 Requires PHP: 7.2
 Loco Translate Tested Up to: 2.8.0
-Stable tag: 2.4.10
+Stable tag: 2.4.11
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -226,6 +226,11 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
+<strong>Version 2.4.11 | 20/06/2025 </strong>
+<pre>
+Preview: Added Preview Button.
+Code Improvements: Minor Code improved.
+</pre>
 <strong>Version 2.4.10 |02/06/2025 </strong>
 <pre>
 Added: User opt-in option in plugin.
