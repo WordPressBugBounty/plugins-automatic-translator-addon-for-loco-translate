@@ -17,12 +17,12 @@
         <?php
         $ai_translations = [
             [
-                'logo' => 'gemini-ai-logo.png',
-                'alt' => 'Gemini AI',
-                'title' => __('AI Translations', $text_domain),
-                'description' => __('Leverage Gemini/OpenAI for seamless and context-aware translations.', $text_domain),
-                'icon' => 'gemini-translate.png',
-                'url' => 'https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=gemini_ai_translations'
+                'logo' => 'chrome-built-in-ai-logo.png',
+                'alt' => 'Chrome Built-in AI',
+                'title' => __('Chrome Built-in AI', $text_domain),
+                'description' => __('Utilize Chrome\'s built-in AI for seamless translation experience.', $text_domain),
+                'icon' => 'chrome-ai-translate.png',
+                'url' => 'https://locoaddon.com/docs/how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=chrome_ai_translations'
             ],
             [
                 'logo' => 'chatgpt-logo.png',
@@ -33,12 +33,20 @@
                 'url' => 'https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=chatgpt_ai_translations'
             ],
             [
-                'logo' => 'chrome-built-in-ai-logo.png',
-                'alt' => 'Chrome Built-in AI',
-                'title' => __('Chrome Built-in AI', $text_domain),
-                'description' => __('Utilize Chrome\'s built-in AI for seamless translation experience.', $text_domain),
-                'icon' => 'chrome-ai-translate.png',
-                'url' => 'https://locoaddon.com/docs/how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=chrome_ai_translations'
+                'logo' => 'geminiai-logo.png',
+                'alt' => 'Gemini',
+                'title' => __('Gemini AI Translations', $text_domain),
+                'description' => __('Leverage Gemini AI for seamless and context-aware translations.', $text_domain),
+                'icon' => 'gemini-translate.png',
+                'url' => 'https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=gemini_ai_translations'
+            ],
+            [
+                'logo' => 'openai-logo.png',
+                'alt' => 'OpenAI',
+                'title' => __('OpenAI Translations', $text_domain),
+                'description' => __('Leverage OpenAI for seamless and context-aware translations.', $text_domain),
+                'icon' => 'open-ai-translate.png',
+                'url' => 'https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=gemini_ai_translations'
             ]
         ];
 

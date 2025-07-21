@@ -320,6 +320,7 @@
                     progressBar.find('#progressText').text((Math.round(scrollPercentage * 10) / 10).toFixed(1) + '%');
                 
                     if ($(this).scrollTop() + $(this).innerHeight() + 50 >= $(this)[0].scrollHeight) {
+                        showYandexTranslationSuccess(container); // Show message
                         // Enable save button, show stats, and hide progress when scrolled to the bottom
                         setTimeout(()=>{
                             handleScrollEnd(container);
@@ -330,6 +331,7 @@
 
                 // If the container is already at the bottom, simulate scroll end
                 if (container.find('.atlt_string_container').innerHeight() + 10 >= scrollHeight) {
+                    showYandexTranslationSuccess(container); // Show message
                     handleScrollEnd(container);
                 }
             } else {
@@ -359,10 +361,29 @@
                     
                     container.data('translation-time', timeTaken);
                     container.data('translation-provider', 'yandex');    
+                    showYandexTranslationSuccess(container);
                 }else{
                     jQuery('.atlt_custom_model.yandex-widget-container').find('.atlt_string_container').scrollTop(0);
                 }
             }, 2000)
+        }
+
+        function formatNumberShort(num) {
+            num = parseInt(num, 10);
+            if (isNaN(num)) return num;
+            if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+            return num;
+        }
+    
+        function showYandexTranslationSuccess(container) {
+            var charCount = container.find('.atlt_stats .totalChars').first().text().trim();
+            var formattedCharCount = formatNumberShort(charCount);
+            var message = `Wahooo! You have saved your valuable time via auto translating ${formattedCharCount} characters using Yandex Translator`;
+            if (!container.data('message-added')) {
+                container.data('message-added', true);
+                container.find(".atlt_translate_progress").append(message);
+            }
         }
 
 

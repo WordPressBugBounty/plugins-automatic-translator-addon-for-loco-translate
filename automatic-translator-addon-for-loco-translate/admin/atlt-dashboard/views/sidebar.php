@@ -44,7 +44,7 @@
                 <?php if (atlt_is_plugin_installed('automatic-translations-for-polylang')): ?>
                     <span class="installed"><?php _e('Installed', $text_domain); ?></span>
                 <?php else: ?>
-                    <a href="<?php echo esc_url(admin_url('plugin-install.php?s=AI+translation+for+polylang+by+coolplugins&tab=search&type=term')); ?>" class="atlt-dashboard-btn" target="_blank"><?php _e('Install', $text_domain); ?></a>
+                    <a href="<?php echo esc_url(admin_url('plugin-install.php?s=AutoPoly+-+AI+Translation+For+Polylang&tab=search&type=term')); ?>" class="atlt-dashboard-btn" target="_blank"><?php _e('Install', $text_domain); ?></a>
                 <?php endif; ?>
             </div>
             <div class="atlt-dashboard-addon-r">
@@ -109,8 +109,8 @@ function atlt_get_plugin_display_name($plugin_slug, $text_domain) {
         'automatic-translations-for-polylang' => [
             'free' => 'automatic-translations-for-polylang/automatic-translation-for-polylang.php',
             'pro'  => 'automatic-translations-for-polylang-pro/automatic-translation-for-polylang.php',
-            'free_name' => __('AI Translation for Polylang', $text_domain),
-            'pro_name'  => __('AI Translation For Polylang (Pro)', $text_domain),
+            'free_name' => __('AutoPoly - AI Translation For Polylang', $text_domain),
+            'pro_name'  => __('AutoPoly - AI Translation For Polylang (Pro)', $text_domain),
         ],
         'automatic-translate-addon-for-translatepress' => [
             'free' => 'automatic-translate-addon-for-translatepress/automatic-translate-addon-for-translatepress.php',

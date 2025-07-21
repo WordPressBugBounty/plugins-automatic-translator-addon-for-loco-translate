@@ -1,6 +1,6 @@
 /*
 =======================================================
-Loco Addon Dashboard - Admin Panel Styles
+LocoAI Dashboard - Admin Panel Styles
 =======================================================
 */
 
@@ -112,7 +112,7 @@ Loco Addon Dashboard - Admin Panel Styles
     gap: 15px;
 }
   	.atlt-dashboard-header-left img{
-	max-width: 170px;
+	max-width: 130px;
 }
 .atlt-dashboard-header-left svg {
     height: 50px;
@@ -160,6 +160,7 @@ Loco Addon Dashboard - Admin Panel Styles
    Welcome Section
 ================================================ */
 .atlt-dashboard-welcome {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     padding: 20px;
@@ -167,7 +168,7 @@ Loco Addon Dashboard - Admin Panel Styles
     border-radius: 8px;
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow);
-	gap: 5px;
+	gap: 20px;
 }
 
 .atlt-dashboard-translation-providers{
@@ -175,7 +176,7 @@ Loco Addon Dashboard - Admin Panel Styles
 }
 
 .atlt-dashboard-welcome-text {
-    width: calc(100% - 45px);
+    width: 50%;
     flex-direction: column;
 }
 
@@ -193,7 +194,7 @@ Loco Addon Dashboard - Admin Panel Styles
 }
 
 .atlt-dashboard-welcome-video {
-    width: 300px;
+    width: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -533,6 +534,8 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     padding: 13px 15px 15px 15px;
     text-align: start;
     flex: 1;
+    min-width: 190px;
+    max-width: 235px;
 }
 
 .atlt-dashboard-ai-translations .atlt-dashboard-translation-card h3{
@@ -551,16 +554,16 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     top: -12px;
     border: 1px solid var(--border-color);
     border-radius: 30px;
-    width: 95px;
     padding: 4px 10px;
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    height: 28px;
 }
 
 .atlt-dashboard-ai-translations .atlt-dashboard-translation-card .logo img{
-    width: 85%;
+    width: 100%;
     height: 100%;
 }
 

@@ -4,8 +4,8 @@
         <!-- Welcome Section -->
         <div class="atlt-dashboard-welcome">
             <div class="atlt-dashboard-welcome-text">
-                <h2><?php echo esc_html__('Welcome To Loco Addon', $text_domain); ?></h2>
-                <p><?php echo esc_html__('Translate WordPress plugins or themes instantly with Loco Addon. One-click, thousands of strings - no extra cost!', $text_domain); ?></p>
+                <h2><?php echo esc_html__('Welcome To LocoAI', $text_domain); ?></h2>
+                <p><?php echo esc_html__('Translate WordPress plugins or themes instantly with LocoAI. One-click, thousands of strings - no extra cost!', $text_domain); ?></p>
                 <div class="atlt-dashboard-btns-row">
                     <a href="<?php echo esc_url(admin_url('admin.php?page=loco-plugin')); ?>" class="atlt-dashboard-btn primary"><?php echo esc_html__('Translate Plugins', $text_domain); ?></a>
                     <a href="<?php echo esc_url(admin_url('admin.php?page=loco-theme')); ?>" class="atlt-dashboard-btn"><?php echo esc_html__('Translate Themes', $text_domain); ?></a>
@@ -31,7 +31,8 @@
                 <?php
 
                 $providers = [
-                    ["AI Translations (Gemini / OpenAI)", "gemini-ai-logo.png", "Pro", ["Unlimited Translations", "Fast Translations via AI", "Gemini API Key Required"], esc_url('https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_gemini'), esc_url('admin.php?page=loco-atlt-dashboard&tab=settings')],
+                    ["Gemini AI Translations","geminiai-logo.png","Pro",["Unlimited Translations","Fast Translations via Gemini AI","Gemini API Key Required"],esc_url('https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_gemini'),esc_url('admin.php?page=loco-atlt-dashboard&tab=settings')],
+                    ["OpenAI Translations","openai-logo.png","Pro",["Unlimited Translations","Fast Translations via openAI","OpenAI API Key Required"],esc_url('https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_gemini'),esc_url('admin.php?page=loco-atlt-dashboard&tab=settings')],
                     ["ChatGPT Translations", "chatgpt-logo.png", "Pro", ["Copy & Translate in ChatGPT", "Fast Translations via AI", "No API Key Required"], esc_url('https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_chatgpt')],
                     ["Chrome Built-in AI", "chrome-built-in-ai-logo.png", "Pro", ["Fast AI Translations in Browser", "Unlimited Free Translations", "Use Translation Modals"], esc_url('https://locoaddon.com/docs/how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_chrome')],
                     ["Google Translate", "google-translate-logo.png", "Pro", ["Unlimited Free Translations", "Fast & No API Key Required"], esc_url('https://locoaddon.com/docs/auto-translations-via-google-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_google')],
@@ -54,7 +55,7 @@
                         </ul>
                         <div class="atlt-dashboard-provider-buttons">
                             <a href="<?php echo esc_url($provider[4]); ?>" class="atlt-dashboard-btn" target="_blank">Docs</a>
-                            <?php if ($index === 0) { ?>
+                            <?php if (isset($provider[5])) { ?>
                                 <a href="<?php echo esc_url($provider[5]); ?>" class="atlt-dashboard-btn">Settings</a>
                             <?php } ?>
                         </div>

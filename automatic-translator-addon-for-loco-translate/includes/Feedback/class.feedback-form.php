@@ -9,7 +9,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 
 		private $plugin_url     = ATLT_URL;
 		private $plugin_version = ATLT_VERSION;
-		private $plugin_name    = 'Loco Automatic Translate Addon';
+		private $plugin_name    = 'LocoAI – Auto Translate for Loco Translate';
 		private $plugin_slug    = 'atlt';
 		private $feedback_url   = ATLT_FEEDBACK_API.'wp-json/coolplugins-feedback/v1/feedback';
 
@@ -103,7 +103,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 							<?php endif; ?>
 						</div>
 					<?php endforeach; ?>
-					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo $this->plugin_slug; ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice"><?php echo __( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support Automatic Translate Addon for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'cool-plugins' ); ?></label>
+					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo $this->plugin_slug; ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice"><?php echo __( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'cool-plugins' ); ?></label>
 				</div>
 				<div class="cool-plugin-popup-button-wrapper">
 					<a class="cool-plugins-button button-deactivate" id="atlt-cool-plugin-submitNdeactivate">Submit and Deactivate</a>

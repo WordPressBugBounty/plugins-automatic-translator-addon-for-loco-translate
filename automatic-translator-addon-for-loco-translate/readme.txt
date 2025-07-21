@@ -1,22 +1,22 @@
-=== Automatic Translate Addon For Loco Translate ===
+=== LocoAI - Auto Translate For Loco Translate ===
 Contributors: narinder-singh, satindersingh, coolplugins
 Donate link: https://paypal.me/CoolPlugins/10USD/
 Tags:ai translation, google translate, translate, chatgpt, multilingual
 Requires at least:5.0
-Tested up to: 6.8.1
+Tested up to: 6.8.2
 Requires PHP: 7.2
-Loco Translate Tested Up to: 2.8.0
-Stable tag: 2.4.11
+Loco Translate Tested Up to: 2.8.2
+Stable tag: 2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-The Automatic Translate Addon for Loco Translate is a powerful tool for developers looking to quickly translate their WordPress plugins and themes.
+LocoAI - Auto Translate For Loco Translate is a powerful tool for developers looking to quickly translate their WordPress plugins and themes.
 
 == Description ==
 
-### Automatic Translate Addon For Loco Translate
+### LocoAI - Auto Translate For Loco Translate
 
-The Automatic Translate Addon for Loco Translate is a powerful tool for website owners and developers looking to quickly **translate** their WordPress **plugins and themes**.
+ The **LocoAI - Auto Translate For Loco Translate** is a powerful tool for website owners and developers looking to quickly **translate** their WordPress **plugins and themes**.
 
 The plugin integrates with the **Loco Translate** plugin to provide a seamless experience for users. The addon uses **machine translation** to **automatically translate** the plugin and theme strings into the desired language, **saving time and effort** for website owners who need to quickly translate their content into multiple languages.
 
@@ -26,7 +26,8 @@ https://www.youtube.com/watch?v=X_1RbSVgnOc
 
 
 Install this plugin along with the famous **[Loco Translate](https://wordpress.org/plugins/loco-translate/)** plugin (**1 million+ Active Installations**) and automatically machine translates any WordPress plugin or theme translation files into any language.
-The Automatic Translate Addon for Loco Translate is a must-have tool for anyone looking for a seamless, efficient, and high-quality solution to translate their WordPress plugins and themes.
+
+The LocoAI - Auto Translate For Loco Translate is a must-have tool for anyone looking for a seamless, efficient, and high-quality solution to translate their WordPress plugins and themes.
 
 ### 🤖 No Translate API Required! + Unlimited Translations!
 
@@ -48,7 +49,7 @@ https://youtu.be/yNuOVKfwFcE?si=4hQResLF76ntAvzb
 
 https://youtu.be/6k8K6ZU2Rvo?si=UdiJr0n5zTwaDfXR
 
-The Automatic Translate Addon for Loco Translate now includes powerful AI translation options: **ChatGPT, Gemini AI, and Chrome Built-in AI**. These integrations provide advanced, high-quality AI translations for your WordPress plugins and themes, using the latest AI technology.
+The LocoAI - Auto Translate For Loco Translate now includes powerful AI translation options: **ChatGPT, Gemini AI, and Chrome Built-in AI**. These integrations provide advanced, high-quality AI translations for your WordPress plugins and themes, using the latest AI technology.
 
 
 **Key Benefits**
@@ -102,27 +103,15 @@ In addition to its efficiency and ease of use, the Automatic Translate Addon als
 
 > **Important Notice:-** This plugin works as an auto-translate addon for the Loco Translate official plugin latest version(2.4.4 or higher).
 
-Check out our new [Automatic Translations For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=atfp_get_pro&utm_content=check_out)
 
-[Automatic Translations For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=atfp_get_pro&utm_content=check_out)  is a powerful addon that streamlines the process of translating WordPress content. By automatically copying and translating posts, including titles, content, images, and meta fields, this plugin helps you efficiently manage multilingual websites. Compatible with Gutenberg and popular third-party blocks, it preserves all styles and formats, ensuring a consistent look across languages. 
+[AutoPoly - AI Translation For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=atfp_get_pro&utm_content=check_out)  is a powerful addon that streamlines the process of translating WordPress content. By automatically copying and translating posts, including titles, content, images, and meta fields, this plugin helps you efficiently manage multilingual websites. Compatible with Gutenberg and popular third-party blocks, it preserves all styles and formats, ensuring a consistent look across languages.
 
-Check out our [Automatic Translate Addon For TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=tpa_get_pro&utm_content=check_out)
+[Check out](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=atfp_get_pro&utm_content=check_out)
 
-Check out our [Automatic Translate Addon For TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=tpa_get_pro&utm_content=check_out) helps you to translate entire page content with one click. You don’t need to translate page content manually one by one.
+Check out our [AI Translation For TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=tpa_get_pro&utm_content=check_out) helps you to translate entire page content with one click. You don’t need to translate page content manually one by one.
 
+[Check out](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=tpa_get_pro&utm_content=check_out)
 
-### 😎 Who's Behind
-
-This plugin is not developed by or affiliated with the "**Loco Translate**" official plugin. It is a third-party addon that provides automatic machine translations to quickly translate your theme or plugin language files.
-
-We(**CoolPlugins.net**) only manage [locoaddon.com](https://locoaddon.com/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=plugin_page&utm_content=addon_website) (**addon website**), Automatic Translate Addon For Loco Translate(**free plugin**) and its premium version. **[Cool Plugins](https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=author_page)** is a team of experienced WordPress plugin developers.
-
-* 7+ years of WordPress plugin development experience.
-* 20+ free and premium WordPress plugins released.
-* 400000+ plugin downloads.
-* 70K+ active websites are using our plugins.
-
-> We provide cool solutions to remove famous plugin limitations!
 
 ### ✍ Special THANKS!
 
@@ -142,7 +131,7 @@ All automatic translations will be machine translations, powered by third-party 
 
 == Installation ==
 
-1. Install **Automatic Translate Addon For Loco Translate** from the WordPress.org repository or by uploading a plugin-zip unzipped folder to the **/wp-content/plugins** directory. You must also install **[Loco Translate](https://wordpress.org/plugins/loco-translate/)** free plugins if you want to use this addon.
+1. Install **LocoAI - Auto Translate For Loco Translate** from the WordPress.org repository or by uploading a plugin-zip unzipped folder to the **/wp-content/plugins** directory. You must also install **[Loco Translate](https://wordpress.org/plugins/loco-translate/)** free plugins if you want to use this addon.
 
 2. Activate the plugin through **Plugins >> Installed Plugin** menu in WordPress
 
@@ -154,9 +143,9 @@ All automatic translations will be machine translations, powered by third-party 
 
 = Can this plugin automatically translate page content ❔ =
  No, this plugin only translates plugins and themes strings automatically. To translate page content automatically, you can try the 
-[Automatic Translate Addon For TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=tpa_get_pro&utm_content=faq)
+[AI Translation For TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=tpa_get_pro&utm_content=faq)
 Or
-[Automatic Translations For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=atfp_get_pro&utm_content=faq)
+[AutoPoly - AI Translation For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=atfp_get_pro&utm_content=faq)
 
 = How it works❔ =
 This plugin works as an add-on for **Loco Translate** official plugin. First, you need to install and activate the free version of "Loco Translate" then install this addon and use one-click machine translations (supported by Yandex Translate Widget).
@@ -226,302 +215,244 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
-<strong>Version 2.4.11 | 20/06/2025 </strong>
-<pre>
-Preview: Added Preview Button.
-Code Improvements: Minor Code improved.
-</pre>
-<strong>Version 2.4.10 |02/06/2025 </strong>
-<pre>
-Added: User opt-in option in plugin.
-Added: Support for additional languages in Yandex Translators.
-</pre>
-<strong>Version 2.4.9 |16/04/2025 </strong>
-<pre>
-Updated: Review notice logo for improved branding.
-Updated: Open AI video link.
-Fixed: Compatibility conflict with the CMC plugin.
-Tested up to: WordPress 6.8
-</pre>
-<strong>Version 2.4.8 |31/03/2025 </strong>
-<pre>
-Added: New Dashboard.
-Fixed: Bug Fixes.
-</pre>
-<strong>Version 2.4.7 |27/02/2025 </strong>
-<pre>
-Added: Review Notice.
-Fixed: Fixed Popup issue.
-Fixed: Bug Fixes.
-Improvements: Translator popup.
-</pre>
-<strong>Version 2.4.6 |27/01/2025 </strong>
-<pre>
-Fixed: Fixed string merging issue with Loco Translate 2.7 latest version.
-Fixed: Fixed load textdomain issues
-</pre>
-<strong>Version 2.4.5 |09/10/2024 </strong>
-<pre>
-Improved: updated utm content in urls
-Improved: updated pro features images and add css
-Fixed: Fixed security issues
-</pre>
-<strong>Version 2.4.4 |21/08/2024 </strong>
-<pre>
-Tweaks:Textual changes in dashboard page and readme file.
-</pre>
-<strong>Version 2.4.3 |22/07/2024 </strong>
-<pre>
-Added:Gemini translation button inside popup.
-Tested Upto: WordPress 6.6.
-</pre>
-<strong>Version 2.4.2 |01/05/2024 </strong>
-<pre>
-Added: Support for Portuguese(Brazil)
-Added: CSS for RTL support
-</pre>
-<strong>Version 2.4.1 |07/02/2024 </strong>
-<pre>
-Fix: Minor bug fixes
-</pre>
-<strong>Version 2.4 |28/11/2023 </strong>
-<pre>
-Improved:Rewrite overall JS code.
-Improved:Optimize styles.
-Added:AI translation button inside popup.
-Tweak:Minor Textual changes.
-Improved:Overall code.
-</pre>
-<strong>Version 2.3.3 |18/05/2023 </strong>
-<pre>
-Tweak:Minor Textual changes
-</pre>
-<strong>Version 2.3.2 |24/03/2023 </strong>
-<pre>
-Tweak:Minor Textual changes
-Improved: Tested upto WP version 6.2
-Fixed: minor bug fixes
-</pre>
-<strong>Version 2.3.1 |02/05/2022 </strong>
-<pre>
-Fixed: scripts not loading in another language
-</pre>
-<strong>Version 2.3 | 29/04/2022 </strong>
-<pre>
-Improved: Overall Code improvements.
-Removed: No need to activate the free version with PRO anymore.
-Fixed: Large string translation merge bug.
-</pre>
 
-<strong>Version 2.2.3 | 05/10/2021 </strong>
-<pre>
-Fixed: License notice issue
-</pre>
-<strong>Version 2.2.2 | 27/04/2021 </strong>
-<pre>
-Fixed: Minor ID bug fixes
-</pre>
-<strong>Version 2.2 | 17/04/2021 </strong>
-<pre>
-Added: Updated Yandex new translation API
-Fixed: unable to translate issue with Yandex
-Improved: tested upto WordPress 5.7
-</pre>
+= 2.5 - 21/07/2025 =
+* **Added:** Redesigned and enhanced the **Translator Popup** for better usability and appearance.
+* **Improved:** Updated the plugin name for improved clarity and branding.
+* **Fixed:** Addressed minor bugs and issues.
+* **Tested:** Compatible with WordPress 6.8.2.
 
-<strong>Version 2.1.3 | 11 DEC 2020 </strong>
-<pre>
-Fixed: Compatibility issues with  WordPress 5.6
-Fixed: unable to save string issue with WordPress 5.6 version
-</pre>
-<strong>Version 2.1.2 | 21 NOV 2020</strong>
-<pre>
-Fixed: Compatibility issues with Loco Translate 2.4.6
-</pre>
-<strong>Version 2.1.1 | 27 OCT 2020</strong>
-<pre>
-Fixed: Compatibility issues with Loco Translate 2.4.4
-</pre>
+= 2.4.11 - 20/06/2025 =
+* **New:** Added a **Preview button**.
+* **Improved:** Minor code improvements for better performance.
 
-<strong>Version 2.1 | 14 OCT 2020</strong>
-<pre>
-Added: integrated new Auto Translation
-Added: Added support for Loco Translate Latest version
-Fixed: compatibility issues with Loco Translate 
-Improved: removed Extra Code
-Improved: improved custom.js
-</pre>
+= 2.4.10 - 02/06/2025 =
+* **New:** Introduced a **user opt-in option** within the plugin.
+* **Improved:** Added support for **additional languages** in Yandex Translators.
 
-<strong>Version 2.0.1 | 07 AUG 2020</strong>
-<pre>
-Notice Added: Addon is currently compatible with only Loco Translate official plugin version 2.4.0, the new compatible update will be available soon.
-</pre>
+= 2.4.9 - 16/04/2025 =
+* **Updated:** Redesigned the **review notice logo** for improved branding.
+* **Updated:** Refreshed the **Open AI video link**.
+* **Fixed:** Resolved a **compatibility conflict with the CMC plugin**.
+* **Tested:** Verified compatibility up to **WordPress 6.8**.
 
-<strong>Version 2.0 | 31 JULY 2020</strong>
-<pre>
-Improved: Addon is now compatible with only Loco Translate version 2.4.0
-Added: Yandex Page Translate Widget (unlimited translations without API)
-Removed: API settings panel (now you can use the plugin without the API key)
-Removed: IBM Watson translator support
-Removed: Loco Translate Older version notices
-Removed: Test API settings
-Removed: All APIs 
-Improved: code improvements
-Updated: Major JS changes
-</pre>
+= 2.4.8 - 31/03/2025 =
+* **New:** Launched a **new Dashboard**.
+* **Fixed:** General bug fixes.
 
-<strong>Version 1.9.1 | 9 JULY 2020</strong>
-<pre>
-Fixed: Minor notice change
-</pre>
+= 2.4.7 - 27/02/2025 =
+* **New:** Implemented a **Review Notice**.
+* **Fixed:** Corrected a **popup display issue**.
+* **Fixed:** General bug fixes.
+* **Improved:** Enhanced the **translator popup**.
 
-<strong>Version 1.9 | 23 JUN 2020</strong>
-<pre>
-Fixed: 404 not found bug with IBM translate.
-Fixed: Unable to disable review notice bug.
-Updated: Updated settings panel and translate popup content.
-Removed: HTML string translation support.
-Added: Added some checks in strings.
-Improved: Improved IBM translation process.
-Improved: Minor JS improvements.
-</pre>
+= 2.4.6 - 27/01/2025 =
+* **Fixed:** Addressed a **string merging issue** with Loco Translate 2.7.
+* **Fixed:** Resolved **load textdomain issues**.
 
-<strong>Version 1.8 | 12 JUN 2020</strong>
-<pre>
-Added: IBM Watson Translator API support.
-Added: Notice! Yandex Translate API v1 is deprecated.
-Fixed: Bug fixes.
-Improved: Endpoint updates.
-Improved: Code improvements.
-</pre>
+= 2.4.5 - 09/10/2024 =
+* **Improved:** Updated **UTM content in URLs**.
+* **Improved:** Refreshed **Pro features images** and optimized their CSS.
+* **Fixed:** Patched **security vulnerabilities**.
 
-<strong>Version 1.7.5 | 27 MAY 2020</strong>
-<pre>
-Fixed: Notice bug fixed.
-Updated: Minor settings updates.
-</pre>
+= 2.4.4 - 21/08/2024 =
+* **Tweaks:** Made **textual adjustments** on the dashboard page and in the readme file.
 
-<strong>Version 1.7.3 | 15 MAY 2020</strong>
-<pre>
-Updates: Minor textual changes.
-</pre>
+= 2.4.3 - 22/07/2024 =
+* **New:** Added a **Gemini translation button** inside the popup.
+* **Tested:** Verified compatibility up to **WordPress 6.6**.
 
-<strong>Version 1.7.1 | 28 APR 2020</strong>
-<pre>
-Fixed: Index per request not working issue.
-Updated: Updated new logo and all assets.
-</pre>
+= 2.4.2 - 01/05/2024 =
+* **New:** Added support for **Portuguese (Brazil)**.
+* **New:** Introduced **CSS for RTL (Right-to-Left) support**.
 
-<strong>Version 1.7 | 13 FEB 2020</strong>
-<pre>
-Added: Added Chinese languages support.
-Added: Supported singular and plural string translation.
-Added: Added admin notices.
-Added: Added support for the major language.
-Added: Added  Punjabi, Kannada, Irish, and Malayalam language support in Microsoft Translator.
-Fixed: % s and s % space after special characters problem.
-Fixed: Wrong index updates with multiple strings.
-Improved: Improved string translation.
-Improved: Overall code improvements.
-Improved: Optimized settings panel.
-Updated: Textual changes.
-</pre>
+= 2.4.1 - 07/02/2024 =
+* **Fixed:** Minor bug fixes.
 
-<strong>Version 1.6 | 27 JAN 2020</strong>
-<pre>
-Added: Integrated Microsoft Translation API support.
-Added: Plain text translation support %s,%d placeholders.
-Added: Integrated API testing button in the settings panel.
-Added: Added error handling messages.
-Added: Integrated sweet alert popup.
-Added: Supported %s,%d placeholder strings in Google Translate.
-Added: Microsoft translation settings.
-Improved: Review notice and updated wrong spelling.
-</pre>
+= 2.4 - 28/11/2023 =
+* **Improved:** Rewrote the **overall JavaScript code**.
+* **Improved:** Optimized plugin styles.
+* **New:** Added an **AI translation button** inside the popup.
+* **Tweaks:** Minor textual changes.
+* **Improved:** Overall code improvements.
 
-<strong>Version 1.5 | 14 JAN 2020</strong>
-<pre>
-Added: Integrated Google Translation API support.
-Added: Integrated reset translation strings button.
-Added: Integrated characters available characters limit in translation popup.
-Added: Google API settings in the settings panel.
-Added: Norwegian language support.
-Improved: Translation popup.
-Improved: Code Improvements.
-Improved: Deactivation popup.
-Improved: Textual changes.
-Fixed: Minor bugs.
-</pre>
+= 2.3.3 - 18/05/2023 =
+* **Tweaks:** Minor textual changes.
 
-<strong>Version 1.4.1 | 8 JAN 2020</strong>
-<pre>
-Fixed: Minor JS bug fixes.
-</pre>
+= 2.3.2 - 24/03/2023 =
+* **Tweaks:** Minor textual changes.
+* **Improved:** Tested compatibility up to **WordPress version 6.2**.
+* **Fixed:** Minor bug fixes.
 
-<strong>Version 1.4 | 31 DEC 2019</strong>
-<pre>
-Added: Integrated HTML string translation feature.
-Added: Supported Norwegian and other missing languages.
-Added: Integrated translation settings popup.
-Improved: Optimized code.
-Improved: Updated preloader.
-Fixed: Unsaved string highlighting the issue.
-Fixed: minor JS issues.
-Fixed: Wrong characters calculation bug.
-</pre>
+= 2.3.1 - 02/05/2022 =
+* **Fixed:** Resolved an issue where **scripts were not loading in other languages**.
 
-<strong>Version 1.3.2 | 13 DEC 2019</strong>
-<pre>
-Added: Integrated URL and link filters in string.
-Added: Added string filters.
-Improved: JS code.
-Improved: Feedback from.
-Fixed: Minor issues.
-</pre>
+= 2.3 - 29/04/2022 =
+* **Improved:** Overall code improvements.
+* **Removed:** No longer requires activation of the free version with PRO.
+* **Fixed:** Corrected a bug with **large string translation merging**.
 
-<strong>Version 1.3 | 03 DEC 2019</strong>
-<pre>
-Added: Integrated translated characters stats tables.
-Added: Extend characters limit with premium license key.
-Added: Integrated namespace.
-Added: Not interested button in review popup.
-Added: Integrated premium license key manager.
-Added: Added security checks in every request.
-Added: Integrated nonce in ajax request.
-Improved: Improved translation issues.
-Improved: Improved overall code.
-Improved: Added new screenshots.
-Fixed: Minor translation issues.
-Fixed: Minor JS errors.
-Fixed: Compatibility issues with WordPress 5.3
-</pre>
+= 2.2.3 - 05/10/2021 =
+* **Fixed:** Addressed a **license notice issue**.
 
-<strong>Version 1.2.1 | 13 SEP 2019</strong>
-<pre>
-Fixed: Instant review popup notification bug fixed.
-</pre>
+= 2.2.2 - 27/04/2021 =
+* **Fixed:** Minor ID bug fixes.
 
-<strong>Version 1.2 | 02 SEP 2019</strong>
-<pre>
-Fixed: Mismatch translation strings in Turkish.
-Fixed: Minor JS issues.
-Improved: Minor textual changes.
-Added: Feedback on plugin deactivation.
-</pre>
+= 2.2 - 17/04/2021 =
+* **Updated:** Integrated the **new Yandex translation API**.
+* **Fixed:** Resolved issues preventing translation with Yandex.
+* **Improved:** Tested compatibility up to **WordPress 5.7**.
 
-<strong>Version 1.1 | 31 AUG 2019</strong>
-<pre>
-Added: Integrated automatic translation progress bar popup
-Added: Batch translation of all untranslated words in a single click.
-Fixed: Issue with HTML translation.
-Fixed: Minor javascript issues.
-</pre>
+= 2.1.3 - 11/12/2020 =
+* **Fixed:** Resolved **compatibility issues with WordPress 5.6**.
+* **Fixed:** Addressed an issue preventing **string saving with WordPress 5.6**.
 
-<strong>Version 1.0.2 | 08 JUL 2019</strong>
-<pre>
-Fixed: Translations issues with the Chinese language.
-</pre>
+= 2.1.2 - 21/11/2020 =
+* **Fixed:** Resolved **compatibility issues with Loco Translate 2.4.6**.
 
-<strong>Version 1.0 | 08 JUN 2019</strong>
-<pre>
-New: Initial plugin release.
-</pre>
+= 2.1.1 - 27/10/2020 =
+* **Fixed:** Resolved **compatibility issues with Loco Translate 2.4.4**.
+
+= 2.1 - 14/10/2020 =
+* **New:** Integrated **new auto-translation features**.
+* **New:** Added support for the **latest version of Loco Translate**.
+* **Fixed:** Resolved **compatibility issues with Loco Translate**.
+* **Improved:** Removed extra code for better efficiency.
+* **Improved:** Enhanced `custom.js`.
+
+= 2.0.1 - 07/08/2020 =
+* **Notice:** Addon is currently compatible only with Loco Translate official plugin version 2.4.0. A new compatible update will be available soon.
+
+= 2.0 - 31/07/2020 =
+* **Improved:** Addon is now exclusively compatible with **Loco Translate version 2.4.0**.
+* **New:** Introduced the **Yandex Page Translate Widget** (unlimited translations without API).
+* **Removed:** API settings panel (plugin can now be used without an API key).
+* **Removed:** IBM Watson translator support.
+* **Removed:** Older Loco Translate version notices.
+* **Removed:** Test API settings.
+* **Removed:** All APIs.
+* **Improved:** Code improvements for enhanced performance.
+* **Updated:** Major JavaScript changes.
+
+= 1.9.1 - 09/07/2020 =
+* **Fixed:** Minor notice change.
+
+= 1.9 - 23/06/2020 =
+* **Fixed:** Resolved a **"404 not found" bug with IBM translate**.
+* **Fixed:** Addressed an issue preventing the **disabling of review notices**.
+* **Updated:** Refreshed the **settings panel and translate popup content**.
+* **Removed:** HTML string translation support.
+* **New:** Added some checks for strings.
+* **Improved:** Enhanced the **IBM translation process**.
+* **Improved:** Minor JavaScript improvements.
+
+= 1.8 - 12/06/2020 =
+* **New:** Added **IBM Watson Translator API support**.
+* **Notice:** Included a notice regarding **Yandex Translate API v1 deprecation**.
+* **Fixed:** Bug fixes.
+* **Improved:** Endpoint updates.
+* **Improved:** Code improvements.
+
+= 1.7.5 - 27/05/2020 =
+* **Fixed:** Notice bug fixed.
+* **Updated:** Minor settings updates.
+
+= 1.7.3 - 15/05/2020 =
+* **Updates:** Minor textual changes.
+
+= 1.7.1 - 28/04/2020 =
+* **Fixed:** Resolved an issue where **index per request was not working**.
+* **Updated:** Updated to a **new logo and all assets**.
+
+= 1.7 - 13/02/2020 =
+* **New:** Added **Chinese language support**.
+* **New:** Supported **singular and plural string translation**.
+* **New:** Added **admin notices**.
+* **New:** Added support for major languages.
+* **New:** Added **Punjabi, Kannada, Irish, and Malayalam language support** in Microsoft Translator.
+* **Fixed:** Corrected **%s and s% space issues after special characters**.
+* **Fixed:** Resolved **wrong index updates with multiple strings**.
+* **Improved:** Enhanced string translation.
+* **Improved:** Overall code improvements.
+* **Improved:** Optimized settings panel.
+* **Updated:** Textual changes.
+
+= 1.6 - 27/01/2020 =
+* **New:** Integrated **Microsoft Translation API support**.
+* **New:** Added **plain text translation support for %s, %d placeholders**.
+* **New:** Integrated an **API testing button** in the settings panel.
+* **New:** Added **error handling messages**.
+* **New:** Integrated a **sweet alert popup**.
+* **New:** Supported **%s, %d placeholder strings in Google Translate**.
+* **New:** Added **Microsoft translation settings**.
+* **Improved:** Enhanced review notice and corrected spelling errors.
+
+= 1.5 - 14/01/2020 =
+* **New:** Integrated **Google Translation API support**.
+* **New:** Integrated a **reset translation strings button**.
+* **New:** Integrated **available character limit display** in the translation popup.
+* **New:** Added **Google API settings** in the settings panel.
+* **New:** Added **Norwegian language support**.
+* **Improved:** Enhanced the **translation popup**.
+* **Improved:** Code improvements.
+* **Improved:** Improved the **deactivation popup**.
+* **Improved:** Textual changes.
+* **Fixed:** Minor bugs.
+
+= 1.4.1 - 08/01/2020 =
+* **Fixed:** Minor JavaScript bug fixes.
+
+= 1.4 - 31/12/2019 =
+* **New:** Integrated **HTML string translation feature**.
+* **New:** Supported **Norwegian and other missing languages**.
+* **New:** Integrated **translation settings popup**.
+* **Improved:** Optimized code.
+* **Improved:** Updated preloader.
+* **Fixed:** Resolved an **unsaved string highlighting issue**.
+* **Fixed:** Minor JavaScript issues.
+* **Fixed:** Corrected a **wrong character calculation bug**.
+
+= 1.3.2 - 13/12/2019 =
+* **New:** Integrated **URL and link filters** in strings.
+* **New:** Added string filters.
+* **Improved:** JavaScript code.
+* **Improved:** Feedback form.
+* **Fixed:** Minor issues.
+
+= 1.3 - 03/12/2019 =
+* **New:** Integrated **translated character statistics tables**.
+* **New:** Extended character limit with premium license key.
+* **New:** Integrated namespace.
+* **New:** Added "Not interested" button in the review popup.
+* **New:** Integrated a premium license key manager.
+* **New:** Added **security checks in every request**.
+* **New:** Integrated **nonce in AJAX requests**.
+* **Improved:** Improved translation issues.
+* **Improved:** Overall code improvements.
+* **Improved:** Added new screenshots.
+* **Fixed:** Minor translation issues.
+* **Fixed:** Minor JavaScript errors.
+* **Fixed:** Compatibility issues with **WordPress 5.3**.
+
+= 1.2.1 - 13/09/2019 =
+* **Fixed:** Instant review popup notification bug fixed.
+
+= 1.2 - 02/09/2019 =
+* **Fixed:** Resolved **mismatch translation strings in Turkish**.
+* **Fixed:** Minor JavaScript issues.
+* **Improved:** Minor textual changes.
+* **New:** Added **feedback on plugin deactivation**.
+
+= 1.1 - 31/08/2019 =
+* **New:** Integrated an **automatic translation progress bar popup**.
+* **New:** Added **batch translation of all untranslated words** in a single click.
+* **Fixed:** Resolved issues with **HTML translation**.
+* **Fixed:** Minor JavaScript issues.
+
+= 1.0.2 - 08/07/2019 =
+* **Fixed:** Translation issues with the **Chinese language**.
+
+= 1.0 - 08/06/2019 =
+* **New:** Initial plugin release.
+
+ == Upgrade Notice ==

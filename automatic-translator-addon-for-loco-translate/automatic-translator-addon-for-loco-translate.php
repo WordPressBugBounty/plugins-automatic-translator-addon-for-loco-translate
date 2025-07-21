@@ -1,8 +1,8 @@
 <?php
 /*
-Plugin Name: Automatic Translate Addon For Loco Translate
-Description: Loco Translate plugin addon to automatic translate plugins and themes translatable string with one click in any language.
-Version: 2.4.11
+Plugin Name: LocoAI – Auto Translate for Loco Translate
+Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
+Version: 2.5
 License: GPL2
 Text Domain: loco-auto-translate
 Domain Path: languages
@@ -17,11 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'ATLT_FILE', __FILE__ );
 define( 'ATLT_URL', plugin_dir_url( ATLT_FILE ) );
 define( 'ATLT_PATH', plugin_dir_path( ATLT_FILE ) );
-define( 'ATLT_VERSION', '2.4.11' );
-define('ATLT_FEEDBACK_API',"https://feedback.coolplugins.net/");
+define( 'ATLT_VERSION', '2.5' );
+!defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API',"https://feedback.coolplugins.net/");
 
 /**
- * @package Loco Automatic Translate Addon
+ * @package LocoAI – Auto Translate for Loco Translate
  * @version 2.4
  */
 
@@ -91,6 +91,9 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 
 				/*** Plugin Setting Page Link inside All Plugins List */
 				add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $thisPlugin, 'atlt_settings_page_link' ) );
+
+				add_filter('plugin_row_meta', array( $thisPlugin,'atlt_add_docs_link_to_plugin_meta'), 10, 2);
+
 				add_action( 'init', array( $thisPlugin, 'updateSettings' ) );
 
 				add_action( 'plugins_loaded', array( $thisPlugin, 'atlt_include_files' ) );
@@ -119,6 +122,14 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 
 				add_action( 'admin_menu', array( $thisPlugin, 'atlt_add_locotranslate_sub_menu' ), 101 );
 			}
+		}
+
+		public function atlt_add_docs_link_to_plugin_meta($links, $file) {
+			if (plugin_basename(__FILE__) === $file) {
+				$docs_link = '<a href="https://locoaddon.com/docs/" target="_blank">Docs</a>';
+				$links[] = $docs_link;
+			}
+			return $links;
 		}
 
 		/*
@@ -166,7 +177,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
                 }
 				
                 $notice = [
-                    'title' => __('Automatic Translate Addon for Loco Translate', 'loco-auto-translate'),
+                    'title' => __('LocoAI – Auto Translate for Loco Translate', 'loco-auto-translate'),
                     'message' => __('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'loco-auto-translate'),
                     'pages' => ['loco-atlt-dashboard'],
                     'always_show_on' => ['loco-atlt-dashboard'], // This enables auto-show
@@ -502,7 +513,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 					if (class_exists('Atlt_Dashboard') && !defined('ATLT_PRO_VERSION')) {
 						Atlt_Dashboard::review_notice(
 							'atlt', // Required
-							'Automatic Translate Addon For Loco Translate', // Required
+							'LocoAI – Auto Translate for Loco Translate', // Required
 							'https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post', // Required
 							ATLT_URL . '/assets/images/atlt-logo.png' // Optional
 						);
@@ -687,14 +698,15 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				$extraData['nonce']           = wp_create_nonce( 'loco-addon-nonces' );
 				$extraData['ATLT_URL']        = ATLT_URL;
 				$extraData['preloader_path']  = 'preloader.gif';
-				$extraData['gt_preview']      = 'google-translate-logo.png';
-				$extraData['dpl_preview']     = 'deepl-translate-logo.png';
-				$extraData['yt_preview']      = 'yandex-translate-logo.png';
-				$extraData['chatGPT_preview'] = 'chatgpt-logo.png';
-				$extraData['geminiAI_preview'] = 'gemini-ai-logo.png';
-				$extraData['chromeAi_preview']      = 'chrome-built-in-ai-logo.png';
+				$extraData['gt_preview']      = 'google.png';
+				$extraData['dpl_preview']     = 'deepl.png';
+				$extraData['yt_preview']      = 'yandex.png';
+				$extraData['chatGPT_preview'] = 'chatgpt.png';
+				$extraData['geminiAI_preview']= 'gemini.png';
+				$extraData['chromeAi_preview']      = 'chrome.png';
 				$extraData['document_preview'] = 'document.svg';
-				$extraData['information_preview'] = 'information.svg';
+				$extraData['openai_preview']    = 'openai.png';
+				$extraData['error_preview']    = 'error-icon.svg';
 				$extraData['extra_class']     = is_rtl() ? 'atlt-rtl' : '';
 
 				$extraData['loco_settings_url'] = admin_url( 'admin.php?page=loco-config&action=apis' );
@@ -734,11 +746,11 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		}
 
 		public function atlt_pro_already_active_notice() {
-			echo '<div class="error loco-pro-missing" style="border:2px solid;border-color:#dc3232;"><p><strong>Loco Automatic Translate Addon Pro</strong> is already active so no need to activate free anymore.</p> </div>';
+			echo '<div class="error loco-pro-missing" style="border:2px solid;border-color:#dc3232;"><p><strong>LocoAI – Auto Translate for Loco Translate (Pro)</strong> is already active so no need to activate free anymore.</p> </div>';
 		}
 
 		public function atlt_use_pro_latest_version() {
-			echo '<div class="error loco-pro-missing" style="border:2px solid;border-color:#dc3232;"><p><strong>Please use <strong>Loco Automatic Translate Addon Pro</strong> latest version 1.4 or higher to use auto translate premium features.</p> </div>';
+			echo '<div class="error loco-pro-missing" style="border:2px solid;border-color:#dc3232;"><p><strong>Please use <strong>LocoAI – Auto Translate for Loco Translate (Pro)</strong> latest version 1.4 or higher to use auto translate premium features.</p> </div>';
 		}
 
 		/*
@@ -781,10 +793,15 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		*/
 		public function atlt_do_activation_redirect() {
 			if (get_option('atlt_do_activation_redirect', false)) {
-                update_option('atlt_do_activation_redirect', false);
+				// Only redirect if not part of a bulk activation
 				if (!isset($_GET['activate-multi'])) {
-					wp_safe_redirect(admin_url('admin.php?page=loco-atlt-dashboard'));
-					exit;
+		
+					// Check if required Loco Translate plugin is active (or required function exists)
+					if (function_exists('loco_plugin_self')) {
+						update_option('atlt_do_activation_redirect', false);
+						wp_safe_redirect(admin_url('admin.php?page=loco-atlt-dashboard'));
+						exit;
+					}
 				}
 			}
 			if(!get_option('atlt-install-date')) {
@@ -811,15 +828,18 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 
 		/*
 		|-------------------------------------------------------
-		|   Automatic Translate Addon For Loco Translate  admin page
+		|   LocoAI – Auto Translate for Loco Translate  admin page
 		|-------------------------------------------------------
 		*/
 		function atlt_add_locotranslate_sub_menu() {
-
+			// Only add submenu if Pro is NOT active
+			if ( defined('ATLT_PRO_VERSION') ) {
+				return;
+			}
 			add_submenu_page(
 				'loco',
 				'Loco Automatic Translate',
-				'Auto Translate Addon',
+				'LocoAI',
 				'manage_options',
 				'loco-atlt-dashboard',
 				array( self::$instance, 'atlt_dashboard_page' )

@@ -60,7 +60,7 @@ if (!class_exists('ALTLReviewNotice')) {
         $wrap_cls="notice notice-info is-dismissible";
         $img_path=ATLT_URL.'assets/images/atlt-logo.png';
      ///   $plugin_info = get_plugin_data( ATLT_PATH , true, true );
-        $p_name='Loco Automatic Translate Addon';
+        $p_name='LocoAI – Auto Translate for Loco Translate';
         $like_it_text='Rate Now! ★★★★★';
         $already_rated_text=esc_html__( 'I already rated it', 'atlt2' );
         $not_like_it_text=esc_html__( 'Not Interested', 'atlt2' );

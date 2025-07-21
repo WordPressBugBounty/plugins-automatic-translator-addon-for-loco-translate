@@ -48,13 +48,6 @@ const AutoTranslator = (function (window, $) {
         // save string inside cache for later use
         $(".atlt_save_strings").on("click", onSaveClick);
 
-        
-        // Open String translation modal on translate wrapper click
-        $(".atlt-translater").on("click", (e)=>{
-            if(!["BUTTON", "IMG", "A"].includes(e.target.tagName)){
-                jQuery(e.delegateTarget).find(".inputGroup button.button[id]").trigger("click");
-            }
-        });
     }
 
     function destroyYandexTranslator() {
@@ -489,103 +482,101 @@ const AutoTranslator = (function (window, $) {
     }
 
     function settingsModel() {
-        const ytPreviewImg = ATLT_URL + 'assets/images/' + extradata['yt_preview'];
-        const gtPreviewImg = ATLT_URL + 'assets/images/' + extradata['gt_preview'];
-        const dplPreviewImg = ATLT_URL + 'assets/images/' + extradata['dpl_preview'];
-        const chatGPTPreviewImg = ATLT_URL + 'assets/images/' + extradata['chatGPT_preview'];
-        const geminiAIPreviewImg = ATLT_URL + 'assets/images/' + extradata['geminiAI_preview'];
-        const chromeAiPreviewImg = ATLT_URL + 'assets/images/' + extradata['chromeAi_preview'];
-        const documentPreviewImg = ATLT_URL + 'assets/images/' + extradata['document_preview'];
-        const informationPreviewImg = ATLT_URL + 'assets/images/' + extradata['information_preview'];
-
+        const icons = {
+            yandex: extradata['yt_preview'],
+            google: extradata['gt_preview'],
+            deepl: extradata['dpl_preview'],
+            chatgpt: extradata['chatGPT_preview'],
+            gemini: extradata['geminiAI_preview'],
+            openai: extradata['openai_preview'],
+            chrome: extradata['chromeAi_preview'],
+            docs: extradata['document_preview'],
+            error: extradata['error_preview']
+        };
+    
+        const url = 'https://locoaddon.com/docs/';
+        const ATLT_IMG = (key) => ATLT_URL + 'assets/images/' + icons[key];
+        const DOC_ICON = `<img src="${ATLT_IMG('docs')}" width="20" alt="Docs">`;
+        const ERROR_ICON = `<img src="${ATLT_IMG('error')}" alt="error" style="height:16px; vertical-align:middle; margin-right:5px;">`;
+    
+        const rows = [
+            {
+                name: 'Yandex Translate',
+                icon: 'yandex',
+                info: 'https://translate.yandex.com/',
+                btn: `<button id="atlt_yandex_translate_btn" class="atlt-provider-btn translate">Translate</button>`,
+                doc: `${url}translate-plugin-theme-via-yandex-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_yandex`
+            },
+            {
+                name: 'Google Translate',
+                icon: 'google',
+                info: 'https://translate.google.com/',
+                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_google" target="_blank"><button id="atlt_google_translate_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}auto-translations-via-google-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_google`
+            },
+            {
+                name: 'Chrome Built-in AI',
+                icon: 'chrome',
+                info: 'https://developer.chrome.com/docs/ai/translator-api',
+                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome" target="_blank"><button id="ChromeAiTranslator_settings_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chrome`
+            },
+            {
+                name: 'ChatGPT Translate',
+                icon: 'chatgpt',
+                info: 'https://chat.openai.com/',
+                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank"><button id="atlt_chatGPT_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chatgpt`
+            },
+            {
+                name: 'Gemini AI Translate',
+                icon: 'gemini',
+                info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/',
+                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_gemini" target="_blank"><button id="atlt_geminiAI_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini`
+            },
+            {
+                name: 'OpenAI Translate',
+                icon: 'openai',
+                info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/',
+                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_openai" target="_blank"><button id="atlt_openai_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini`
+            },
+            {
+                name: 'DeepL Translate',
+                icon: 'deepl',
+                info: 'https://www.deepl.com/en/translator',
+                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_deepl" target="_blank"><button id="atlt_deepl_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}translate-via-deepl-doc-translator/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_deepl`
+            }
+        ];
+    
+        const rowHTML = rows.map(row => `
+            <tr>
+                <td class="atlt-provider-name">
+                    <a href="${row.info}" target="_blank">
+                        <img src="${ATLT_IMG(row.icon)}" class="atlt-provider-icon" alt="${row.name}">
+                    </a>
+                    ${row.name}
+                </td>
+                <td>${row.btn}</td>
+                <td>
+                    <a href="${row.doc}" target="_blank" class="atlt-provider-docs-btn">${DOC_ICON}</a>
+                </td>
+            </tr>
+        `).join('');
+    
         const modelHTML = `
-            <div id="atlt-dialog" title="Step 1 - Select Translation Provider" style="display:none;">
-                <div class="atlt-settings">
-                    <div class="atlt-translater-row">
-                        <div class="atlt-translater">
-                            <div class="atlt-translater-icon">
-                                <a href="https://locoaddon.com/docs/translate-plugin-theme-via-yandex-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_yandex" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
-                                <a href="https://translate.yandex.com/" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
-                            </div>
-                            <strong class="atlt-heading">Translate Using Yandex Page Translate Widget</strong>
-                            <div class="inputGroup">
-                                <img  class="pro-features-img" src="${ytPreviewImg}" alt="powered by Yandex Translate Widget">
-                                <br/><button id="atlt_yandex_translate_btn" class="notranslate button button-primary">Yandex Translate</button>
-                                <span class="proonly-button alsofree">✔ Available</span>
-                            </div>
-                        </div>
-
-                        <div class="atlt-translater">
-                            <div class="atlt-translater-icon">
-                                <a href="https://locoaddon.com/docs/how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chrome" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
-                                <a href="https://developer.chrome.com/docs/ai/translator-api" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
-                            </div>
-                            <strong class="atlt-heading">Translate Using Chrome Built-in AI</strong>
-                            <div class="inputGroup">
-                                <img  class="pro-features-img" src="${chromeAiPreviewImg}" width="100" alt="powered by Chrome built-in API">
-                                <br/><button id="ChromeAiTranslator_settings_btn" disabled="disabled" class="notranslate button button-primary">Chrome AI Translator (Beta)</button>
-                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome" target="_blank" title="Buy Pro">PRO Only</a></span>
-                            </div>
-                        </div>
-
-                        <div class="atlt-translater">
-                            <div class="atlt-translater-icon">
-                                <a href="https://locoaddon.com/docs/auto-translations-via-google-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_google" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
-                                <a href="https://translate.google.com/" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
-                            </div>
-                            <strong class="atlt-heading">Translate Using Google Page Translate Widget</strong>
-                            <div class="inputGroup">
-                                <img  class="pro-features-img" src="${gtPreviewImg}" alt="powered by Google Translate Widget">
-                                <br/><button id="atlt_gtranslate_btn" disabled="disabled" class="notranslate button button-primary">Google Translate</button>
-                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_google" target="_blank" title="Buy Pro">PRO Only</a></span>
-                            </div>
-                        </div>
-                    </div>
-                        
-                    <div class="atlt-translater-row">
-                        <div class="atlt-translater">
-                            <div class="atlt-translater-icon">
-                                <a href="https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
-                                <a href="https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/?utm_source=atlt_plugin&utm_medium=popup&utm_campaign=docs&utm_content=gemini_ai_translation" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
-                            </div>
-                            <strong class="atlt-heading">Translate Using AI APIs</strong>
-                            <div class="inputGroup">
-                                <img  class="pro-features-img" src="${geminiAIPreviewImg}" alt="powered by GeminiAI Translate">
-                                <br/><button id="atlt_openAI_btn" disabled="disabled" class="notranslate button button-primary">AI Translate (GeminiAI / OpenAI)</button>
-                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_gemini" target="_blank" title="Buy Pro">PRO Only</a></span>
-                            </div>
-                        </div>
-                        
-                        <div class="atlt-translater">
-                            <div class="atlt-translater-icon">
-                                <a href="https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chatgpt" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
-                                <a href="https://chat.openai.com/" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
-                            </div>
-                            <strong class="atlt-heading">Translate Using ChatGPT Translator</strong>
-                            <div class="inputGroup">
-                                <img  class="pro-features-img" src="${chatGPTPreviewImg}" alt="powered by ChatGPT Translate">
-                                <br/><button id="atlt_chatGPT_btn" disabled="disabled" class="notranslate button button-primary">ChatGPT Translate</button>
-                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank" title="Buy Pro">PRO Only</a></span>
-                            </div>
-                        </div>
-
-                        <div class="atlt-translater">
-                            <div class="atlt-translater-icon">
-                                <a href="https://locoaddon.com/docs/translate-via-deepl-doc-translator/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_deepl" target="_blank"><img src="${documentPreviewImg}" alt="Documentation"></a>
-                                <a href="https://www.deepl.com/en/translator" target="_blank"><img src="${informationPreviewImg}" alt="Information"></a>
-                            </div>
-                            <strong class="atlt-heading">Translate Using Deepl Doc Translator</strong>
-                            <div class="inputGroup">
-                                <img class="pro-features-img" src="${dplPreviewImg}" alt="powered by DeepL Translate">
-                                <br/><button  disabled="disabled" id="atlt_deepl_btn" class="notranslate button button-primary">DeepL Translate</button>
-                                <span class="proonly-button"><a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_deepl" target="_blank" title="Buy Pro">PRO Only</a></span>
-                            </div>
-                        </div>
-                    </div> 
-                </div>
+            <div class="atlt-provider-modal" id="atlt-dialog" title="Step 2 - Select Translation Provider" style="display:none;">
+                <table class="atlt-provider-table">
+                    <thead>
+                        <tr><th>Name</th><th>Translate</th><th>Docs</th></tr>
+                    </thead>
+                    <tbody>${rowHTML}</tbody>
+                </table>
             </div>
         `;
-
+    
         $("body").append(modelHTML);
     }
 
@@ -676,7 +667,7 @@ const AutoTranslator = (function (window, $) {
                             <strong class="totalChars"></strong> characters  using 
                             <strong>
                                 <a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">
-                                    Loco Automatic Translate Addon
+                                    LocoAI – Auto Translate for Loco Translate
                                 </a>
                             </strong>
                         </div>
@@ -701,7 +692,7 @@ const AutoTranslator = (function (window, $) {
             <strong class="totalChars"></strong> characters  using 
             <strong>
                 <a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">
-                    Loco Automatic Translate Addon
+                    LocoAI – Auto Translate for Loco Translate
                 </a>
             </strong>
         </div>

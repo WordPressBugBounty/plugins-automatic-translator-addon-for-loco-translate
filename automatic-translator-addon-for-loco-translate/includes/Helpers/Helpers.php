@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * @package Loco Automatic Translate Addon
+ * @package LocoAI – Auto Translate for Loco Translate
  */
 class Helpers{
     public static function proInstalled(){

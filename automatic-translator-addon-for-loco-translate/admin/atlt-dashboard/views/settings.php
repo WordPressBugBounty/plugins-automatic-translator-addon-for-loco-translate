@@ -40,7 +40,7 @@
             }
             ?>
             <div class="header">
-                <h1><?php _e('Loco Addon Settings', $text_domain); ?></h1>
+                <h1><?php _e('LocoAI Settings', $text_domain); ?></h1>
                 <div class="atlt-dashboard-status">
                     <span><?php _e('Inactive', $text_domain); ?></span>
                     <a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=settings" class='atlt-dashboard-btn' target="_blank">
@@ -51,7 +51,7 @@
             </div>
 
             <p class="description">
-                <?php _e('Configure your settings for the Loco Addon to optimize your translation experience. Enter your API keys and manage your preferences for seamless integration.', $text_domain); ?>
+                <?php _e('Configure your settings for the LocoAI to optimize your translation experience. Enter your API keys and manage your preferences for seamless integration.', $text_domain); ?>
             </p>
 
             <div class="atlt-dashboard-api-settings-container">
@@ -64,7 +64,7 @@
                              // Define all API-related settings in a single configuration array
                             $api_settings = [
                                 'gemini' => [
-                                    'name' => 'Gemini',
+                                    'name' => 'Gemini AI',
                                     'doc_url' => 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/generate-gemini-api-key/',
                                     'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
                                 ],
@@ -106,7 +106,7 @@
                                       <a href="#" class="atlt-see-terms">[See terms]</a>
                                   </div>
                                   <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
-                                          <p><?php _e("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'ccpw'); ?></p>
+                                          <p><?php _e("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect: ", 'ccpw'); ?><a href="https://my.coolplugins.net/terms/usage-tracking/" target="_blank"> Click here</a></p>
                                           <ul style="list-style-type:auto;">
                                               <li><?php esc_html_e('Your website home URL and WordPress admin email.', 'ccpw'); ?></li>
                                               <li><?php esc_html_e('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw'); ?></li>
