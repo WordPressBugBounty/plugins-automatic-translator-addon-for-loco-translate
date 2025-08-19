@@ -251,6 +251,8 @@ if(!class_exists('Atlt_Dashboard')){
 
             
 
+            // Sanitize dynamic pieces before composing the message
+            $plugin_name = sanitize_text_field($plugin_name);
             $message = sprintf(
                 '🎉 %s! %s <strong>%s</strong> %s 🚀<br>%s %s 🌟<br>',
                 __('Thank You For Using', 'cp-notice').' '.$plugin_name,
@@ -270,21 +272,21 @@ if(!class_exists('Atlt_Dashboard')){
             add_action('admin_notices', function() use ($message, $prefix, $url, $icon, $plugin_name){
                 $html= '<div class="notice notice-info cpt-review-notice">';
                 if($icon){
-                    $html .= '<img class="cpt-review-notice-icon" src="'.$icon.'" alt="'.$plugin_name.'">';
+                    $html .= '<img class="cpt-review-notice-icon" src="'.esc_url($icon).'" alt="'.esc_attr($plugin_name).'">';
                 }
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('atlt_hide_review_notice').'"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.__('Not Interested', 'cp-notice').'</button><button class="button cpt-already-reviewed">'.__('Already Reviewed', 'cp-notice').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr( wp_create_nonce('atlt_hide_review_notice') ).'"><a href="'. $url .'" target="_blank" rel="noopener noreferrer" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button></div></div></div>';
                 
-                echo $html;
+                echo wp_kses_post($html);
             });
 
             add_action('atlt_display_admin_notices', function() use ($message, $prefix, $url, $icon, $plugin_name){
                 $html= '<div class="notice notice-info cpt-review-notice">';
                 if($icon){
-                    $html .= '<img class="cpt-review-notice-icon" src="'.$icon.'" alt="'.$plugin_name.'">';
+                    $html .= '<img class="cpt-review-notice-icon" src="'.esc_url($icon).'" alt="'.esc_attr($plugin_name).'">';
                 }
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('atlt_hide_review_notice').'"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.__('Not Interested', 'cp-notice').'</button><button class="button cpt-already-reviewed">'.__('Already Reviewed', 'cp-notice').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr( wp_create_nonce('atlt_hide_review_notice') ).'"><a href="'. $url .'" target="_blank" rel="noopener noreferrer" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button></div></div></div>';
                 
-                echo $html;
+                echo wp_kses_post($html);
             });
         }
 
@@ -294,15 +296,21 @@ if(!class_exists('Atlt_Dashboard')){
         }
 
         public function atlt_hide_review_notice(){
-            if(wp_verify_nonce($_POST['nonce'], 'atlt_hide_review_notice')){
-                $prefix = sanitize_key($_POST['prefix']);
-                $review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
-                $review_notice_dismissed[$prefix] = true;
-                update_option('cpt_review_notice_dismissed', $review_notice_dismissed);
-                wp_send_json_success();
-            }else{
+            if ( ! current_user_can( 'manage_options' ) ) {
+                wp_send_json_error('Unauthorized', 403);
+            }
+            $nonce  = isset($_POST['nonce']) ? wp_unslash($_POST['nonce']) : '';
+            if ( ! wp_verify_nonce( $nonce, 'atlt_hide_review_notice' ) ) {
                 wp_send_json_error('Invalid nonce');
             }
+            $prefix = isset($_POST['prefix']) ? sanitize_key( wp_unslash($_POST['prefix']) ) : '';
+            if ( empty( $prefix ) ) {
+                wp_send_json_error('Missing prefix', 400);
+            }
+            $review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
+            $review_notice_dismissed[$prefix] = true;
+            update_option('cpt_review_notice_dismissed', $review_notice_dismissed);
+            wp_send_json_success();
         }
     }
 }

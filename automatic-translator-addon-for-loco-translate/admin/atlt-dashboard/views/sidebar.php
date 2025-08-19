@@ -1,7 +1,7 @@
 <!-- Right Sidebar -->
 <div class="atlt-dashboard-sidebar">
     <div class="atlt-dashboard-status">
-        <h3><?php _e('Auto Translation status', $text_domain); ?></h3>
+        <h3><?php esc_html_e('Auto Translation status', $text_domain); ?></h3>
         <div class="atlt-dashboard-sts-top">
             <?php
 
@@ -26,51 +26,51 @@
             $time_taken_str = atlt_format_time_taken($totals['time_taken'] ,$text_domain);
             ?>
             <span><?php echo esc_html(atlt_format_number($totals['string_count'], $text_domain)); ?></span>
-            <span><?php _e('Total Strings Translated!', $text_domain); ?></span>
+            <span><?php esc_html_e('Total Strings Translated!', $text_domain); ?></span>
         </div>
         <ul class="atlt-dashboard-sts-btm">
-            <li><span><?php _e('Total Characters', $text_domain); ?></span> <span><?php echo esc_html(atlt_format_number($totals['character_count'], $text_domain)); ?></span></li>
-            <li><span><?php _e('Total Plugins / Themes', $text_domain); ?></span> <span><?php echo esc_html(count($totals['plugins_themes'])); ?></span></li>
-            <li><span><?php _e('Time Taken', $text_domain); ?></span> <span><?php echo esc_html($time_taken_str); ?></span></li>
+            <li><span><?php esc_html_e('Total Characters', $text_domain); ?></span> <span><?php echo esc_html(atlt_format_number($totals['character_count'], $text_domain)); ?></span></li>
+            <li><span><?php esc_html_e('Total Plugins / Themes', $text_domain); ?></span> <span><?php echo esc_html(count($totals['plugins_themes'])); ?></span></li>
+            <li><span><?php esc_html_e('Time Taken', $text_domain); ?></span> <span><?php echo esc_html($time_taken_str); ?></span></li>
         </ul>
     </div>
 
     <div class="atlt-dashboard-translate-full">
-        <h3><?php _e('Automatically Translate Full Webpage', $text_domain); ?></h3>
+        <h3><?php esc_html_e('Automatically Translate Full Webpage', $text_domain); ?></h3>
         <div class="atlt-dashboard-addon first">
             <div class="atlt-dashboard-addon-l">
                 <strong><?php echo esc_html(atlt_get_plugin_display_name('automatic-translations-for-polylang', $text_domain)); ?></strong>
-                <span class="addon-desc"><?php _e('Polylang addon to translate webpages.', $text_domain); ?></span>
+                <span class="addon-desc"><?php esc_html_e('Polylang addon to translate webpages.', $text_domain); ?></span>
                 <?php if (atlt_is_plugin_installed('automatic-translations-for-polylang')): ?>
-                    <span class="installed"><?php _e('Installed', $text_domain); ?></span>
+                    <span class="installed"><?php esc_html_e('Installed', $text_domain); ?></span>
                 <?php else: ?>
-                    <a href="<?php echo esc_url(admin_url('plugin-install.php?s=AutoPoly+-+AI+Translation+For+Polylang&tab=search&type=term')); ?>" class="atlt-dashboard-btn" target="_blank"><?php _e('Install', $text_domain); ?></a>
+                    <a href="<?php echo esc_url(admin_url('plugin-install.php?s=AutoPoly+-+AI+Translation+For+Polylang&tab=search&type=term')); ?>" class="atlt-dashboard-btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Install', $text_domain); ?></a>
                 <?php endif; ?>
             </div>
             <div class="atlt-dashboard-addon-r">
-                <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/polylang-addon.png'); ?>" alt="<?php _e('Polylang Addon', $text_domain); ?>">
+                <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/polylang-addon.png'); ?>" alt="<?php esc_attr_e('Polylang Addon', $text_domain); ?>">
             </div>
         </div>
         <div class="atlt-dashboard-addon">
             <div class="atlt-dashboard-addon-l">
                 <strong><?php echo esc_html(atlt_get_plugin_display_name('automatic-translate-addon-for-translatepress', $text_domain)); ?></strong>
-                <span class="addon-desc"><?php _e('TranslatePress addon to translate webpages.', $text_domain); ?></span>
+                <span class="addon-desc"><?php esc_html_e('TranslatePress addon to translate webpages.', $text_domain); ?></span>
                 <?php if (atlt_is_plugin_installed('automatic-translate-addon-for-translatepress')): ?>
-                    <span class="installed"><?php _e('Installed', $text_domain); ?></span>
+                    <span class="installed"><?php esc_html_e('Installed', $text_domain); ?></span>
                 <?php else: ?>
-                    <a href="<?php echo esc_url(admin_url('plugin-install.php?s=AI+Translation+for+translatepress+by+coolplugins&tab=search&type=term')); ?>" class="atlt-dashboard-btn" target="_blank"><?php _e('Install', $text_domain); ?></a>
+                    <a href="<?php echo esc_url(admin_url('plugin-install.php?s=AI+Translation+for+translatepress+by+coolplugins&tab=search&type=term')); ?>" class="atlt-dashboard-btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Install', $text_domain); ?></a>
                 <?php endif; ?>
             </div>
             <div class="atlt-dashboard-addon-r">
-                <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/translatepress-addon.png'); ?>" alt="<?php _e('TranslatePress Addon', $text_domain); ?>">
+                <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/translatepress-addon.png'); ?>" alt="<?php esc_attr_e('TranslatePress Addon', $text_domain); ?>">
             </div>
         </div>
     </div>
 
     <div class="atlt-dashboard-rate-us">
-        <h3><?php _e('Rate Us ⭐⭐⭐⭐⭐', $text_domain); ?></h3>
-        <p><?php _e('We\'d love your feedback! Hope this addon made auto-translations easier for you.', $text_domain); ?></p>
-        <a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" class="review-link" target="_blank"><?php _e('Submit a Review →', $text_domain); ?></a>
+        <h3><?php esc_html_e('Rate Us ⭐⭐⭐⭐⭐', $text_domain); ?></h3>
+        <p><?php esc_html_e('We\'d love your feedback! Hope this addon made auto-translations easier for you.', $text_domain); ?></p>
+        <a href="<?php echo esc_url('https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post'); ?>" class="review-link" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Submit a Review →', $text_domain); ?></a>
     </div>
 </div>
 
@@ -122,7 +122,7 @@ function atlt_get_plugin_display_name($plugin_slug, $text_domain) {
 
     // Check if the provided plugin slug exists
     if (!isset($plugin_paths[$plugin_slug])) {
-        return $plugin_slug['free_name'];
+        return __('Unknown plugin', $text_domain);
     }
 
     $free_installed = isset($plugins[$plugin_paths[$plugin_slug]['free']]);

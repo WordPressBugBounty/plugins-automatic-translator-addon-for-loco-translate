@@ -22,15 +22,24 @@ class CPFM_Feedback_Notice {
             return;
         }
         
-        if (!isset(self::$registered_notices[$key])) {
-            self::$registered_notices[$key] = wp_parse_args($args, [
-                'title'   => '',
-                'message' => '',
-                'pages'   => [],
-                'always_show_on' => [],
-            ]);
-        }
-         self::$registered_notices[$key][] = $args;
+        $safe_key = sanitize_key($key);
+        
+        $notice = wp_parse_args($args, [
+            'title'          => '',
+            'message'        => '',
+            'pages'          => [],
+            'always_show_on' => [],
+            'plugin_name'    => '',
+        ]);
+
+        // Sanitize and coerce expected types
+        $notice['title']          = is_string($notice['title']) ? wp_strip_all_tags($notice['title']) : '';
+        $notice['message']        = is_string($notice['message']) ? wp_strip_all_tags($notice['message']) : '';
+        $notice['pages']          = array_values(array_filter(array_map('sanitize_key', (array) $notice['pages'])));
+        $notice['always_show_on'] = array_values(array_filter(array_map('sanitize_key', (array) $notice['always_show_on'])));
+        $notice['plugin_name']    = is_string($notice['plugin_name']) ? sanitize_key($notice['plugin_name']) : '';
+
+        self::$registered_notices[$safe_key] = $notice;
     }
     
     public function cpfm_listen_for_external_notice_registration() {
@@ -111,11 +120,9 @@ class CPFM_Feedback_Notice {
 
         check_ajax_referer('dismiss_admin_notice', 'nonce');
 
-        $category           = isset($_POST['category']) ? sanitize_text_field( wp_unslash( $_POST['category'] ) ): '';
+        $category           = isset($_POST['category']) ? sanitize_key( wp_unslash( $_POST['category'] ) ): '';
         $opt_in_raw         = isset($_POST['opt_in']) ? sanitize_text_field( wp_unslash( $_POST['opt_in'] ) ) : '';
         $opt_in             = ($opt_in_raw === 'yes') ? 'yes' : 'no';
-        $category_notices   = self::$registered_notices;
-        $registered_notices = isset($GLOBALS['cool_plugins_feedback'])? $GLOBALS['cool_plugins_feedback']:$category_notices;
 
         if (!$category || !isset(self::$registered_notices[$category])) {
 
@@ -128,18 +135,11 @@ class CPFM_Feedback_Notice {
         
        
         if ($review_option === 'yes') {
-            
-             foreach (self::$registered_notices[$category] as $notice) {
-
-                    $plugin_name = isset($notice['plugin_name'])?sanitize_key($notice['plugin_name']):'';
-
-                    if($plugin_name){
-
-                        do_action('cpfm_after_opt_in_' . $plugin_name, $category);
-                    }
-              
+            $notice = self::$registered_notices[$category];
+            $plugin_name = isset($notice['plugin_name']) ? sanitize_key($notice['plugin_name']) : '';
+            if ($plugin_name) {
+                do_action('cpfm_after_opt_in_' . $plugin_name, $category);
             }
-          
         }
 
         wp_send_json_success();
@@ -178,7 +178,7 @@ class CPFM_Feedback_Notice {
             if ($choice !== false) continue;
     
             $should_show = false;
-            foreach ($notice['pages'] as $match) {
+            foreach ((array) $notice['pages'] as $match) {
                 
                 if ($current_page === $match || strpos($current_page, $match) === 0) {
                 
@@ -218,7 +218,7 @@ class CPFM_Feedback_Notice {
         $output .= '</div>'; 
      
         if ($unread_count > 0) {
-            echo $output;
+            echo wp_kses_post($output);
         }
     }
 }

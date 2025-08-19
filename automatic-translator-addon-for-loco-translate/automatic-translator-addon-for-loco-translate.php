@@ -2,7 +2,7 @@
 /*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.5
+Version: 2.5.1
 License: GPL2
 Text Domain: loco-auto-translate
 Domain Path: languages
@@ -17,12 +17,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'ATLT_FILE', __FILE__ );
 define( 'ATLT_URL', plugin_dir_url( ATLT_FILE ) );
 define( 'ATLT_PATH', plugin_dir_path( ATLT_FILE ) );
-define( 'ATLT_VERSION', '2.5' );
+define( 'ATLT_VERSION', '2.5.1' );
 !defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API',"https://feedback.coolplugins.net/");
 
 /**
  * @package LocoAI – Auto Translate for Loco Translate
- * @version 2.4
+ * @version 2.5.1
  */
 
 if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
@@ -101,7 +101,8 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				add_action( 'admin_enqueue_scripts', array( $thisPlugin, 'atlt_enqueue_scripts' ) );
 
 				// Add the action to hide unrelated notices
-				if(isset($_GET['page']) && $_GET['page'] == 'loco-atlt-dashboard'){
+				$page = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
+				if ( $page === 'loco-atlt-dashboard' ){
 					add_action('admin_print_scripts', array($thisPlugin, 'atlt_hide_unrelated_notices'));
 				}
 
@@ -115,7 +116,8 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				Yandex translate widget integration
 				*/
 				// add no translate attribute in html tag
-				if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'file-edit' ) {
+				$req_action = isset($_REQUEST['action']) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+				if ( $req_action === 'file-edit' ) {
 					add_action( 'admin_footer', array( $thisPlugin, 'atlt_load_ytranslate_scripts' ), 100 );
 					add_filter( 'admin_body_class', array( $thisPlugin, 'atlt_add_custom_class' ) );
 				}
@@ -126,7 +128,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 
 		public function atlt_add_docs_link_to_plugin_meta($links, $file) {
 			if (plugin_basename(__FILE__) === $file) {
-				$docs_link = '<a href="https://locoaddon.com/docs/" target="_blank">Docs</a>';
+				$docs_link = '<a href="' . esc_url( 'https://locoaddon.com/docs/' ) . '" target="_blank" rel="noopener noreferrer">Docs</a>';
 				$links[] = $docs_link;
 			}
 			return $links;
@@ -235,17 +237,18 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		 */
 		function loco_auto_translator_process_batch(array $targets, array $items, Loco_Locale $locale, array $config) {
 			// Extract domain from the referrer URL
-			$url_data   = self::$instance->atlt_parse_query( $_SERVER['HTTP_REFERER'] );
+			$referer    = isset($_SERVER['HTTP_REFERER']) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_REFERER'] ) ) : '';
+			$url_data   = self::$instance->atlt_parse_query( $referer );
 			$domain     = isset( $url_data['domain'] ) && ! empty( $url_data['domain'] ) ? sanitize_text_field( $url_data['domain'] ) : 'temp';
 			$lang       = sanitize_text_field( $locale->lang );
 			$region     = sanitize_text_field( $locale->region );
 			$project_id = $domain . '-' . $lang . '-' . $region;
 			if($domain === 'temp' && !empty(get_transient('loco_current_translation'))){
-                $project_id = !empty(get_transient('loco_current_translation'))?get_transient('loco_current_translation'):'temp';
-            }
-
-
-
+				$project_id = !empty(get_transient('loco_current_translation'))?get_transient('loco_current_translation'):'temp';
+			}
+			
+			
+			
 			// Combine transient parts if available
 			$allStrings = array();
 			
@@ -284,6 +287,10 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			 *  the output of parse_url().
 			 */
 
+			if ( empty( $var ) || ! is_string( $var ) ) {
+				return array();
+			}
+
 			$var = parse_url( $var, PHP_URL_QUERY );
 			$var = html_entity_decode( $var );
 			$var = explode( '&', $var );
@@ -307,42 +314,68 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		// save translations inside transient cache for later use
 		function atlt_save_translations_handler() {
 
+			// Capability check to restrict access to admins
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( 'Unauthorized', 403 );
+			}
+
 			check_ajax_referer( 'loco-addon-nonces', 'wpnonce' );
 
 			if ( isset( $_POST['data'] ) && ! empty( $_POST['data'] ) && isset( $_POST['part'] ) ) {
 
-				$allStrings = json_decode( stripslashes( $_POST['data'] ), true );
-				$translationData = isset($_POST['translation_data']) ? json_decode(stripslashes($_POST['translation_data']), true) : null;
+				// Secure JSON deserialization with proper error handling
+				$raw_data = wp_unslash( $_POST['data'] );
+				$allStrings = json_decode( $raw_data, true );
+				
+				// Validate JSON parsing for main data
+				if ( json_last_error() !== JSON_ERROR_NONE ) {
+					wp_send_json_error( array( 
+						'error' => 'Invalid JSON data provided.', 
+						'details' => 'Translation data must be valid JSON format.' 
+					), 400 );
+				}
+				
+				// Secure JSON deserialization for translation metadata (optional field)
+				$translationData = null;
+				if ( isset($_POST['translation_data']) && !empty($_POST['translation_data']) ) {
+					$raw_translation_data = wp_unslash( $_POST['translation_data'] );
+					$translationData = json_decode( $raw_translation_data, true );
+					
+					// Validate JSON parsing for translation metadata
+					if ( json_last_error() !== JSON_ERROR_NONE ) {
+						wp_send_json_error( array( 
+							'error' => 'Invalid translation metadata JSON.', 
+							'details' => 'Translation metadata must be valid JSON format.' 
+						), 400 );
+					}
+				}
 
-				if ( empty( $allStrings ) ) {
-					echo json_encode(
-						array(
-							'success' => false,
-							'error'   => 'No data found in the request. Unable to save translations.',
-						)
-					);
-					wp_die();
+				// Validate that decoded data is actually an array and not empty
+				if ( empty( $allStrings ) || !is_array( $allStrings ) ) {
+					wp_send_json_error( array( 'error' => 'No valid translation data found in the request. Unable to save translations.' ), 400 );
 				}
 
 				// Determine the project ID based on the loop value
-				$projectId = $_POST['project-id'] . $_POST['part'];
+				$incoming_project = isset($_POST['project-id']) ? sanitize_key( wp_unslash( $_POST['project-id'] ) ) : '';
+				$incoming_part = isset($_POST['part']) ? sanitize_text_field( wp_unslash( $_POST['part'] ) ) : '';
+				if ( ! preg_match( '/^\-part\-\d+$/', $incoming_part ) ) {
+					wp_send_json_error( 'Invalid part', 400 );
+				}
+				$projectId = $incoming_project . $incoming_part;
 				
 				$dataToStore = array(
 					'strings' => $allStrings,
 				);
 
 				// Save the combined data in transient
-				set_transient('loco_current_translation',$_POST['project-id'], 5 * MINUTE_IN_SECONDS);
+				set_transient('loco_current_translation', $incoming_project, 5 * MINUTE_IN_SECONDS);
 				$rs = set_transient( $projectId, $dataToStore, 5 * MINUTE_IN_SECONDS );
-				echo json_encode(
-					array(
-						'success'  => true,
-						'message'  => 'Translations successfully stored in the cache.',
-						'response' => $rs == true ? 'saved' : 'cache already exists',
-					)
+				$response_data = array(
+					'message'  => 'Translations successfully stored in the cache.',
+					'response' => $rs == true ? 'saved' : 'cache already exists',
 				);
 
-				if ( $_POST['part'] === '-part-0') {
+				if ( $incoming_part === '-part-0') {
 					// Safely extract and sanitize translation metadata
 					$metadata = array(
 						'translation_provider' => isset($translationData['translation_provider']) ? sanitize_text_field($translationData['translation_provider']) : 'yandex',
@@ -353,7 +386,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 						'total_strings' => isset($translationData['total_strings']) ? absint($translationData['total_strings']) : 0
 					);
 
-						if (class_exists('Atlt_Dashboard')) {
+						if ( current_user_can( 'manage_options' ) && class_exists('Atlt_Dashboard') ) {
 							Atlt_Dashboard::store_options(
 								'atlt',
 								'plugins_themes',
@@ -372,11 +405,11 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 							);
 						}
 				}
+				wp_send_json_success( $response_data );
 			} else {
 				// Security check failed or missing parameters
-				echo json_encode( array( 'error' => 'Invalid request. Missing required parameters.' ) );
+				wp_send_json_error( array( 'error' => 'Invalid request. Missing required parameters.' ), 400 );
 			}
-			wp_die();
 		}
 
 		/*
@@ -386,8 +419,13 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		|----------------------------------------------------------------------
 		*/
 		function atlt_load_ytranslate_scripts() {
-			if ( isset( $_REQUEST['action'] ) && $_REQUEST['action'] == 'file-edit' ) {
-				echo "<script>document.getElementsByTagName('html')[0].setAttribute('translate', 'no');</script>";
+			$req_action = isset($_REQUEST['action']) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+			if ( $req_action === 'file-edit' ) {
+				// Secure inline script using WordPress best practices
+				wp_add_inline_script(
+					'loco-translate-admin', 	
+					'document.getElementsByTagName("html")[0].setAttribute("translate", "no");'
+		            );
 			}
 		}
 		// add no translate class in admin body to disable whole page translation
@@ -448,10 +486,13 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			{ // phpcs:ignore Generic.Metrics.CyclomaticComplexity.MaxExceeded, Generic.Metrics.NestingLevel.MaxExceeded
 				$cfkef_pages = false;
 
-				if(isset($_GET['page']) && $_GET['page'] == 'loco-atlt-dashboard'){
-					$cfkef_pages = true;
+				if ( isset($_GET['page']) ) {
+					$page_param = sanitize_key( wp_unslash( $_GET['page'] ) );
+					if ( $page_param === 'loco-atlt-dashboard' ) {
+						$cfkef_pages = true;
+					}
 				}
-
+				
 				if ($cfkef_pages) {
 					global $wp_filter;
 					// Define rules to remove callbacks.
@@ -604,7 +645,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			// Server and WP environment details
 			$server_info = [
 				'server_software'        => isset($_SERVER['SERVER_SOFTWARE']) ? sanitize_text_field($_SERVER['SERVER_SOFTWARE']) : 'N/A',
-				'mysql_version'          => $wpdb ? sanitize_text_field($wpdb->get_var("SELECT VERSION()")) : 'N/A',
+				'mysql_version'          => ($wpdb && method_exists($wpdb, 'db_version')) ? sanitize_text_field( $wpdb->db_version() ) : 'N/A',
 				'php_version'            => sanitize_text_field(phpversion() ?: 'N/A'),
 				'wp_version'             => sanitize_text_field(get_bloginfo('version') ?: 'N/A'),
 				'wp_debug'               => (defined('WP_DEBUG') && WP_DEBUG) ? 'Enabled' : 'Disabled',
@@ -627,19 +668,21 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 			// Active plugins details
+			$all_plugins = function_exists('get_plugins') ? get_plugins() : [];
 			$active_plugins = get_option('active_plugins', []);
 			$plugin_data = [];
 			foreach ( $active_plugins as $plugin_path ) {
-				
-				$plugin_info = get_plugin_data(WP_PLUGIN_DIR . '/' . sanitize_text_field($plugin_path));
-				
+				$plugin_path = sanitize_text_field( $plugin_path );
+				if ( ! isset( $all_plugins[ $plugin_path ] ) ) {
+					continue;
+				}
+				$plugin_info = $all_plugins[ $plugin_path ];
 				$author_url = ( isset( $plugin_info['AuthorURI'] ) && !empty( $plugin_info['AuthorURI'] ) ) ? esc_url( $plugin_info['AuthorURI'] ) : 'N/A';
 				$plugin_url = ( isset( $plugin_info['PluginURI'] ) && !empty( $plugin_info['PluginURI'] ) ) ? esc_url( $plugin_info['PluginURI'] ) : '';
-	
 				$plugin_data[] = [
-					'name'       => sanitize_text_field($plugin_info['Name']),
-					'version'    => sanitize_text_field($plugin_info['Version']),
-				   'plugin_uri' => !empty($plugin_url) ? $plugin_url : $author_url,
+					'name'       => sanitize_text_field( $plugin_info['Name'] ),
+					'version'    => sanitize_text_field( $plugin_info['Version'] ),
+					'plugin_uri' => ! empty( $plugin_url ) ? $plugin_url : $author_url,
 				];
 			}
 			return [
@@ -658,7 +701,8 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		*/
 		function atlt_enqueue_scripts($hook) {
 			// Load assets for the dashboard page
-			if (isset($_GET['page']) && $_GET['page'] === 'loco-atlt-dashboard') {
+			$page = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
+			if ( $page === 'loco-atlt-dashboard') {
 				wp_enqueue_style(
 					'atlt-dashboard-style',
 					ATLT_URL . 'admin/atlt-dashboard/css/admin-styles.css',
@@ -668,7 +712,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				);
 			}
 
-			if (isset($_GET['page']) && $_GET['page'] === 'loco-atlt-dashboard') {
+			if ( $page === 'loco-atlt-dashboard') {
 				wp_enqueue_script(
 					'atlt-dashboard-script',
 					ATLT_URL . 'admin/atlt-dashboard/js/atlt-data-share-setting.js',
@@ -678,7 +722,8 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 				);
 			}
 			// Keep existing editor page scripts
-			if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'file-edit') {
+			$req_action = isset($_REQUEST['action']) ? sanitize_text_field( wp_unslash( $_REQUEST['action'] ) ) : '';
+			if ( $req_action === 'file-edit') {
 				wp_register_script( 'loco-addon-custom', ATLT_URL . 'assets/js/custom.min.js', array( 'loco-translate-admin' ), ATLT_VERSION, true );
 				wp_register_style(
 					'loco-addon-custom-css',
@@ -920,7 +965,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			
 			<nav class="nav-tab-wrapper" aria-label="<?php esc_attr_e('Dashboard navigation', $text_domain); ?>">
 				<?php foreach ($valid_tabs as $tab_key => $tab_title): ?>
-					<a href="?page=loco-atlt-dashboard&tab=<?php echo esc_attr($tab_key); ?>" 
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=loco-atlt-dashboard&tab=' . $tab_key ) ); ?>" 
 					class="nav-tab <?php echo esc_attr($tab === $tab_key ? 'nav-tab-active' : ''); ?>">
 						<?php echo esc_html($tab_title); ?>
 					</a>
@@ -929,13 +974,61 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 			
 			<div class="tab-content">
 				<?php
-				require_once ATLT_PATH . $file_prefix . $tab . '.php';
-				require_once ATLT_PATH . $file_prefix . 'sidebar.php';
+				// Secure file inclusion with strict whitelist validation
+				$allowed_templates = [
+					'dashboard'       => 'dashboard.php',
+					'ai-translations' => 'ai-translations.php',
+					'settings'        => 'settings.php',
+					'license'         => 'license.php',
+					'free-vs-pro'     => 'free-vs-pro.php'
+				];
+				
+				// Double validation: check if current_tab exists in allowed templates
+				if ( !array_key_exists( $current_tab, $allowed_templates ) ) {
+					$current_tab = 'dashboard'; // Fallback to safe default
+				}
+				
+				$template_filename = $allowed_templates[ $current_tab ];
+				$template_file = ATLT_PATH . $file_prefix . $template_filename;
+				
+				// Additional security: ensure the resolved path is within the expected directory
+				$real_template_path = realpath( $template_file );
+				$expected_base_path = realpath( ATLT_PATH . $file_prefix );
+				
+				if ( $real_template_path && $expected_base_path && 
+					 strpos( $real_template_path, $expected_base_path ) === 0 && 
+					 file_exists( $template_file ) ) {
+					require_once $template_file;
+				} else {
+					// Fallback to dashboard if template validation fails
+					$fallback_template = ATLT_PATH . $file_prefix . 'dashboard.php';
+					if ( file_exists( $fallback_template ) ) {
+						require_once $fallback_template;
+					}
+				}
+				
+				// Include sidebar (with same security validation)
+				$sidebar_file = ATLT_PATH . $file_prefix . 'sidebar.php';
+				$real_sidebar_path = realpath( $sidebar_file );
+				if ( $real_sidebar_path && $expected_base_path && 
+					 strpos( $real_sidebar_path, $expected_base_path ) === 0 && 
+					 file_exists( $sidebar_file ) ) {
+					require_once $sidebar_file;
+				}
 				
 				?>
 			</div>
 			
-			<?php require_once ATLT_PATH . $file_prefix . 'footer.php'; ?>
+			<?php 
+			// Secure footer inclusion
+			$footer_file = ATLT_PATH . $file_prefix . 'footer.php';
+			$real_footer_path = realpath( $footer_file );
+			if ( $real_footer_path && $expected_base_path && 
+				 strpos( $real_footer_path, $expected_base_path ) === 0 && 
+				 file_exists( $footer_file ) ) {
+				require_once $footer_file;
+			}
+			?>
 		</div>
 		<?php
 	}

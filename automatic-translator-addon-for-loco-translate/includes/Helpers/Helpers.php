@@ -8,19 +8,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Helpers{
     public static function proInstalled(){
-        if (defined('ATLT_PRO_FILE')) {
-            return true;
-        }else{
-            return false;
-        }
+        return defined('ATLT_PRO_FILE');
     }
     // return user type
     public static function userType(){
-        $type='';
-      if(get_option('atlt-type')==false || get_option('atlt-type')=='free'){
-            return $type='free';
-        }else if(get_option('atlt-type')=='pro'){
-            return $type='pro';
-        }  
+        $option_value = get_option('atlt-type', 'free');
+        $sanitized_type = sanitize_key($option_value);
+        if ($sanitized_type === 'pro') {
+            return 'pro';
+        }
+        return 'free';
     }
 }

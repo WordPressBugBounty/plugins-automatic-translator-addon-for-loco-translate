@@ -76,11 +76,11 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 						
 			<div class="cool-plugins-deactivation-response">
 			<div id="cool-plugins-deactivate-feedback-dialog-header">
-				<span id="cool-plugins-feedback-form-title"><?php echo __( 'Quick Feedback', 'cool-plugins' ); ?></span>
+				<span id="cool-plugins-feedback-form-title"><?php echo esc_html__( 'Quick Feedback', 'cool-plugins' ); ?></span>
 			</div>
 			<div id="cool-plugins-loader-wrapper">
 				<div class="cool-plugins-loader-container">
-					<img class="cool-plugins-preloader" src="<?php echo $this->plugin_url; ?>includes/Feedback/images/cool-plugins-preloader.gif">
+					<img class="cool-plugins-preloader" src="<?php echo esc_url( $this->plugin_url . 'includes/Feedback/images/cool-plugins-preloader.gif' ); ?>">
 				</div>
 			</div>
 			<div id="cool-plugins-form-wrapper" class="cool-plugins-form-wrapper-cls">
@@ -89,7 +89,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 				wp_nonce_field( '_cool-plugins_deactivate_feedback_nonce' );
 				?>
 				<input type="hidden" name="action" value="cool-plugins_deactivate_feedback" />
-				<div id="cool-plugins-deactivate-feedback-dialog-form-caption"><?php echo __( 'If you have a moment, please share why you are deactivating this plugin.', 'cool-plugins' ); ?></div>
+				<div id="cool-plugins-deactivate-feedback-dialog-form-caption"><?php echo esc_html__( 'If you have a moment, please share why you are deactivating this plugin.', 'cool-plugins' ); ?></div>
 				<div id="cool-plugins-deactivate-feedback-dialog-form-body">
 					<?php foreach ( $deactivate_reasons as $reason_key => $reason ) : ?>
 						<div class="cool-plugins-deactivate-feedback-dialog-input-wrapper">
@@ -103,7 +103,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 							<?php endif; ?>
 						</div>
 					<?php endforeach; ?>
-					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo $this->plugin_slug; ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice"><?php echo __( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'cool-plugins' ); ?></label>
+					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>"><?php echo esc_html__( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'cool-plugins' ); ?></label>
 				</div>
 				<div class="cool-plugin-popup-button-wrapper">
 					<a class="cool-plugins-button button-deactivate" id="atlt-cool-plugin-submitNdeactivate">Submit and Deactivate</a>
@@ -121,8 +121,11 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 			if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], '_cool-plugins_deactivate_feedback_nonce' ) ) {
 				wp_send_json_error();
 			} else {
-				$reason             = isset( $_POST['reason'] ) ? $_POST['reason'] : '';
-				$reason             = htmlspecialchars( $reason, ENT_QUOTES );
+				if ( ! current_user_can( 'activate_plugins' ) ) {
+					wp_send_json_error( array( 'message' => 'forbidden' ), 403 );
+				}
+
+				$reason             = isset( $_POST['reason'] ) ? sanitize_key( wp_unslash( $_POST['reason'] ) ) : '';
 				$deactivate_reasons = array(
 					'didnt_work_as_expected'         => array(
 						'title'             => __( 'The plugin didn\'t work as expected', 'cool-plugins' ),
@@ -146,36 +149,41 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 					),
 				);
 
-				$plugin_initial =  get_option( 'atlt_initial_save_version' );
+				$plugin_initial     = get_option( 'atlt_initial_save_version' );
 				$deativation_reason = array_key_exists( $reason, $deactivate_reasons ) ? $reason : 'other';
 
-				$sanitized_message = sanitize_text_field( $_POST['message'] ) == '' ? 'N/A' : sanitize_text_field( $_POST['message'] );
+				$raw_message       = isset( $_POST['message'] ) ? wp_unslash( $_POST['message'] ) : '';
+				$sanitized_message = $raw_message === '' ? 'N/A' : sanitize_text_field( $raw_message );
 				$admin_email       = sanitize_email( get_option( 'admin_email' ) );
-				$site_url       = get_site_url();
-				$install_date   = get_option('atlt-install-date');
-				$unique_key     = '8';  // Ensure this key is unique per plugin to prevent collisions when site URL and install date are the same across plugins
-				$site_id        = $site_url . '-' . $install_date . '-' . $unique_key;
+				$site_url          = get_site_url();
+				$install_date      = get_option( 'atlt-install-date' );
+				$unique_key        = '8';  // Ensure this key is unique per plugin to prevent collisions when site URL and install date are the same across plugins
+				$site_id           = $site_url . '-' . $install_date . '-' . $unique_key;
 				$site_url          = esc_url( site_url() );
-				$response          = wp_remote_post(
+
+				$body = array(
+					'site_id'        => md5( $site_id ),
+					'plugin_initial' => isset( $plugin_initial ) ? sanitize_text_field( $plugin_initial ) : 'N/A',
+					'plugin_version' => $this->plugin_version,
+					'plugin_name'    => $this->plugin_name,
+					'reason'         => $deativation_reason,
+					'review'         => $sanitized_message,
+					'server_info' => serialize(LocoAutoTranslateAddon::atlt_get_user_info()['server_info']),
+						'extra_details' => serialize(LocoAutoTranslateAddon::atlt_get_user_info()['extra_details']),
+					'domain'         => $site_url,
+					'email' => $admin_email,
+				);
+
+				$response = wp_remote_post(
 					$this->feedback_url,
 					array(
 						'timeout' => 30,
-							'body'    => array(
-							'site_id' => md5($site_id),
-							'server_info' => serialize(LocoAutoTranslateAddon::atlt_get_user_info()['server_info']),
-							'extra_details' => serialize(LocoAutoTranslateAddon::atlt_get_user_info()['extra_details']),
-							'plugin_initial'  => isset($plugin_initial) ? sanitize_text_field($plugin_initial) : 'N/A',
-							'plugin_version' => $this->plugin_version,
-							'plugin_name'    => $this->plugin_name,
-							'reason'         => $deativation_reason,
-							'review'         => $sanitized_message,
-							'email'          => $admin_email,
-							'domain'         => $site_url,
-						),
+						'body'    => $body,
 					)
 				);
 
-				die( json_encode( array( 'response' => $response ) ) );
+				$status_code = is_wp_error( $response ) ? 0 : wp_remote_retrieve_response_code( $response );
+				wp_send_json_success( array( 'status' => $status_code ) );
 			}
 
 		}

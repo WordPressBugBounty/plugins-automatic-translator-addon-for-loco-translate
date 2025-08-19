@@ -1,10 +1,11 @@
+<?php if ( ! defined( 'ABSPATH' ) ) { exit; } ?>
 <div class="atlt-dashboard-free-vs-pro">
     <div class="atlt-dashboard-free-vs-pro-container">
     <div class="header">
-        <h1><?php _e('Free VS Pro', $text_domain); ?></h1>
+        <h1><?php esc_html_e('Free VS Pro', $text_domain); ?></h1>
         <div class="atlt-dashboard-status">
-            <span class="status"><?php _e('Inactive', $text_domain); ?></span>
-            <a href="<?php echo esc_url('https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=freevspro'); ?>" class='atlt-dashboard-btn' target="_blank">
+            <span class="status"><?php esc_html_e('Inactive', $text_domain); ?></span>
+            <a href="<?php echo esc_url('https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=freevspro'); ?>" class='atlt-dashboard-btn' target="_blank" rel="noopener noreferrer">
               <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/upgrade-now.svg'); ?>" alt="<?php echo esc_attr(__('Upgrade Now', $text_domain)); ?>">
                 <?php echo esc_html(__('Upgrade Now', $text_domain)); ?>
             </a>
@@ -37,11 +38,11 @@
              foreach ($features as $feature => $availability): ?>
                 <tr>
                     <td><?php echo esc_html($feature); ?></td>
-                    <td class="<?php echo $availability[0] ? 'check' : 'cross'; ?>">
-                        <?php echo $availability[0] ? '✓' : '✗'; ?>
+                    <td class="<?php echo esc_attr( $availability[0] ? 'check' : 'cross' ); ?>">
+                        <?php echo esc_html( $availability[0] ? '✓' : '✗' ); ?>
                     </td>
-                    <td class="<?php echo $availability[1] ? 'check' : 'cross'; ?>">
-                        <?php echo $availability[1] ? '✓' : '✗'; ?>
+                    <td class="<?php echo esc_attr( $availability[1] ? 'check' : 'cross' ); ?>">
+                        <?php echo esc_html( $availability[1] ? '✓' : '✗' ); ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
