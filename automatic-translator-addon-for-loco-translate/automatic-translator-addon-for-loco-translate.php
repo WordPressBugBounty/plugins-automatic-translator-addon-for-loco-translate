@@ -2,12 +2,12 @@
 /*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.5.1
+Version: 2.5.2
 License: GPL2
 Text Domain: loco-auto-translate
 Domain Path: languages
 Author: Cool Plugins
-Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=dashboard
+Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'ATLT_FILE', __FILE__ );
 define( 'ATLT_URL', plugin_dir_url( ATLT_FILE ) );
 define( 'ATLT_PATH', plugin_dir_path( ATLT_FILE ) );
-define( 'ATLT_VERSION', '2.5.1' );
+define( 'ATLT_VERSION', '2.5.2' );
 !defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API',"https://feedback.coolplugins.net/");
 
 /**
@@ -128,7 +128,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 
 		public function atlt_add_docs_link_to_plugin_meta($links, $file) {
 			if (plugin_basename(__FILE__) === $file) {
-				$docs_link = '<a href="' . esc_url( 'https://locoaddon.com/docs/' ) . '" target="_blank" rel="noopener noreferrer">Docs</a>';
+				$docs_link = '<a href="' . esc_url( 'https://locoaddon.com/docs/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=plugins_list' ) . '" target="_blank" rel="noopener noreferrer">Docs</a>';
 				$links[] = $docs_link;
 			}
 			return $links;
@@ -569,7 +569,7 @@ if ( ! class_exists( 'LocoAutoTranslateAddon' ) ) {
 		|----------------------------------------------------------------------
 		*/
 		public function atlt_settings_page_link( $links ) {
-			$links[] = '<a style="font-weight:bold" target="_blank" href="' . esc_url( 'https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=buy_pro' ) . '">Buy PRO</a>';
+			$links[] = '<a style="font-weight:bold" target="_blank" href="' . esc_url( 'https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=plugins_list' ) . '">Buy PRO</a>';
 			$links[] = '<a style="font-weight:bold" href="' . esc_url( get_admin_url( null, 'admin.php?page=loco-atlt-dashboard&tab=dashboard' ) ) . '">Settings</a>';
 			return $links;
 		}

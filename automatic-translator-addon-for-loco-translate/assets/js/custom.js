@@ -540,7 +540,7 @@ const AutoTranslator = (function (window, $) {
                 icon: 'openai',
                 info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/',
                 btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_openai" target="_blank"><button id="atlt_openai_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini`
+                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_openai`
             },
             {
                 name: 'DeepL Translate',
