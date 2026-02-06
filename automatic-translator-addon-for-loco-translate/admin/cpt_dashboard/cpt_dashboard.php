@@ -128,11 +128,11 @@ if(!class_exists('Atlt_Dashboard')){
         public static function store_options($prefix='', $unique_key='', $old_data='update', array $data = array()){
             if(!empty($prefix) && isset($data['string_count']) && isset($data['character_count'])){
                 $prefix = sanitize_key($prefix);
-                $all_data = get_option('cpt_dashboard_data', array());
+                $atlt_all_data = get_option('cpt_dashboard_data', array());
                 
-                if(isset($all_data[$prefix])){
+                if(isset($atlt_all_data[$prefix])){
                     $data_update = false;
-                    foreach($all_data[$prefix] as $key => $translate_data){
+                    foreach($atlt_all_data[$prefix] as $key => $translate_data){
                         if(!empty($unique_key) && isset($translate_data[$unique_key]) && 
                         sanitize_text_field($translate_data[$unique_key]) === sanitize_text_field($data[$unique_key]) && 
                         sanitize_text_field($translate_data['service_provider']) === sanitize_text_field($data['service_provider']) &&
@@ -147,20 +147,20 @@ if(!class_exists('Atlt_Dashboard')){
                             }
                             
                             foreach($data as $id => $value){
-                                $all_data[$prefix][$key][sanitize_key($id)] = sanitize_text_field($value);
+                                $atlt_all_data[$prefix][$key][sanitize_key($id)] = sanitize_text_field($value);
                             }
                             $data_update = true;
                         }
                     }
 
                     if(!$data_update){
-                        $all_data[$prefix][] = array_map('sanitize_text_field', $data);
+                        $atlt_all_data[$prefix][] = array_map('sanitize_text_field', $data);
                     }
                 }else{
-                    $all_data[$prefix][] = array_map('sanitize_text_field', $data);
+                    $atlt_all_data[$prefix][] = array_map('sanitize_text_field', $data);
                 }
 
-                update_option('cpt_dashboard_data', $all_data);
+                update_option('cpt_dashboard_data', $atlt_all_data);
             }
         }
 
@@ -171,14 +171,14 @@ if(!class_exists('Atlt_Dashboard')){
          */
         public static function get_translation_data($prefix, $key_exists=array()){
             $prefix = sanitize_key($prefix);
-            $all_data = get_option('cpt_dashboard_data', array());
+            $atlt_all_data = get_option('cpt_dashboard_data', array());
             $data = array();
 
-            if(isset($all_data[$prefix])){
+            if(isset($atlt_all_data[$prefix])){
                 $total_string_count = 0;
                 $total_character_count = 0;
 
-                foreach($all_data[$prefix] as $key => $value){
+                foreach($atlt_all_data[$prefix] as $key => $value){
 
                     $continue=false;
                     foreach($key_exists as $key_exists_key => $key_exists_value){
@@ -200,7 +200,7 @@ if(!class_exists('Atlt_Dashboard')){
                     'prefix' => $prefix,
                     'data' => array_map(function($item) {
                         return array_map('sanitize_text_field', $item);
-                    }, $all_data[$prefix]),
+                    }, $atlt_all_data[$prefix]),
                     'total_string_count' => $total_string_count,
                     'total_character_count' => $total_character_count,
                 );
@@ -232,7 +232,7 @@ if(!class_exists('Atlt_Dashboard')){
             return $number;
         }
 
-        public static function review_notice($prefix, $plugin_name, $url, $icon=''){
+        public static function review_notice($prefix, $plugin_name, $url){
             if(self::atlt_hide_review_notice_status($prefix)){
                 return;
             }
@@ -253,38 +253,35 @@ if(!class_exists('Atlt_Dashboard')){
 
             // Sanitize dynamic pieces before composing the message
             $plugin_name = sanitize_text_field($plugin_name);
+
+            
             $message = sprintf(
-                '🎉 %s! %s <strong>%s</strong> %s 🚀<br>%s %s 🌟<br>',
-                __('Thank You For Using', 'cp-notice').' '.$plugin_name,
-                __('You\'ve translated', 'cp-notice'),
-                esc_html__(esc_html($total_character_count).' characters', 'cp-notice'),
-                esc_html__('so far using our plugin!', 'cp-notice'),
-                __('If our plugin has saved your time and effort, please consider leaving a', 'cp-notice'),
-                __('review to support our work. Your feedback means the world to us!', 'cp-notice')
+                 
+                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+                /* translators: %d: number of seconds */  __('Thanks for using <b>%1$s</b>! You have translated <b>%2$s</b> characters so far using our plugin!<br>Please give us a quick rating, it works as a boost for us to keep working on more <a style="text-decoration: none;" href="%3$s" target="_blank" rel="noopener noreferrer"><b>Cool Plugins</b></a>!', 'cp-notice'),
+                $plugin_name,
+                $total_character_count,
+                esc_url('https://coolplugins.net/')
             );
 
             $prefix = sanitize_key($prefix);
             $message = wp_kses_post($message);
             $url = esc_url($url);
             $plugin_name = sanitize_text_field($plugin_name);
-            $icon = isset($icon) && !empty($icon) ? esc_url($icon) : '';
 
-            add_action('admin_notices', function() use ($message, $prefix, $url, $icon, $plugin_name){
-                $html= '<div class="notice notice-info cpt-review-notice">';
-                if($icon){
-                    $html .= '<img class="cpt-review-notice-icon" src="'.esc_url($icon).'" alt="'.esc_attr($plugin_name).'">';
-                }
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr( wp_create_nonce('atlt_hide_review_notice') ).'"><a href="'. $url .'" target="_blank" rel="noopener noreferrer" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button></div></div></div>';
+            add_action('admin_notices', function() use ($message, $prefix, $url , $plugin_name){
+
+                $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
+                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button></div></div></div>';
                 
                 echo wp_kses_post($html);
             });
 
-            add_action('atlt_display_admin_notices', function() use ($message, $prefix, $url, $icon, $plugin_name){
-                $html= '<div class="notice notice-info cpt-review-notice">';
-                if($icon){
-                    $html .= '<img class="cpt-review-notice-icon" src="'.esc_url($icon).'" alt="'.esc_attr($plugin_name).'">';
-                }
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr( wp_create_nonce('atlt_hide_review_notice') ).'"><a href="'. $url .'" target="_blank" rel="noopener noreferrer" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button></div></div></div>';
+            add_action('atlt_display_admin_notices', function() use ($message, $prefix, $url, $plugin_name){
+                $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
+               // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button></div></div></div>';
                 
                 echo wp_kses_post($html);
             });
@@ -299,10 +296,11 @@ if(!class_exists('Atlt_Dashboard')){
             if ( ! current_user_can( 'manage_options' ) ) {
                 wp_send_json_error('Unauthorized', 403);
             }
-            $nonce  = isset($_POST['nonce']) ? wp_unslash($_POST['nonce']) : '';
+            $nonce  = isset($_POST['nonce']) ? sanitize_text_field( wp_unslash($_POST['nonce']) ) : '';
             if ( ! wp_verify_nonce( $nonce, 'atlt_hide_review_notice' ) ) {
                 wp_send_json_error('Invalid nonce');
             }
+            
             $prefix = isset($_POST['prefix']) ? sanitize_key( wp_unslash($_POST['prefix']) ) : '';
             if ( empty( $prefix ) ) {
                 wp_send_json_error('Missing prefix', 400);

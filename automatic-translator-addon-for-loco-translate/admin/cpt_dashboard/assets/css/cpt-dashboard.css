@@ -4,6 +4,11 @@
   padding: 5px;
   display: flex;
   align-items: center;
+  border-radius: 5px;
+  max-width: 790px;
+  padding-left: 11px;
+  padding-bottom: 11px !important;
+  flex-wrap: wrap;
 }
 
 .cpt-review-notice .cpt-review-notice-icon{
@@ -18,24 +23,14 @@
 }
 
 .cpt-review-notice .atlt-review-notice-dismiss {
-  display: -webkit-box;
-  display: -ms-flexbox;
+  display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-}
-
-.cpt-review-notice .cpt-not-interested {
-  position: absolute;
-  top: 5px;
-  right: 5px;
 }
 
 body.rtl .cpt-review-notice .cpt-not-interested {
   right: auto;
   left: 5px;
-}
-
-.cpt-review-notice .button-primary {
-  margin-right: 10px !important;
 }
 
 .cpt-review-notice :where(.cpt-not-interested, .cpt-already-reviewed)::before {
@@ -48,9 +43,9 @@ body.rtl .cpt-review-notice .cpt-not-interested {
   height: 22px;
 }
 
-.cpt-review-notice .cpt-review-notice-content{
+/* .cpt-review-notice .cpt-review-notice-content{
   max-width: calc(100% - 240px);
-}
+} */
 
 @media (max-width: 767px) and (min-width: 100px) {
   .cpt-review-notice {

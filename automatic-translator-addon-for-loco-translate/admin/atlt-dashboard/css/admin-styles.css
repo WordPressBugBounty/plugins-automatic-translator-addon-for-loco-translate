@@ -75,6 +75,7 @@ LocoAI Dashboard - Admin Panel Styles
     background: #efffef;
     color: var(--primary-color);
     border-color: var(--border-color);
+    cursor: pointer;
 }
 
 .atlt-dashboard-btn.svg-hover:hover svg path {
@@ -363,11 +364,12 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 }
 
 .atlt-dashboard-translate-full .installed {
-    background: #cfd5d1;
-    color: #7f7f7f;
+    background: #9a9d9a6e;
+    color: black;
     padding: 4px 10px;
     border-radius: 4px;
     font-weight: 500;
+    cursor: default;
 }
 
 .atlt-dashboard-translate-full .addon-desc {

@@ -59,6 +59,7 @@ class CPFM_Feedback_Notice {
          *     'pages' => ['dashboard', 'cpfm_'],
          * ]);
          */
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook has cpfm_ prefix which is the feedback module prefix
         do_action('cpfm_register_notice');
     }
 
@@ -72,6 +73,7 @@ class CPFM_Feedback_Notice {
 
  
         $screen         = get_current_screen();
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking current admin page for display purposes, no action taken
         $current_page   = isset($_GET['page'])? sanitize_key($_GET['page']):'';
     
         // Gather all unique pages from registered notices
@@ -87,7 +89,7 @@ class CPFM_Feedback_Notice {
         if (!in_array($current_page, array_unique($allowed_pages))) {
             return;
         }
-        wp_enqueue_style('cpfm-common-review-style', ATLT_URL . 'admin/feedback/css/cpfm-admin-feedback.css');
+        wp_enqueue_style('cpfm-common-review-style', ATLT_URL . 'admin/feedback/css/cpfm-admin-feedback.css', [], ATLT_VERSION);
         wp_enqueue_script(
             'cpfm-common-review-script', 
             ATLT_URL . 'admin/feedback/js/cpfm-admin-feedback.js', 
@@ -138,6 +140,7 @@ class CPFM_Feedback_Notice {
             $notice = self::$registered_notices[$category];
             $plugin_name = isset($notice['plugin_name']) ? sanitize_key($notice['plugin_name']) : '';
             if ($plugin_name) {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Dynamic hook name with proper cpfm_ prefix
                 do_action('cpfm_after_opt_in_' . $plugin_name, $category);
             }
         }
@@ -152,6 +155,7 @@ class CPFM_Feedback_Notice {
         }
 
         $screen         = get_current_screen();
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking current admin page for display purposes, no action taken
         $current_page   = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
 
        
@@ -168,7 +172,8 @@ class CPFM_Feedback_Notice {
     
         $output = '';
         $output .= '<div id="cpfNoticePanel" class="notice-panel"' . ($auto_show ? ' data-auto-show="true"' : '') . '>';
-        $output .= '<div class="notice-panel-header">' . esc_html__('Help Improve Plugins', 'ccpw') . ' <span class="dashicons dashicons-no" id="cpfm_remove_notice"></span></div>';
+        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+        $output .= '<div class="notice-panel-header">' . esc_html__('Help Improve Plugins', 'loco-auto-translate') . ' <span class="dashicons dashicons-no" id="cpfm_remove_notice"></span></div>';
         $output .= '<div class="notice-panel-content">';
     
         foreach (self::$registered_notices as $key => $notice) {
@@ -194,21 +199,37 @@ class CPFM_Feedback_Notice {
             $output .= '<strong>' . esc_html($notice['title']) . '</strong>';
             
             $output .= '<div class="notice-message-with-toggle">';
-            $output .= '<p>' . esc_html($notice['message']) . '<a href="#" class="cpf-toggle-extra">' . esc_html__(' More info', 'ccpw') . '</a></p>';
+             // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+            $output .= '<p>' . esc_html($notice['message']) . '<a href="#" class="cpf-toggle-extra">' . esc_html__(' More info', 'loco-auto-translate') . '</a></p>';
             $output .= '</div>';
             
             $output .= '<div class="cpf-extra-info">';
-            $output .= '<p>' . esc_html__('Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We\'ll collect:', 'ccpw') . '</p>';
+
+             // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+            $output .= '<p>' . esc_html__('Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We\'ll collect:', 'loco-auto-translate') . '</p>';
             $output .= '<ul>';
-            $output .= '<li>' . esc_html__('Your website home URL and WordPress admin email.', 'ccpw') . '</li>';
-            $output .= '<li>' . esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw') . '</li>';
+             // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+            $output .= '<li>' . esc_html__('Your website home URL and WordPress admin email.', 'loco-auto-translate') . '</li>';
+            
+            $output .= '<li>' .
+    sprintf(
+        wp_kses_post(
+            // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+            /* translators: %s: API provider name like OpenAI or Gemini */ __('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix. <a href="%s" target="_blank" rel="noopener noreferrer">Click here</a>.', 'loco-auto-translate')
+        ),
+        esc_url('https://my.coolplugins.net/terms/usage-tracking/')
+    ) .
+'</li>';
+
             $output .= '</ul>';
             
             $output .= '</div>';
             
             $output .= '<div class="notice-actions">';
-            $output .= '<button class="button button-primary opt-in-yes" data-category="' . esc_attr($key) . '" id="yes-share-data" value="yes">' . esc_html__("Yes, I Agree", 'ccpw') . '</button>';
-            $output .= '<button class="button opt-in-no" data-category="' . esc_attr($key) . '" id="no-share-data" value="no">' . esc_html__('No, Thanks', 'ccpw') . '</button>';
+             // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+            $output .= '<button class="button button-primary opt-in-yes" data-category="' . esc_attr($key) . '" id="yes-share-data" value="yes">' . esc_html__("Yes, I Agree", 'loco-auto-translate') . '</button>';
+            // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+            $output .= '<button class="button opt-in-no" data-category="' . esc_attr($key) . '" id="no-share-data" value="no">' . esc_html__('No, Thanks', 'loco-auto-translate') . '</button>';
             $output .= '</div>';
             
             $output .= '</div>';

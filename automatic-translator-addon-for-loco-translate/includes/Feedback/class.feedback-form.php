@@ -32,7 +32,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 		function enqueue_feedback_scripts() {
 			$screen = get_current_screen();
 			if ( isset( $screen ) && $screen->id == 'plugins' ) {
-				wp_enqueue_script( 'atlt-free-feedback-script', $this->plugin_url . 'includes/Feedback/js/admin-feedback.js', array( 'jquery' ), $this->plugin_version );
+				wp_enqueue_script( 'atlt-free-feedback-script', $this->plugin_url . 'includes/Feedback/js/admin-feedback.js', array( 'jquery' ), $this->plugin_version, false );
 				wp_enqueue_style( 'cool-plugins-feedback-style', $this->plugin_url . 'includes/Feedback/css/admin-feedback.css', null, $this->plugin_version );
 			}
 		}
@@ -50,24 +50,31 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 
 			$deactivate_reasons = array(
 				'didnt_work_as_expected'         => array(
-					'title'             => __( 'The plugin didn\'t work as expected', 'cool-plugins' ),
+                      // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'title'             => __( 'The plugin didn\'t work as expected', 'loco-auto-translate' ),
 					'input_placeholder' => 'What did you expect?',
 				),
 				'found_a_better_plugin'          => array(
-					'title'             => __( 'I found a better plugin', 'cool-plugins' ),
-					'input_placeholder' => __( 'Please share which plugin', 'cool-plugins' ),
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'title'             => __( 'I found a better plugin', 'loco-auto-translate' ),
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'input_placeholder' => __( 'Please share which plugin', 'loco-auto-translate' ),
 				),
 				'couldnt_get_the_plugin_to_work' => array(
-					'title'             => __( 'The plugin is not working', 'cool-plugins' ),
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'title'             => __( 'The plugin is not working', 'loco-auto-translate' ),
 					'input_placeholder' => 'Please share your issue. So we can fix that for other users.',
 				),
 				'temporary_deactivation'         => array(
-					'title'             => __( 'It\'s a temporary deactivation', 'cool-plugins' ),
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'title'             => __( 'It\'s a temporary deactivation', 'loco-auto-translate' ),
 					'input_placeholder' => '',
 				),
 				'other'                          => array(
-					'title'             => __( 'Other', 'cool-plugins' ),
-					'input_placeholder' => __( 'Please share the reason', 'cool-plugins' ),
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'title'             => __( 'Other', 'loco-auto-translate' ),
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					'input_placeholder' => __( 'Please share the reason', 'loco-auto-translate' ),
 				),
 			);
 
@@ -76,7 +83,10 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 						
 			<div class="cool-plugins-deactivation-response">
 			<div id="cool-plugins-deactivate-feedback-dialog-header">
-				<span id="cool-plugins-feedback-form-title"><?php echo esc_html__( 'Quick Feedback', 'cool-plugins' ); ?></span>
+
+				<span id="cool-plugins-feedback-form-title"><?php
+				 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				echo esc_html__( 'Quick Feedback', 'loco-auto-translate' ); ?></span>
 			</div>
 			<div id="cool-plugins-loader-wrapper">
 				<div class="cool-plugins-loader-container">
@@ -89,7 +99,9 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 				wp_nonce_field( '_cool-plugins_deactivate_feedback_nonce' );
 				?>
 				<input type="hidden" name="action" value="cool-plugins_deactivate_feedback" />
-				<div id="cool-plugins-deactivate-feedback-dialog-form-caption"><?php echo esc_html__( 'If you have a moment, please share why you are deactivating this plugin.', 'cool-plugins' ); ?></div>
+				<div id="cool-plugins-deactivate-feedback-dialog-form-caption"><?php
+				 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+				echo esc_html__( 'If you have a moment, please share why you are deactivating this plugin.', 'loco-auto-translate' ); ?></div>
 				<div id="cool-plugins-deactivate-feedback-dialog-form-body">
 					<?php foreach ( $deactivate_reasons as $reason_key => $reason ) : ?>
 						<div class="cool-plugins-deactivate-feedback-dialog-input-wrapper">
@@ -103,7 +115,9 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 							<?php endif; ?>
 						</div>
 					<?php endforeach; ?>
-					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>"><?php echo esc_html__( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'cool-plugins' ); ?></label>
+					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>"><?php
+					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+					echo esc_html__( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'loco-auto-translate' ); ?></label>
 				</div>
 				<div class="cool-plugin-popup-button-wrapper">
 					<a class="cool-plugins-button button-deactivate" id="atlt-cool-plugin-submitNdeactivate">Submit and Deactivate</a>
@@ -117,8 +131,8 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 		}
 
 
-		function submit_deactivation_response() {
-			if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( $_POST['_wpnonce'], '_cool-plugins_deactivate_feedback_nonce' ) ) {
+	function submit_deactivation_response() {
+			if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), '_cool-plugins_deactivate_feedback_nonce' ) ) {
 				wp_send_json_error();
 			} else {
 				if ( ! current_user_can( 'activate_plugins' ) ) {
@@ -128,32 +142,39 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 				$reason             = isset( $_POST['reason'] ) ? sanitize_key( wp_unslash( $_POST['reason'] ) ) : '';
 				$deactivate_reasons = array(
 					'didnt_work_as_expected'         => array(
-						'title'             => __( 'The plugin didn\'t work as expected', 'cool-plugins' ),
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'title'             => __( 'The plugin didn\'t work as expected', 'loco-auto-translate' ),
 						'input_placeholder' => 'What did you expect?',
 					),
 					'found_a_better_plugin'          => array(
-						'title'             => __( 'I found a better plugin', 'cool-plugins' ),
-						'input_placeholder' => __( 'Please share which plugin', 'cool-plugins' ),
+
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'title'             => __( 'I found a better plugin', 'loco-auto-translate' ),
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'input_placeholder' => __( 'Please share which plugin', 'loco-auto-translate' ),
 					),
 					'couldnt_get_the_plugin_to_work' => array(
-						'title'             => __( 'The plugin is not working', 'cool-plugins' ),
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'title'             => __( 'The plugin is not working', 'loco-auto-translate' ),
 						'input_placeholder' => 'Please share your issue. So we can fix that for other users.',
 					),
 					'temporary_deactivation'         => array(
-						'title'             => __( 'It\'s a temporary deactivation', 'cool-plugins' ),
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'title'             => __( 'It\'s a temporary deactivation', 'loco-auto-translate' ),
 						'input_placeholder' => '',
 					),
 					'other'                          => array(
-						'title'             => __( 'Other', 'cool-plugins' ),
-						'input_placeholder' => __( 'Please share the reason', 'cool-plugins' ),
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'title'             => __( 'Other', 'loco-auto-translate' ),
+						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+						'input_placeholder' => __( 'Please share the reason', 'loco-auto-translate' ),
 					),
 				);
 
 				$plugin_initial     = get_option( 'atlt_initial_save_version' );
 				$deativation_reason = array_key_exists( $reason, $deactivate_reasons ) ? $reason : 'other';
-
-				$raw_message       = isset( $_POST['message'] ) ? wp_unslash( $_POST['message'] ) : '';
-				$sanitized_message = $raw_message === '' ? 'N/A' : sanitize_text_field( $raw_message );
+				$raw_message       = isset( $_POST['message'] ) ? sanitize_text_field( wp_unslash( $_POST['message'] ) ) : '';
+				$sanitized_message = $raw_message === '' ? 'N/A' : $raw_message;
 				$admin_email       = sanitize_email( get_option( 'admin_email' ) );
 				$site_url          = get_site_url();
 				$install_date      = get_option( 'atlt-install-date' );
