@@ -32,8 +32,7 @@ if (!class_exists('ATLT_cronjob')) {
 
                 $schedules['every_30_days'] = array(
                     'interval' => 30 * 24 * 60 * 60, // 2,592,000 seconds
-                    // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                    'display'  => __('Once every 30 days', 'loco-auto-translate'),
+                    'display'  => __('Once every 30 days', 'automatic-translator-addon-for-loco-translate'),
                 );
             }
 

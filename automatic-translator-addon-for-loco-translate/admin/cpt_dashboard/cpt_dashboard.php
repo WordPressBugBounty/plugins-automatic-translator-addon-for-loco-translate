@@ -4,75 +4,6 @@ if(!defined('ABSPATH')){
     exit;
 }
 
-/**
- * Dashboard
- * 
- * example:
- * 
- * Dashbord initialize
- * if(!class_exists('Atlt_Dashboard')){
- * $dashboard=Atlt_Dashboard::instance();
- * }
- * 
- * Store options
- * if(class_exists('Atlt_Dashboard')){
- *  Atlt_Dashboard::store_options(
- *      'prefix', // Required plugin prefix
- *      'unique_key',// Optional unique key is used to update the data based on post/page id or plugin/themes name
- *      'update', // Optional preview string count or character count update or replace
- *      array(
- *           'post/page or theme/plugin name' => 'name or id',
- *          'post_title (optional)' => 'Post Title',
- *          'service_provider' => 'google', // don't change this key
- *          'source_language' => 'en', // don't change this key
- *          'target_language' => 'fr', // don't change this key
- *          'time_taken' => '10', // don't change this key
- *          'string_count'=>10, 
- *          'character_count'=>100, 
- *          'date_time' => date('Y-m-d H:i:s'),
- *      ) // Required data array
- *  );
- * }
- * 
- * Add Tabs
- * add_filter('cpt_dashboard_tabs', function($tabs){
- *  $tabs[]=array(
- *      'prefix'=>'tab_name', // Required
- *      'tab_name'=>'Tab Name', // Required
- *      'columns'=>array(
- *          'post_id or plugin_name'=>'Post Id or Plugin Name',
- *          'post_title (optional)'=>'Post Title',
- *          'string_count'=>'String Count',
- *           'character_count'=>'Character Count',
- *           'service_provider'=>'Service Provider',
- *           'time_taken'=>'Time Taken',
- *           'date_time'=>'Date Time',
- *      ) // columns Required
- *  );
- *  return $tabs;
- * });
- * 
- * Display review notice
- * if(class_exists('Atlt_Dashboard')){
- *  Atlt_Dashboard::review_notice(
- *      'prefix', // Required
- *      'plugin_name', // Required
- *      'url', // Required
- *      'icon' // Optional
- *  );
- * }
- * 
- * Get translation data
- * if(class_exists('Atlt_Dashboard')){
- *  Atlt_Dashboard::get_translation_data(
- *      'prefix', // Required
- *      array(
- *          'editor_type' => 'gutenberg', // optional return data based on editor type
- *          'post_id' => '123', // optional return data based on post id
- *      ) // Optional
- *  );
- * }
- */
 
 if(!class_exists('Atlt_Dashboard')){
     class Atlt_Dashboard{
@@ -256,8 +187,7 @@ if(!class_exists('Atlt_Dashboard')){
 
             
             $message = sprintf(
-                 
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
+                  // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
                 /* translators: %d: number of seconds */  __('Thanks for using <b>%1$s</b>! You have translated <b>%2$s</b> characters so far using our plugin!<br>Please give us a quick rating, it works as a boost for us to keep working on more <a style="text-decoration: none;" href="%3$s" target="_blank" rel="noopener noreferrer"><b>Cool Plugins</b></a>!', 'cp-notice'),
                 $plugin_name,
                 $total_character_count,
@@ -272,16 +202,14 @@ if(!class_exists('Atlt_Dashboard')){
             add_action('admin_notices', function() use ($message, $prefix, $url , $plugin_name){
 
                 $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
                 
                 echo wp_kses_post($html);
             });
 
             add_action('atlt_display_admin_notices', function() use ($message, $prefix, $url, $plugin_name){
                 $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
-               // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'cp-notice').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'cp-notice').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
                 
                 echo wp_kses_post($html);
             });

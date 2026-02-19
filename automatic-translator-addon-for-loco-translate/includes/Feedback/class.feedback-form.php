@@ -50,31 +50,24 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 
 			$deactivate_reasons = array(
 				'didnt_work_as_expected'         => array(
-                      // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'title'             => __( 'The plugin didn\'t work as expected', 'loco-auto-translate' ),
+					'title'             => __( 'The plugin didn\'t work as expected', 'automatic-translator-addon-for-loco-translate' ),
 					'input_placeholder' => 'What did you expect?',
 				),
 				'found_a_better_plugin'          => array(
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'title'             => __( 'I found a better plugin', 'loco-auto-translate' ),
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'input_placeholder' => __( 'Please share which plugin', 'loco-auto-translate' ),
+					'title'             => __( 'I found a better plugin', 'automatic-translator-addon-for-loco-translate' ),
+					'input_placeholder' => __( 'Please share which plugin', 'automatic-translator-addon-for-loco-translate' ),
 				),
 				'couldnt_get_the_plugin_to_work' => array(
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'title'             => __( 'The plugin is not working', 'loco-auto-translate' ),
+					'title'             => __( 'The plugin is not working', 'automatic-translator-addon-for-loco-translate' ),
 					'input_placeholder' => 'Please share your issue. So we can fix that for other users.',
 				),
 				'temporary_deactivation'         => array(
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'title'             => __( 'It\'s a temporary deactivation', 'loco-auto-translate' ),
+					'title'             => __( 'It\'s a temporary deactivation', 'automatic-translator-addon-for-loco-translate' ),
 					'input_placeholder' => '',
 				),
 				'other'                          => array(
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'title'             => __( 'Other', 'loco-auto-translate' ),
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					'input_placeholder' => __( 'Please share the reason', 'loco-auto-translate' ),
+					'title'             => __( 'Other', 'automatic-translator-addon-for-loco-translate' ),
+					'input_placeholder' => __( 'Please share the reason', 'automatic-translator-addon-for-loco-translate' ),
 				),
 			);
 
@@ -85,8 +78,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 			<div id="cool-plugins-deactivate-feedback-dialog-header">
 
 				<span id="cool-plugins-feedback-form-title"><?php
-				 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				echo esc_html__( 'Quick Feedback', 'loco-auto-translate' ); ?></span>
+				echo esc_html__( 'Quick Feedback', 'automatic-translator-addon-for-loco-translate' ); ?></span>
 			</div>
 			<div id="cool-plugins-loader-wrapper">
 				<div class="cool-plugins-loader-container">
@@ -100,8 +92,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 				?>
 				<input type="hidden" name="action" value="cool-plugins_deactivate_feedback" />
 				<div id="cool-plugins-deactivate-feedback-dialog-form-caption"><?php
-				 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-				echo esc_html__( 'If you have a moment, please share why you are deactivating this plugin.', 'loco-auto-translate' ); ?></div>
+				echo esc_html__( 'If you have a moment, please share why you are deactivating this plugin.', 'automatic-translator-addon-for-loco-translate' ); ?></div>
 				<div id="cool-plugins-deactivate-feedback-dialog-form-body">
 					<?php foreach ( $deactivate_reasons as $reason_key => $reason ) : ?>
 						<div class="cool-plugins-deactivate-feedback-dialog-input-wrapper">
@@ -116,8 +107,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 						</div>
 					<?php endforeach; ?>
 					<input class="cool-plugins-GDPR-data-notice" id="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>" type="checkbox"><label for="cool-plugins-GDPR-data-notice-<?php echo esc_attr( $this->plugin_slug ); ?>"><?php
-					 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-					echo esc_html__( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'loco-auto-translate' ); ?></label>
+					echo esc_html__( 'I agree to share anonymous usage data and basic site details (such as server, PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco Translate improvement efforts. Additionally, I allow Cool Plugins to store all information provided through this form and to respond to my inquiry', 'automatic-translator-addon-for-loco-translate' ); ?></label>
 				</div>
 				<div class="cool-plugin-popup-button-wrapper">
 					<a class="cool-plugins-button button-deactivate" id="atlt-cool-plugin-submitNdeactivate">Submit and Deactivate</a>
@@ -142,32 +132,24 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 				$reason             = isset( $_POST['reason'] ) ? sanitize_key( wp_unslash( $_POST['reason'] ) ) : '';
 				$deactivate_reasons = array(
 					'didnt_work_as_expected'         => array(
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'title'             => __( 'The plugin didn\'t work as expected', 'loco-auto-translate' ),
+						'title'             => __( 'The plugin didn\'t work as expected', 'automatic-translator-addon-for-loco-translate' ),
 						'input_placeholder' => 'What did you expect?',
 					),
 					'found_a_better_plugin'          => array(
-
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'title'             => __( 'I found a better plugin', 'loco-auto-translate' ),
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'input_placeholder' => __( 'Please share which plugin', 'loco-auto-translate' ),
+						'title'             => __( 'I found a better plugin', 'automatic-translator-addon-for-loco-translate' ),
+						'input_placeholder' => __( 'Please share which plugin', 'automatic-translator-addon-for-loco-translate' ),
 					),
 					'couldnt_get_the_plugin_to_work' => array(
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'title'             => __( 'The plugin is not working', 'loco-auto-translate' ),
+						'title'             => __( 'The plugin is not working', 'automatic-translator-addon-for-loco-translate' ),
 						'input_placeholder' => 'Please share your issue. So we can fix that for other users.',
 					),
 					'temporary_deactivation'         => array(
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'title'             => __( 'It\'s a temporary deactivation', 'loco-auto-translate' ),
+						'title'             => __( 'It\'s a temporary deactivation', 'automatic-translator-addon-for-loco-translate' ),
 						'input_placeholder' => '',
 					),
 					'other'                          => array(
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'title'             => __( 'Other', 'loco-auto-translate' ),
-						 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-						'input_placeholder' => __( 'Please share the reason', 'loco-auto-translate' ),
+						'title'             => __( 'Other', 'automatic-translator-addon-for-loco-translate' ),
+						'input_placeholder' => __( 'Please share the reason', 'automatic-translator-addon-for-loco-translate' ),
 					),
 				);
 

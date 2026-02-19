@@ -3,67 +3,53 @@
     <div class="atlt-dashboard-ai-translations-container">
     <div class="header">
         <h1><?php
-         // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-        esc_html_e('AI Translations', 'loco-auto-translate'); ?></h1>
+        esc_html_e('AI Translations', 'automatic-translator-addon-for-loco-translate'); ?></h1>
         <div class="atlt-dashboard-status">
             <span><?php
-             // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-             esc_html_e('Inactive', 'loco-auto-translate'); ?></span>
+             esc_html_e('Inactive', 'automatic-translator-addon-for-loco-translate'); ?></span>
             <a href="<?php echo esc_url('https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=ai_translations'); ?>" class='atlt-dashboard-btn' target="_blank" rel="noopener noreferrer">
                 <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/upgrade-now.svg'); ?>" alt="<?php
-                 // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                esc_attr_e('Upgrade Now', 'loco-auto-translate'); ?>">
+                esc_attr_e('Upgrade Now', 'automatic-translator-addon-for-loco-translate'); ?>">
                 <?php 
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                esc_html_e('Upgrade Now', 'loco-auto-translate'); ?>
+                esc_html_e('Upgrade Now', 'automatic-translator-addon-for-loco-translate'); ?>
             </a>
         </div>
     </div>
     <p class="description">
-        <?php // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-        esc_html_e('Experience the power of AI for faster, more accurate translations. Choose from multiple AI providers to translate your content efficiently.', 'loco-auto-translate'); ?>
+        <?php esc_html_e('Experience the power of AI for faster, more accurate translations. Choose from multiple AI providers to translate your content efficiently.', 'automatic-translator-addon-for-loco-translate'); ?>
     </p>
     <div class="atlt-dashboard-translations">
         <?php
-        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
         $atlt_ai_translations = [
             [
                 'logo' => 'chrome-built-in-ai-logo.png',
                 'alt' => 'Chrome Built-in AI',
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'title' => __('Chrome Built-in AI', 'loco-auto-translate'),
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'description' => __('Utilize Chrome\'s built-in AI for seamless translation experience.', 'loco-auto-translate'),
+                'title' => __('Chrome Built-in AI', 'automatic-translator-addon-for-loco-translate'),
+                'description' => __('Utilize Chrome\'s built-in AI for seamless translation experience.', 'automatic-translator-addon-for-loco-translate'),
                 'icon' => 'chrome-ai-translate.png',
                 'url' => 'https://locoaddon.com/docs/how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=chrome_ai_translations'
             ],
             [
                 'logo' => 'chatgpt-logo.png',
                 'alt' => 'ChatGPT AI',
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'title' => __('ChatGPT Translations', 'loco-auto-translate'),
-               // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'description' => __('Use OpenAI\'s ChatGPT for fast, natural, accurate, and fluent translations.', 'loco-auto-translate'),
+                'title' => __('ChatGPT Translations', 'automatic-translator-addon-for-loco-translate'),
+                'description' => __('Use OpenAI\'s ChatGPT for fast, natural, accurate, and fluent translations.', 'automatic-translator-addon-for-loco-translate'),
                 'icon' => 'chatgpt-translate.png',
                 'url' => 'https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=chatgpt_ai_translations'
             ],
             [
                 'logo' => 'geminiai-logo.png',
                 'alt' => 'Gemini',
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'title' => __('Gemini AI Translations', 'loco-auto-translate'),
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'description' => __('Leverage Gemini AI for seamless and context-aware translations.', 'loco-auto-translate'),
+                'title' => __('Gemini AI Translations', 'automatic-translator-addon-for-loco-translate'),
+                'description' => __('Leverage Gemini AI for seamless and context-aware translations.', 'automatic-translator-addon-for-loco-translate'),
                 'icon' => 'gemini-translate.png',
                 'url' => 'https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=gemini_ai_translations'
             ],
             [
                 'logo' => 'openai-logo.png',
                 'alt' => 'OpenAI',
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'title' => __('OpenAI Translations', 'loco-auto-translate'),
-                // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                'description' => __('Leverage OpenAI for seamless and context-aware translations.', 'loco-auto-translate'),
+                'title' => __('OpenAI Translations', 'automatic-translator-addon-for-loco-translate'),
+                'description' => __('Leverage OpenAI for seamless and context-aware translations.', 'automatic-translator-addon-for-loco-translate'),
                 'icon' => 'open-ai-translate.png',
                 'url' => 'https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=openai_ai_translations'
             ]

@@ -1,10 +1,10 @@
 <?php
-    /*
+/*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.6.1
+Version: 2.6.2
 License: GPL2
-Text Domain: loco-auto-translate
+Text Domain: automatic-translator-addon-for-loco-translate
 Author: Cool Plugins
 Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list
 */
@@ -16,7 +16,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     define('ATLT_FILE', __FILE__);
     define('ATLT_URL', plugin_dir_url(ATLT_FILE));
     define('ATLT_PATH', plugin_dir_path(ATLT_FILE));
-    define('ATLT_VERSION', '2.6.1');
+    define('ATLT_VERSION', '2.6.2');
     ! defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API', "https://feedback.coolplugins.net/");
 
     /**
@@ -88,7 +88,6 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
             // run actions and filter only at admin end.
             if (is_admin()) {
                 add_action('plugins_loaded', [$thisPlugin, 'atlt_check_required_loco_plugin']);
-                add_action('init', [$thisPlugin, 'atlt_load_textdomain']);
                 // add notice to use latest loco translate addon
                 add_action('init', [$thisPlugin, 'atlt_verify_loco_version']);
 
@@ -138,8 +137,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
                 if (! current_user_can('install_plugins')) {
                     wp_send_json_error([
-                        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                        'errorMessage' => __('Sorry, you are not allowed to install plugins on this site.', 'loco-auto-translate'),
+                        'errorMessage' => __('Sorry, you are not allowed to install plugins on this site.', 'automatic-translator-addon-for-loco-translate'),
                     ]);
                 }
 
@@ -149,8 +147,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     wp_send_json_error([
                         'slug'         => '',
                         'errorCode'    => 'no_plugin_specified',
-                        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                        'errorMessage' => __('No plugin specified.', 'loco-auto-translate'),
+                        'errorMessage' => __('No plugin specified.', 'automatic-translator-addon-for-loco-translate'),
                     ]);
                 }
 
@@ -170,8 +167,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     wp_send_json_error([
                         'slug'         => $plugin_slug,
                         'errorCode'    => 'plugin_not_allowed',
-                        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                        'errorMessage' => __('This plugin is not allowed to be installed via this interface.', 'loco-auto-translate'),
+                        'errorMessage' => __('This plugin is not allowed to be installed via this interface.', 'automatic-translator-addon-for-loco-translate'),
                     ]);
                 }
                 
@@ -274,8 +270,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     } elseif (is_null($result)) {
                         global $wp_filesystem;
                         $status['errorCode'] = 'unable_to_connect_to_filesystem';
-                        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                        $status['errorMessage'] = __('Unable to connect to the filesystem. Please confirm your credentials.', 'loco-auto-translate');
+                        $status['errorMessage'] = __('Unable to connect to the filesystem. Please confirm your credentials.', 'automatic-translator-addon-for-loco-translate');
                         if ($wp_filesystem instanceof WP_Filesystem_Base && is_wp_error($wp_filesystem->errors) && $wp_filesystem->errors->has_errors()) {
                             $status['errorMessage'] = esc_html($wp_filesystem->errors->get_error_message());
                         }
@@ -360,11 +355,8 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     }
 
                     $notice = [
-
-                        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                        'title'          => __('LocoAI – Auto Translate for Loco Translate', 'loco-auto-translate'),
-                        // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-                        'message'        => __('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'loco-auto-translate'),
+                        'title'          => __('LocoAI – Auto Translate for Loco Translate', 'automatic-translator-addon-for-loco-translate'),
+                        'message'        => __('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'automatic-translator-addon-for-loco-translate'),
                         'pages'          => ['loco-atlt-dashboard'],
                         'always_show_on' => ['loco-atlt-dashboard'], // This enables auto-show
                         'plugin_name'    => 'atlt',
@@ -626,11 +618,6 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 		| also register the plugin text domain
 		|----------------------------------------------------------------------
 		*/
-
-        public function atlt_load_textdomain()
-        {
-
-        }
 
         public function atlt_check_required_loco_plugin()
         {
@@ -1105,12 +1092,12 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
         /**
          * Render the dashboard page with dynamic text domain support
          *
-         * @param string $text_domain The text domain for translations (default: 'loco-auto-translate')
+         * @param string $text_domain The text domain for translations (default: 'automatic-translator-addon-for-loco-translate')
          */
         public function atlt_dashboard_page()
         {
 
-            $text_domain = 'loco-auto-translate';
+            $text_domain = 'automatic-translator-addon-for-loco-translate';
             $file_prefix = 'admin/atlt-dashboard/views/';
 
             $valid_tabs = [
@@ -1265,8 +1252,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
         public function __clone()
         {
             // Cloning instances of the class is forbidden.
-            // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-            _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'loco-auto-translate'), '2.3');
+            _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'automatic-translator-addon-for-loco-translate'), '2.3');
         }
 
         /**
@@ -1275,8 +1261,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
         public function __wakeup()
         {
             // Unserializing instances of the class is forbidden.
-            // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch
-            _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'loco-auto-translate'), '2.3');
+            _doing_it_wrong(__FUNCTION__, esc_html__('Cheatin&#8217; huh?', 'automatic-translator-addon-for-loco-translate'), '2.3');
         }
 
     }

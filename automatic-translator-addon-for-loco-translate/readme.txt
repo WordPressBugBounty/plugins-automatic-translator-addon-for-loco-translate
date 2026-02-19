@@ -5,8 +5,8 @@ Tags: AI translation, google translate, translate, chatgpt, multilingual
 Requires at least:5.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Loco Translate Tested Up to: 2.8.2
-Stable tag: 2.6.1
+Loco Translate Tested Up to: 2.8.1
+Stable tag: 2.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,8 @@ Loco Translate is primarily a manual translation tool for translating WordPress 
 * **[AI Translation for TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=tpa_check_out)** is a powerful addon that enhances the functionality of the TranslatePress plugin. This addon uses advanced translation services, like Google Translate, Yandex, and Chrome AI translator, to provide accurate and instant translations for your web pages automatically.
 
 * **[Linguator – Multilingual AI Translation](https://wordpress.org/plugins/translate-words/)** is a powerful multilingual plugin that helps you create and manage multilingual content on your WordPress website. Easily translate your **posts, pages, menus,** and **categories** into different languages using AI and connect with visitors worldwide.
+
+**Use of 3rd Party Services:** This plugin connects to the Cool Plugins feedback server only for optional usage data sharing and voluntary feedback submission (for example, during plugin deactivation). Data is transmitted solely after explicit user consent. No hidden tracking is performed, and no frontend visitor or site user data is collected.  For more details, please review our [Data Usage Policy](https://my.coolplugins.net/terms/usage-tracking/), [TOS](https://my.coolplugins.net/terms/), and [Privacy Policy](https://my.coolplugins.net/terms/privacy-policy/).
 
 ### Special THANKS!
 
@@ -159,6 +161,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
+
+= Version 2.6.2 - 19/02/2026 =
+* **Improved:** Standardized text domain across plugin.
 
 = Version 2.6.1 - 2/2/2026 =
 * **Improved:** Code Improvements.
@@ -426,17 +431,5 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
  == Upgrade Notice ==
 
-= Version 1.3 - 03/12/2019 =
-* **New:** Integrated **translated character statistics tables**.
-* **New:** Extended character limit with premium license key.
-* **New:** Integrated namespace.
-* **New:** Added "Not interested" button in the review popup.
-* **New:** Integrated a premium license key manager.
-* **New:** Added **security checks in every request**.
-* **New:** Integrated **nonce in AJAX requests**.
-* **Improved:** Improved translation issues.
-* **Improved:** Overall code improvements.
-* **Improved:** Added new screenshots.
-* **Fixed:** Minor translation issues.
-* **Fixed:** Minor JavaScript errors.
-* **Fixed:** Compatibility issues with **WordPress 5.3**.
+= Version 2.6.2 - 19/02/2026 =
+* **Improved:** Standardized text domain across plugin.
