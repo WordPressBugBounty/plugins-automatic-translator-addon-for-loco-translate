@@ -604,11 +604,14 @@ div.ui-dialog[aria-describedby="atlt-dialog"].atlt-rtl{
   justify-content: center;
   align-items: center;
 }
-
-.yandex-widget-container .translator-widget #ytWidget {
-  margin: 20px 23px 10px 0px;
+.yandex-widget-container .yandex-widget-body .yandex-translation-info {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
 }
-
 /* Translation Provider Table Styles */
 
 .ui-dialog {

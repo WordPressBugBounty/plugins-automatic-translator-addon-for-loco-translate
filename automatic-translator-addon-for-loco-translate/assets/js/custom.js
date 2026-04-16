@@ -51,6 +51,11 @@ const AutoTranslator = (function (window, $) {
     }
 
     function destroyYandexTranslator() {
+        if (typeof window.atltDestroyYandexTranslation === 'function') {
+            window.atltDestroyYandexTranslation();
+        } else {
+            $(document).trigger('atlt:yandex-cancel');
+        }
         $('.yt-button__icon.yt-button__icon_type_right').trigger('click');
         $('.atlt_custom_model.yandex-widget-container').find('.atlt_string_container').scrollTop(0);
     
@@ -84,6 +89,7 @@ const AutoTranslator = (function (window, $) {
     // Yandex click handler
     function onYandexTranslateClick(locale) {
         const defaultcode = locale.lang || null;
+        const langugeName = locale.label || null;
         let defaultlang = '';
 
         const langMapping = {
@@ -102,7 +108,8 @@ const AutoTranslator = (function (window, $) {
         modelContainer.find(".atlt_stats").hide();
 
         localStorage.setItem("lang", defaultlang);
-
+        localStorage.setItem("langName", langugeName);
+        modelContainer.find(".yandex-translation-info").text(`Translating Strings into ${localStorage.getItem("langName") || 'Selected Language'} Using Yandex Translator.`);
         const supportedLanguages = ['kir', 'he', 'af', 'jv', 'no', 'am', 'ar', 'az', 'ba', 'be', 'bg', 'bn', 'bs', 'ca', 'ceb', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd', 'gl', 'gu', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'jv', 'ka', 'kk', 'km', 'kn', 'ko', 'ky', 'la', 'lb', 'lo', 'lt', 'lv', 'mg', 'mhr', 'mi', 'mk', 'ml', 'mn', 'mr', 'mrj', 'ms', 'mt', 'my', 'ne', 'nl', 'no', 'pa', 'pap', 'pl', 'pt', 'ro', 'ru', 'si', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tl', 'tr', 'tt', 'udm', 'uk', 'ur', 'uz', 'vi', 'xh', 'yi', 'zh'];
 
         if (!supportedLanguages.includes(defaultlang)) {
@@ -114,7 +121,10 @@ const AutoTranslator = (function (window, $) {
             modelContainer.fadeIn("slow");
         } else {
             $("#atlt-dialog").dialog("close");
-            modelContainer.fadeIn("slow");
+            modelContainer.fadeIn("slow", function () {
+                // Start Yandex automatically once popup is visible
+                $(document).trigger('atlt:yandex-start');
+            });
         }
 
 
@@ -232,7 +242,7 @@ const AutoTranslator = (function (window, $) {
                         locoBatch.append(`<div class='noapiadded'>
                             <p>Add automatic translation services in the plugin settings.<br>or<br>Use <strong>Auto Translate</strong> addon button.</p>
                             <nav>
-                                <a href='http://locotranslate.local/wp-admin/admin.php?page=loco-config&amp;action=apis' class='button button-link has-icon icon-cog'>Settings</a>
+                                <a href="${(window.extradata && extradata.loco_settings_url) ? extradata.loco_settings_url : ''}" class='button button-link has-icon icon-cog'>Settings</a>
                                 <a href='https://localise.biz/wordpress/plugin/manual/providers' class='button button-link has-icon icon-help' target='_blank'>Help</a>
                                 <a href='https://localise.biz/wordpress/translation?l=de-DE' class='button button-link has-icon icon-group' target='_blank'>Need a human?</a>
                             </nav>
@@ -638,6 +648,7 @@ const AutoTranslator = (function (window, $) {
             </div>
             ${translatorWidget(widgetType)}
             <div class="atlt_string_container">
+                <div class ="yandex-translation-info">Translating Strings into ${localStorage.getItem("langName") || 'Selected Language'} Using Yandex Translator.</div>
                 <table class="scrolldown atlt_strings_table">
                     <thead>
                         <th class="notranslate">S.No</th>
@@ -703,14 +714,8 @@ const AutoTranslator = (function (window, $) {
     // Translator widget HTML
     function translatorWidget(widgetType) {
         if (widgetType === "yandex") {
-            const widgetPlaceholder = '<div id="ytWidget">..Loading</div>';
             return `
-                <div class="translator-widget">
-                    <h3 class="choose-lang">Choose language <span class="dashicons-before dashicons-translation"></span></h3>
-                    ${widgetPlaceholder}
-                </div>`;
-        } else {
-            return ''; // Return an empty string for non-yandex widget types
+                <div id="ytWidget" style="display:none"></div>`;
         }
     }
     // oninit

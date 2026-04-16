@@ -6,7 +6,7 @@ Requires at least:5.0
 Tested up to: 6.9
 Requires PHP: 7.2
 Loco Translate Tested Up to: 2.8.1
-Stable tag: 2.6.2
+Stable tag: 2.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -161,6 +161,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
+
+= Version 2.6.3 - 16/04/2026 =
+* **Fixed:** Issue with yandex translator.
 
 = Version 2.6.2 - 19/02/2026 =
 * **Improved:** Standardized text domain across plugin.

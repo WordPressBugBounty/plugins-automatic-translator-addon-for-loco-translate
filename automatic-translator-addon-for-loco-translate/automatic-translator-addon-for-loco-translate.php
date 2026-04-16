@@ -2,7 +2,7 @@
 /*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.6.2
+Version: 2.6.3
 License: GPL2
 Text Domain: automatic-translator-addon-for-loco-translate
 Author: Cool Plugins
@@ -16,7 +16,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     define('ATLT_FILE', __FILE__);
     define('ATLT_URL', plugin_dir_url(ATLT_FILE));
     define('ATLT_PATH', plugin_dir_path(ATLT_FILE));
-    define('ATLT_VERSION', '2.6.2');
+    define('ATLT_VERSION', '2.6.3');
     ! defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API', "https://feedback.coolplugins.net/");
 
     /**
@@ -913,7 +913,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Checking action parameter for conditional script loading, no data processing
             $req_action = isset($_REQUEST['action']) ? sanitize_text_field(wp_unslash($_REQUEST['action'])) : '';
             if ($req_action === 'file-edit') {
-                wp_register_script('loco-addon-custom', ATLT_URL . 'assets/js/custom.min.js', ['loco-translate-admin'], ATLT_VERSION, true);
+                wp_register_script('loco-addon-custom', ATLT_URL . 'assets/js/custom.js', ['loco-translate-admin'], ATLT_VERSION, true);
                 wp_register_style(
                     'loco-addon-custom-css',
                     ATLT_URL . 'assets/css/custom.min.css',
@@ -949,9 +949,8 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 // copy object
                 wp_add_inline_script(
                     'loco-translate-admin',
-                    '
-            var returnedTarget = JSON.parse(JSON.stringify(window.loco));
-            window.locoConf=returnedTarget;'
+                    'var returnedTarget = JSON.parse(JSON.stringify(window.loco));
+                    window.locoConf=returnedTarget;'
                 );
 
             }
@@ -1121,14 +1120,6 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
             // Action buttons configuration
             $buttons = [
                 [
-                    'url'  => 'https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard_header',
-                    'img'  => 'upgrade-now.svg',
-                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                    'alt'  => __('premium', $text_domain),
-                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                    'text' => __('Unlock Pro Features', $text_domain),
-                ],
-                [
                     'url' => 'https://locoaddon.com/docs/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_header',
                     'img' => 'document.svg',
                     // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
@@ -1139,6 +1130,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     'img' => 'contact.svg',
                     // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
                     'alt' => __('contact', $text_domain),
+                    'text' => __('Support', $text_domain),
                 ],
             ];
 

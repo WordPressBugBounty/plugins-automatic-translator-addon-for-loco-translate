@@ -141,8 +141,9 @@
                                   <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
                                           <p><?php 
                                           // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                          echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect: ", $atlt_text_domain); ?><a href="<?php echo esc_url('https://my.coolplugins.net/terms/usage-tracking/'); ?>" target="_blank" rel="noopener noreferrer"><?php
-                                           // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain ?>
+                                          echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect: ", $atlt_text_domain); ?><a href="<?php echo esc_url('https://my.coolplugins.net/terms/usage-tracking/'); ?>" target="_blank" rel="noopener noreferrer"><?php 
+                                          // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
+                                          esc_html_e('Click here', $atlt_text_domain); ?></a></p>
                                           <ul style="list-style-type:auto;">
                                               <li><?php 
                                               // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
