@@ -444,6 +444,70 @@ span.beta-button {
   padding-top: 30px;
 }
 
+.atlt_custom_model .atlt_translate_warning-massage {
+  position: absolute;
+  display: none;
+  top: 0;
+  left: 10px;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  width: calc(100% - 22px);
+  border-radius: 3px;
+  height: 100%;
+  z-index: 9;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.atlt_custom_model .atlt_translate_warning-massage .warning-massage-wrapper {
+  z-index: 10;
+  width: 60%;
+  max-height: 80vh;
+  padding: 15px;
+  background-color: #fff;
+  position: absolute;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  display: flex;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.atlt_custom_model .atlt_translate_warning-massage .warning-massage-wrapper .warning-massage-content{
+  width: 100%;
+}
+
+.atlt_custom_model .atlt_translate_warning-massage .warning-massage-wrapper h2 {
+  margin: 8px 0;
+  font-size: 16px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  max-width: 100%;
+  text-align: center;
+}
+
+.atlt_custom_model .atlt_translate_warning-massage .warning-massage-wrapper .close-button {
+  position: absolute;
+  top: -7px;
+  right: 0;
+  font-weight: 700;
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: #000;
+  z-index: 11;
+}
+
+.atlt_custom_model .atlt_translate_warning-massage .warning-massage-wrapper .close-button:hover {
+  color: #f00;
+}
+
 .atlt_custom_model .modal-footer {
   padding: 2px 16px;
   background-color: #5cb85c;
@@ -599,12 +663,14 @@ div.ui-dialog[aria-describedby="atlt-dialog"].atlt-rtl{
   margin-top: 10px;
 }
 
-.yandex-widget-container .translator-widget {
+.yandex-widget-container .translator-widget,
+.openai-widget-container .translator-widget {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.yandex-widget-container .yandex-widget-body .yandex-translation-info {
+.yandex-widget-container .yandex-widget-body .yandex-translation-info,
+.openai-widget-container .openai-widget-body .openai-translation-info {
   display: flex;
   justify-content: center;
   margin-top: 10px;

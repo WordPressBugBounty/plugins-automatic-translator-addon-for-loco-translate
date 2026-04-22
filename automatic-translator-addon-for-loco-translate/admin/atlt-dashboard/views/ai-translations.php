@@ -51,7 +51,7 @@
                 'title' => __('OpenAI Translations', 'automatic-translator-addon-for-loco-translate'),
                 'description' => __('Leverage OpenAI for seamless and context-aware translations.', 'automatic-translator-addon-for-loco-translate'),
                 'icon' => 'open-ai-translate.png',
-                'url' => 'https://locoaddon.com/docs/gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=openai_ai_translations'
+                'url' => 'https://locoaddon.com/docs/open-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=openai_ai_translations'
             ]
         ];
 

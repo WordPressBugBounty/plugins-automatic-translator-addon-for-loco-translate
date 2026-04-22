@@ -680,16 +680,34 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     width: 100%;
 }
 
-.atlt-dashboard-api-settings-form {
-    width: 55%;
-}
-
 .atlt-dashboard-api-settings label {
     display: block;
     font-weight: bold;
     margin: 10px 0px;
 }
 
+.atlt-dashboard-api-settings label:not(:first-of-type) {
+    padding: 10px 0px 0px 0px;
+    border-top: 1px solid var(--border-color);
+}
+
+.atlt-dashboard-api-settings .api-settings-label:not(:first-of-type) {
+    border-top: 1px solid var(--border-color);
+    margin-top: 25px;
+    padding-top: 18px;
+}
+
+.atlt-dashboard-api-settings .input-group{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.atlt-dashboard-api-settings .input-group input{
+    width: 60%;
+}
 .atlt-dashboard-api-settings input {
     width: 100%;
     padding: 8px;
@@ -697,6 +715,24 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+.atlt-openai-model-select {
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    vertical-align: middle;
+    margin-bottom: 10px;
+}
+
+.atlt-openai-model-select, .atlt-google-model-select {
+    width: 200px;
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    vertical-align: middle;
+}
+
 
 .atlt-dashboard-api-settings-form a { 
     display: inline-block;
@@ -704,6 +740,25 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     color: #0073aa;
     text-decoration: none;
     margin-bottom: 18px;
+}
+
+.atlt-dashboard-api-settings .atlt-context-aware-textarea {
+    width: 100%;
+    min-height: 110px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-color);
+    background: #fff;
+    resize: vertical;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.atlt-dashboard-api-settings .atlt-context-aware-textarea[disabled] {
+    background: #f6f7f7;
+    color: #8c8f94;
 }
 
 .atlt-dashboard-api-settings p{

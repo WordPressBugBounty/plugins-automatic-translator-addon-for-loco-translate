@@ -3,8 +3,8 @@ const AutoTranslator = (function (window, $) {
     const locoConf = window.locoConf;
     // get plugin configuration object.
     const configData = window.extradata;
-    const { ajax_url: ajaxUrl, nonce: nonce, ATLT_URL: ATLT_URL, extra_class: rtlClass} = configData;
-
+    const { ajax_url: ajaxUrl, nonce: nonce, ATLT_URL: ATLT_URL, extra_class: rtlClass, openai_api_key: openaiApiKey} = configData;
+    let openAISourceValues = {};
     onLoad();
     function onLoad() {
         if (locoConf && locoConf.conf) {
@@ -17,9 +17,15 @@ const AutoTranslator = (function (window, $) {
             // create a project ID for later use in ajax request.
             const projectId = generateProjectId(project, locale);
             // create strings modal
-            const widgetType = 'yandex';
-            createStringsModal(projectId, widgetType);
-            addStringsInModal(allStrings)
+            createStringsModal(projectId, 'yandex');
+            createStringsModal(projectId, 'openai');
+            addStringsInModal(allStrings, 'yandex');
+            addStringsInModal(allStrings, 'openai');
+
+            const filterstring = filterRawObject(allStrings, "plain");
+            openAISourceValues = Object.fromEntries(
+                filterstring.map((item, index) => [String(index + 1), String((item && item.source) || '').trim().replace(/\s+/g, ' ')])
+            );
         }
     }
 
@@ -45,6 +51,10 @@ const AutoTranslator = (function (window, $) {
             onYandexTranslateClick(locale);
         });
 
+        $("#atlt_openai_translate_btn").on("click", function () {
+            onOpenAITranslateClick(locale);
+        });
+
         // save string inside cache for later use
         $(".atlt_save_strings").on("click", onSaveClick);
 
@@ -66,10 +76,10 @@ const AutoTranslator = (function (window, $) {
         progressContainer.find('#progressText').text('0%');
     }
 
-    function addStringsInModal(allStrings) {
+    function addStringsInModal(allStrings, type) {
         const plainStrArr = filterRawObject(allStrings, "plain");
         if (plainStrArr.length > 0) {
-            printStringsInPopup(plainStrArr, type = "yandex");
+            printStringsInPopup(plainStrArr, type);
         } else {
             $("#ytWidget").hide();
             $(".notice-container")
@@ -129,8 +139,425 @@ const AutoTranslator = (function (window, $) {
 
 
     }
+
+    function onOpenAITranslateClick(locale) {
+        const defaultcode = locale.lang || null;
+        const langugeName = locale.label || null;
+        const langMapping = {
+            'bel': 'be',
+            'snd': 'sd',
+            'jv': 'jv',
+            'nb': 'no',
+            'nn': 'no'
+        };
+        const defaultlang = langMapping[defaultcode] || defaultcode;
+        let modelContainer = $('div#atlt_strings_model.openai-widget-container');
+        modelContainer.find(".atlt_actions > .atlt_save_strings").prop("disabled", true);
+        $("#atlt-dialog").dialog("close");
+        modelContainer.find(".atlt_stats").hide();
+        localStorage.setItem("lang", defaultlang);
+        localStorage.setItem("langName", langugeName);
+        modelContainer.find(".openai-translation-info").text(`Translating Strings into ${langugeName} Using OpenAI.`);
+        modelContainer.fadeIn("slow", function () {
+            startOpenAITranslation(locale, modelContainer);
+        });
+
+    }
+
+    function calculateOpenAITokensInBatches(stringsObj) {
+        const maxTokens = 500;
+        const batches = [];
+        let currentBatch = {};
+        let totalTokensBatch = 0;
+        const entries = Object.entries(stringsObj);
+
+        for (let i = 0; i < entries.length; i++) {
+            const [key, value] = entries[i];
+            const strValue = String(value || '');
+            const tokens = Math.ceil(strValue.length / 4);
+
+            if (totalTokensBatch + tokens <= maxTokens) {
+                currentBatch[key] = strValue;
+                totalTokensBatch += tokens;
+            } else {
+                if (Object.keys(currentBatch).length > 0) {
+                    batches.push(currentBatch);
+                }
+                currentBatch = { [key]: strValue };
+                totalTokensBatch = tokens;
+            }
+        }
+
+        if (Object.keys(currentBatch).length > 0) {
+            batches.push(currentBatch);
+        }
+
+        return batches;
+    }
+
+    function startOpenAITranslation(locale, container) {
+        const BATCH_SIZE = 15;
+        const DELAY = 0;
+        const selectedApi = 'openai';
+        const selectedStringsBatches = calculateOpenAITokensInBatches(openAISourceValues);
+
+        if (!selectedStringsBatches.length || !Object.keys(openAISourceValues || {}).length) {
+            container.find(".notice-container")
+                .addClass('notice inline notice-warning')
+                .html('No translatable strings found for OpenAI.');
+            return;
+        }
+
+        const state = {
+            ajaxStore: [],
+            totalSourceCount: Object.values(openAISourceValues).reduce((sum, str) => sum + str.length, 0),
+            isModalAppended: false,
+            isTbodyEmpty: false,
+            translatedResponse: [],
+            totalTranslatedCount: 0,
+            totalTranslatedWords: 0,
+            currentIndex: 0,
+            stopProcess: true,
+            stopResponse: false,
+            uiUpdated: false,
+            startTime: new Date()
+        };
+
+        function stopOpenAITranslation() {
+            state.stopProcess = false;
+            state.stopResponse = true;
+            state.ajaxStore.forEach((item) => {
+                if (item && typeof item.abort === 'function') {
+                    item.abort();
+                }
+            });
+        }
+
+        container.data('atlt-openai-stop-handler', stopOpenAITranslation);
+
+        const elements = {
+            progressBar: container.find("#myProgressBar"),
+            progressText: container.find("#progressText"),
+            tbody: container.find(".atlt_strings_table > tbody.atlt_strings_body"),
+            warningWrapper: container.find(".warning-massage-content"),
+            warningMessage: container.find(".atlt_translate_warning-massage"),
+            progressIndicator: container.find(".atlt_translate_progress"),
+            stats: container.find('.atlt_stats')
+        };
+
+        function initializeUI() {
+            container.find(".notice-container").removeClass('notice notice-warning inline').empty();
+            const stringContainer = container.find('.atlt_string_container');
+            stringContainer.scrollTop(0);
+            stringContainer.off('scroll');
+            elements.warningWrapper.empty();
+            elements.warningMessage.hide();
+            elements.progressIndicator.fadeIn("slow");
+            container.find('.progress-wrapper').show();
+            elements.progressBar.css('width', '0%');
+            elements.progressText.text('0%');
+            elements.progressText.css('color', '#f3f3f3');
+            container.find(".atlt_actions > .atlt_save_strings").prop("disabled", true);
+            container.find(".atlt_stats").hide();
+            setupEventListeners();
+        }
+
+        function setupEventListeners() {
+            container.find(".modal-header .close").off('click.atltOpenAI').on("click.atltOpenAI", () => {
+                stopOpenAITranslation();
+            });
+
+            container.find('.close-button').off('click.atltOpenAI').on("click.atltOpenAI", () => {
+                elements.warningMessage.fadeOut("slow");
+            });
+        }
+
+        function processTranslatedStrings(translatedStrings, metadata, sourceValues, selectedProvider) {
+            const regex = /(?:\\{1,2}u([0-9a-fA-F]{4})|\\u([0-9a-fA-F]{4}))/g;
+            const source = [];
+            const target = [];
+
+            const batchIndex = metadata && metadata.batchIndex ? metadata.batchIndex : 0;
+            const requestIndex = metadata && metadata.requestIndex ? metadata.requestIndex : 0;
+            const globalIndex = (batchIndex * BATCH_SIZE) + requestIndex;
+            const originalSource = sourceValues[globalIndex];
+
+            function decodeUnicode(str) {
+                if (Array.isArray(str)) {
+                    str = str.join('');
+                }
+                return String(str).replace(regex, (match, p1, p2) => String.fromCharCode(parseInt(p1 || p2, 16)));
+            }
+
+            if (Array.isArray(translatedStrings) || selectedProvider === 'deepl') {
+                if (originalSource && typeof originalSource === 'object') {
+                    const orderedKeys = Object.keys(originalSource)
+                        .map(k => parseInt(k, 10))
+                        .sort((a, b) => a - b)
+                        .map(n => String(n));
+
+                    for (let i = 0; i < orderedKeys.length && i < translatedStrings.length; i++) {
+                        const key = orderedKeys[i];
+                        const val = translatedStrings[i];
+                        if (typeof val === 'string' && val.trim()) {
+                            source.push(originalSource[key]);
+                            target.push(decodeUnicode(val).replace(/\\/g, ''));
+                        }
+                    }
+                }
+            } else if (translatedStrings && typeof translatedStrings === 'object' && originalSource && typeof originalSource === 'object') {
+                const originalKeys = Object.keys(originalSource);
+                const translatedKeys = Object.keys(translatedStrings);
+                const hasMatchingKeys = translatedKeys.some(key => Object.prototype.hasOwnProperty.call(originalSource, key));
+
+                if (hasMatchingKeys) {
+                    translatedKeys.forEach((key) => {
+                        if (Object.prototype.hasOwnProperty.call(originalSource, key)) {
+                            const val = translatedStrings[key];
+                            if (typeof val === 'string' && val.trim()) {
+                                source.push(originalSource[key]);
+                                target.push(decodeUnicode(val).replace(/\\/g, ''));
+                            }
+                        }
+                    });
+                } else {
+                    translatedKeys.forEach((key, idx) => {
+                        const originalKey = originalKeys[idx];
+                        const val = translatedStrings[key];
+                        if (typeof val === 'string' && val.trim() && typeof originalKey !== 'undefined') {
+                            source.push(originalSource[originalKey]);
+                            target.push(decodeUnicode(val).replace(/\\/g, ''));
+                        }
+                    });
+                }
+            }
+
+            return { source, target };
+        }
+
+        function updateProgress() {
+            const progressValue = Math.round((state.totalTranslatedCount / state.totalSourceCount) * 100);
+            elements.progressBar.css('width', `${progressValue}%`);
+            elements.progressText.text(`${progressValue}%`);
+            elements.progressText.css('color', '#f3f3f3');
+        }
+
+        function handleSuccessfulTranslation() {
+            const message = state.totalTranslatedCount < state.totalSourceCount
+                ? `Wahooo! You have saved your valuable time by using auto-translation. You have translated <strong class="totalChars">${state.totalTranslatedCount}</strong> characters Out of <strong class="totalChars">${state.totalSourceCount}</strong> characters using <strong><a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">LocoAI - Auto Translate for Loco Translate (Pro)</a></strong>`
+                : `Wahooo! You have saved your valuable time via auto translating <strong class="totalChars">${state.totalTranslatedCount}</strong> characters using <strong><a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">LocoAI - Auto Translate for Loco Translate (Pro)</a></strong>`;
+
+            elements.stats.html(message);
+        }
+
+        function makeAjaxRequest(chunk, batchIndex, requestIndex) {
+            function getErrorMessageFromResponse(response) {
+                if (!response) {
+                    return 'OpenAI translation failed.';
+                }
+                const responseData = response.data;
+                if (typeof responseData === 'string' && responseData.trim() !== '') {
+                    return responseData;
+                }
+                if (responseData && typeof responseData === 'object') {
+                    if (typeof responseData.message === 'string' && responseData.message.trim() !== '') {
+                        return responseData.message;
+                    }
+                    if (typeof responseData.error === 'string' && responseData.error.trim() !== '') {
+                        return responseData.error;
+                    }
+                    if (typeof responseData.details === 'string' && responseData.details.trim() !== '') {
+                        return responseData.details;
+                    }
+                }
+                return 'OpenAI translation failed.';
+            }
+
+            const data = {
+                action: 'atlt_openai_ajax_handler',
+                nonce: nonce,
+                source_data: {
+                    locale: locale,
+                    source: chunk,
+                    selectedApi: selectedApi
+                },
+                metadata: {
+                    batchIndex: batchIndex,
+                    requestIndex: requestIndex
+                }
+            };
+
+            return new Promise((resolve, reject) => {
+                state.ajaxStore.push($.ajax({
+                    url: ajaxUrl,
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        if (!state.stopResponse && !response.success) {
+                            state.stopProcess = false;
+                            state.stopResponse = true;
+                            elements.warningWrapper.html(`<h2>${getErrorMessageFromResponse(response)}</h2>`);
+                            elements.warningMessage.fadeIn("slow");
+                            elements.progressIndicator.fadeOut("slow");
+                            state.ajaxStore.forEach(item => item.abort());
+                            resolve();
+                            return;
+                        }
+
+                        if (response.success && response.data && response.data.data) {
+                            const result = processTranslatedStrings(response.data.data, response.data.metadata, selectedStringsBatches, selectedApi);
+                            const { source, target } = result;
+                            state.translatedResponse.push(Boolean(response.data.data));
+
+                            let tbody = '';
+                            for (let j = 0; j < source.length; j++) {
+                                tbody += `<tr id="${state.currentIndex}"><td>${state.currentIndex + 1}</td><td class="notranslate source">${encodeHtmlEntity(source[j])}</td>`;
+                                tbody += `<td class="target translate">${encodeHtmlEntity(target[j])}</td></tr>`;
+                                state.currentIndex++;
+                            }
+
+                            state.totalTranslatedCount += source.reduce((sum, str) => sum + str.length, 0);
+                            state.totalTranslatedWords += source.reduce((sum, str) => sum + str.trim().split(/\s+/).filter(word => word.length > 0).length, 0);
+                            updateProgress();
+
+                            if (!state.isModalAppended && tbody) {
+                                elements.tbody.html('');
+                                state.isModalAppended = true;
+                            }
+
+                            if (tbody) {
+                                elements.tbody.append(tbody);
+                                const stringContainer = container.find('.atlt_string_container');
+                                stringContainer.off('scroll').stop();
+
+                                const tbodyScrollHeight = stringContainer.find('.atlt_strings_table tbody').prop('scrollHeight');
+                                const scrollSpeed = 3000;
+
+                                if (tbodyScrollHeight > 100 && container.css('display') === 'block') {
+                                    stringContainer.animate({
+                                        scrollTop: tbodyScrollHeight
+                                    }, scrollSpeed, 'linear');
+                                }
+                            } else {
+                                handleEmptyResponse();
+                            }
+                        }
+                        resolve();
+                    },
+                    error: reject
+                }));
+            });
+        }
+
+        function handleEmptyResponse() {
+            state.isTbodyEmpty = true;
+            state.stopProcess = false;
+            state.stopResponse = true;
+            if (!elements.warningWrapper.find("h2:contains('Translation Aborted.')").length) {
+                elements.warningWrapper.append("<h2>Translation Aborted.</h2>");
+            }
+            elements.warningMessage.fadeIn("slow");
+            elements.progressIndicator.fadeOut("slow");
+            state.ajaxStore.forEach(item => item.abort());
+            container.removeData('atlt-openai-stop-handler');
+        }
+
+        async function processChunksInBatches() {
+            try {
+                for (let i = 0; i < selectedStringsBatches.length; i += BATCH_SIZE) {
+                    if (container.css('display') === 'block' && !state.stopResponse) {
+                        state.stopProcess = true;
+                    }
+
+                    if (state.stopProcess) {
+                        const batch = selectedStringsBatches.slice(i, i + BATCH_SIZE);
+                        const batchIndex = Math.floor(i / BATCH_SIZE);
+
+                        await Promise.allSettled(
+                            batch.map((chunk, requestIndex) =>
+                                makeAjaxRequest(chunk, batchIndex, requestIndex)
+                            )
+                        );
+
+                        if (i + BATCH_SIZE < selectedStringsBatches.length) {
+                            await new Promise(resolve => setTimeout(resolve, DELAY));
+                        }
+                    } else {
+                        break;
+                    }
+                }
+
+                function updateTranslationUI() {
+                    if (!state.uiUpdated) {
+                        elements.progressBar.css({
+                            'background-image': 'none',
+                            'animation': 'none',
+                            'background-size': 'none'
+                        });
+                        state.uiUpdated = true;
+                        const endTime = new Date();
+                        const timeTaken = Math.round((endTime - state.startTime) / 1000);
+                        container.data('translation-time', timeTaken);
+                        container.data('translation-provider', 'openai');
+
+                        function formatNumberShort(n) {
+                            n = Number(n);
+                            if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
+                            if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
+                            return n.toString();
+                        }
+                        setTimeout(() => {
+                            container.find(".atlt_save_strings").prop("disabled", false);
+                            elements.stats.fadeIn("slow");
+                            elements.progressIndicator.fadeOut("slow");
+                            handleSuccessfulTranslation();
+                            container.removeData('atlt-openai-stop-handler');
+                        }, 3000);
+                    }
+                }
+
+                if (state.translatedResponse.some(Boolean) && !state.isTbodyEmpty) {
+                    const stringContainer = container.find('.atlt_string_container');
+                    const scrollHeight = stringContainer[0].scrollHeight;
+                    const offsetHeight = stringContainer[0].offsetHeight;
+
+                    stringContainer.on('scroll', function () {
+                        const currentScrollHeight = stringContainer[0].scrollHeight;
+                        const scrollTop = stringContainer[0].scrollTop;
+                        const clientHeight = stringContainer[0].clientHeight;
+                        const tolerance = 5;
+                        const isComplete = (Math.ceil(scrollTop + clientHeight) >= currentScrollHeight - tolerance);
+
+                        if (isComplete) {
+                            updateTranslationUI();
+                        }
+                    });
+
+                    if (offsetHeight === scrollHeight) {
+                        updateTranslationUI();
+                    }
+                } else {
+                    elements.progressIndicator.fadeOut("slow");
+                    handleEmptyResponse();
+                }
+            } catch (error) {
+                console.error('An error occurred during the AJAX processing:', error);
+                elements.progressIndicator.fadeOut("slow");
+                container.removeData('atlt-openai-stop-handler');
+            }
+        }
+
+        initializeUI();
+        processChunksInBatches().catch(error => {
+            console.error('An error occurred during the AJAX processing:', error);
+            elements.progressIndicator.fadeOut("slow");
+        });
+    }
     // parse all translated strings and pass to save function
     function onSaveClick() {
+        const container = $(this).closest('.atlt_custom_model');
+        const tableRows = container.find(".atlt_strings_table tbody tr");
+
         // Safely access nested properties without optional chaining
         let pluginOrTheme = '';
         let pluginOrThemeName = '';
@@ -168,7 +595,7 @@ const AutoTranslator = (function (window, $) {
         };
         const regex = /(\%\s*\d+\s*\$?\s*[a-z0-9])/gi;
         
-        $(".atlt_strings_table tbody tr").each(function () {
+        tableRows.each(function () {
             const source = $(this).find("td.source").text();
             const target = $(this).find("td.target").text();
 
@@ -188,7 +615,6 @@ const AutoTranslator = (function (window, $) {
                 "target": improvedTarget
             });
         });
-        const container = $(this).closest('.atlt_custom_model');
         const time_taken = container.data('translation-time') || 0;
         const translation_provider = container.data('translation-provider');
         const { lang, region } = locoConf.conf.locale;
@@ -205,7 +631,7 @@ const AutoTranslator = (function (window, $) {
             total_strings: totalStrings,
         }
 
-        var projectId = $(this).parents("#atlt_strings_model").find("#project_id").val();
+        var projectId = container.find("#project_id").val();
 
         //  Save Translated Strings
         saveTranslatedStrings(translatedObj, projectId, translationData);
@@ -417,22 +843,36 @@ const AutoTranslator = (function (window, $) {
         });
     }
 
-    //String Translate Model
-    // Get the modal
-    var gModal = document.getElementById("atlt_strings_model");
-    // When the user clicks anywhere outside of the modal, close it
-    $(window).click(function (event) {
-        if (!event.target.closest(".modal-content")) {
-            destroyYandexTranslator();  
-        }
-        if (event.target == gModal) {
-            gModal.style.display = "none";
+    // String translate modal close handlers (works for Yandex + OpenAI modals)
+    $(window).on('click', function (event) {
+        const modal = event.target;
+        if (modal && modal.classList && modal.classList.contains('atlt_custom_model')) {
+            const $modal = $(modal);
+            if ($modal.hasClass('yandex-widget-container')) {
+                destroyYandexTranslator();
+            }
+            if ($modal.hasClass('openai-widget-container')) {
+                const stopHandler = $modal.data('atlt-openai-stop-handler');
+                if (typeof stopHandler === 'function') {
+                    stopHandler();
+                }
+            }
+            $modal.fadeOut("slow");
         }
     });
-    // Get the <span> element that closes the modal
-    $("#atlt_strings_model").find(".close").on("click", function () {
-        destroyYandexTranslator();
-        $("#atlt_strings_model").fadeOut("slow");
+
+    $(document).on('click', '.atlt_custom_model .modal-header .close', function () {
+        const $modal = $(this).closest('.atlt_custom_model');
+        if ($modal.hasClass('yandex-widget-container')) {
+            destroyYandexTranslator();
+        }
+        if ($modal.hasClass('openai-widget-container')) {
+            const stopHandler = $modal.data('atlt-openai-stop-handler');
+            if (typeof stopHandler === 'function') {
+                stopHandler();
+            }
+        }
+        $modal.fadeOut("slow");
     });
 
 
@@ -501,14 +941,13 @@ const AutoTranslator = (function (window, $) {
             openai: extradata['openai_preview'],
             chrome: extradata['chromeAi_preview'],
             docs: extradata['document_preview'],
-            error: extradata['error_preview']
+            error: extradata['error_preview'],
         };
     
         const url = 'https://locoaddon.com/docs/';
         const ATLT_IMG = (key) => ATLT_URL + 'assets/images/' + icons[key];
         const DOC_ICON = `<img src="${ATLT_IMG('docs')}" width="20" alt="Docs">`;
         const ERROR_ICON = `<img src="${ATLT_IMG('error')}" alt="error" style="height:16px; vertical-align:middle; margin-right:5px;">`;
-    
         const rows = [
             {
                 name: 'Yandex Translate',
@@ -534,7 +973,7 @@ const AutoTranslator = (function (window, $) {
             {
                 name: 'ChatGPT Translate',
                 icon: 'chatgpt',
-                info: 'https://chat.openai.com/',
+                info: 'https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/',
                 btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank"><button id="atlt_chatGPT_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
                 doc: `${url}chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chatgpt`
             },
@@ -548,9 +987,9 @@ const AutoTranslator = (function (window, $) {
             {
                 name: 'OpenAI Translate',
                 icon: 'openai',
-                info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/',
-                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_openai" target="_blank"><button id="atlt_openai_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_openai`
+                info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-open-ai-to-translate-plugins-or-themes/',
+                btn: `${openaiApiKey ? `<button id="atlt_openai_translate_btn" class="atlt-provider-btn translate">Translate</button>` : `<a href="admin.php?page=loco-atlt-dashboard&tab=settings" target="_blank"><button id="atlt_openai_btn" class="atlt-provider-btn error">${ERROR_ICON}Add API Key</button></a>`}`,
+                doc: `${url}open-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_openai`
             },
             {
                 name: 'DeepL Translate',
@@ -593,7 +1032,7 @@ const AutoTranslator = (function (window, $) {
     // modal to show strings
     function createStringsModal(projectId, widgetType) {
         // Set wrapper, header, and body classes based on widgetType
-        let { wrapperCls, headerCls, bodyCls, footerCls } = getWidgetClasses('yandex');
+        let { wrapperCls, headerCls, bodyCls, footerCls } = getWidgetClasses(widgetType);
         let modelHTML = `
             <div id="atlt_strings_model" class="modal atlt_custom_model  ${wrapperCls} ${rtlClass}">
                 <div class="modal-content">
@@ -618,6 +1057,13 @@ const AutoTranslator = (function (window, $) {
                 headerCls = 'yandex-widget-header';
                 bodyCls = 'yandex-widget-body';
                 footerCls = 'yandex-widget-footer';
+
+                break;
+            case 'openai':
+                wrapperCls = 'openai-widget-container';
+                headerCls = 'openai-widget-header';
+                bodyCls = 'openai-widget-body';
+                footerCls = 'openai-widget-footer';
 
                 break;
             default:
@@ -646,9 +1092,15 @@ const AutoTranslator = (function (window, $) {
                     </div>
                 </div>
             </div>
+            <div class="atlt_translate_warning-massage">
+                <div class="warning-massage-wrapper">
+                     <button class="close-button">&times;</button>
+                     <div class="warning-massage-content"></div>
+                </div>
+            </div>
             ${translatorWidget(widgetType)}
             <div class="atlt_string_container">
-                <div class ="yandex-translation-info">Translating Strings into ${localStorage.getItem("langName") || 'Selected Language'} Using Yandex Translator.</div>
+                <div class ="${widgetType}-translation-info">Translating Strings into ${localStorage.getItem("langName") || 'Selected Language'} Using ${widgetType === "yandex" ? "Yandex" : "OpenAI"}</div>
                 <table class="scrolldown atlt_strings_table">
                     <thead>
                         <th class="notranslate">S.No</th>
@@ -716,6 +1168,10 @@ const AutoTranslator = (function (window, $) {
         if (widgetType === "yandex") {
             return `
                 <div id="ytWidget" style="display:none"></div>`;
+        }
+        if (widgetType === "openai") {
+            return `
+                <div id="openaiWidget" style="display:none"></div>`;
         }
     }
     // oninit

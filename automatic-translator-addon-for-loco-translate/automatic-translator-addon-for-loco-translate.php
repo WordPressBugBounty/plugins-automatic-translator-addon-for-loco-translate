@@ -2,7 +2,7 @@
 /*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.6.3
+Version: 2.7.0
 License: GPL2
 Text Domain: automatic-translator-addon-for-loco-translate
 Author: Cool Plugins
@@ -16,7 +16,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     define('ATLT_FILE', __FILE__);
     define('ATLT_URL', plugin_dir_url(ATLT_FILE));
     define('ATLT_PATH', plugin_dir_path(ATLT_FILE));
-    define('ATLT_VERSION', '2.6.3');
+    define('ATLT_VERSION', '2.7.0');
     ! defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API', "https://feedback.coolplugins.net/");
 
     /**
@@ -63,7 +63,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
             // Initialize feedback notice
             $this->init_feedback_notice();
-
+            add_action( 'init', array($this, 'atlt_register_ai_client') );
             // Add CPT Dashboard initialization
             if (! class_exists('Atlt_Dashboard')) {
                 require_once ATLT_PATH . 'admin/cpt_dashboard/cpt_dashboard.php';
@@ -115,6 +115,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 add_filter('loco_api_providers', [$thisPlugin, 'atlt_register_api'], 10, 1);
                 add_action('loco_api_ajax', [$thisPlugin, 'atlt_ajax_init'], 0, 0);
                 add_action('wp_ajax_save_all_translations', [$thisPlugin, 'atlt_save_translations_handler']);
+                add_action('wp_ajax_atlt_openai_ajax_handler', [$thisPlugin, 'atlt_openai_ajax_handler']);
 
                 /*
 				since version 2.0
@@ -483,6 +484,222 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
         /*
 		|----------------------------------------------------------------------
+		| OpenAI AJAX translation handler
+		|----------------------------------------------------------------------
+		*/
+        public function atlt_openai_ajax_handler() {
+            check_ajax_referer('loco-addon-nonces', 'nonce');
+
+            if (! current_user_can('manage_options')) {
+                wp_send_json_error(__('Unauthorized request.', 'automatic-translator-addon-for-loco-translate'));
+            }
+
+            if (! isset($_POST['source_data']) || ! is_array($_POST['source_data'])) {
+                wp_send_json_error(__('Invalid request payload.', 'automatic-translator-addon-for-loco-translate'));
+            }
+
+            $source_data = wp_unslash($_POST['source_data']);
+            if (! isset($source_data['source']) || ! is_array($source_data['source'])) {
+                wp_send_json_error(__('Source strings are missing.', 'automatic-translator-addon-for-loco-translate'));
+            }
+
+            $source = array();
+            foreach ($source_data['source'] as $key => $value) {
+                $sanitized_key = sanitize_key((string) $key);
+                $sanitized_value = sanitize_text_field((string) $value);
+                if ($sanitized_key !== '' && $sanitized_value !== '') {
+                    $source[$sanitized_key] = $sanitized_value;
+                }
+            }
+
+            if (empty($source)) {
+                wp_send_json_error(__('No valid source strings found.', 'automatic-translator-addon-for-loco-translate'));
+            }
+
+            $metadata = array(
+                'batchIndex'   => 0,
+                'requestIndex' => 0,
+            );
+            if (isset($_POST['metadata']) && is_array($_POST['metadata'])) {
+                $request_metadata = wp_unslash($_POST['metadata']);
+                if (isset($request_metadata['batchIndex'])) {
+                    $metadata['batchIndex'] = max(0, absint($request_metadata['batchIndex']));
+                }
+                if (isset($request_metadata['requestIndex'])) {
+                    $metadata['requestIndex'] = max(0, absint($request_metadata['requestIndex']));
+                }
+            }
+
+            $locale_label = 'English';
+            if (
+                isset($source_data['locale']) &&
+                is_array($source_data['locale']) &&
+                isset($source_data['locale']['label'])
+            ) {
+                $locale_label = sanitize_text_field((string) $source_data['locale']['label']);
+            }
+
+            $selected_model = get_option('atlt_selected_openai_model', '');
+            if (! is_string($selected_model) || trim($selected_model) === '') {
+                $selected_model = 'gpt-4o-mini';
+            }
+
+            $content = sprintf(
+                'Instruction 1: [%%s, %%d, %%S, %%D, %%s, %%S, %%d, %%D, %%س] These placeholders are special and should not be translated.
+                Instruction 2: Avoid repeating translations and skip any strings if necessary. If a string is skipped, maintain its original key.
+                Instruction 3: Return translation as a JSON object with numeric keys matching source keys, values as translated strings.
+                Instruction 4: Use escaped characters where needed so output remains valid JSON.
+                Instruction 5: Translate provided JSON object into %s language. Output only valid JSON in format {"key":"translated string"}.
+                Strings are: %s',
+                $locale_label,
+                wp_json_encode($source)
+            );
+
+            $translated_text = $this->atlt_generate_text_with_ai($content, 'openai', $selected_model, 120);
+            if (is_wp_error($translated_text)) {
+                wp_send_json_error($translated_text->get_error_message());
+            }
+
+            $clean_text = preg_replace('/(^```json\n|```$)/', '', (string) $translated_text);
+            $decoded_data = json_decode((string) $clean_text, true);
+            if (! is_array($decoded_data)) {
+                wp_send_json_error(__('OpenAI returned invalid JSON output.', 'automatic-translator-addon-for-loco-translate'));
+            }
+
+            wp_send_json_success(
+                array(
+                    'data'     => $decoded_data,
+                    'metadata' => $metadata,
+                )
+            );
+        }
+
+        /**
+         * Generate text using configured AI provider/model.
+         *
+         * @param string $content Prompt content.
+         * @param string $provider Provider slug.
+         * @param string $selected_model Model ID.
+         * @param int    $timeout Request timeout.
+         * @return string|\WP_Error
+         */
+        private function atlt_generate_text_with_ai($content, $provider, $selected_model, $timeout = 120) {
+            if (! class_exists('\WordPress\AiClient\AiClient')) {
+                return new \WP_Error('atlt_ai_client_missing', __('AI client is not available.', 'automatic-translator-addon-for-loco-translate'));
+            }
+
+            $timeout_filter = static function ($time) use ($timeout) {
+                return (int) $timeout;
+            };
+
+            add_filter(
+                'wp_ai_client_default_request_timeout',
+                $timeout_filter,
+                10,
+                1
+            );
+
+            try {
+                $is_anthropic = str_contains(strtolower((string) $provider), 'anthropic');
+                $builder = null;
+
+                /*
+                 * Prefer AiClient::prompt() across WP 6.9/7.x.
+                 * This avoids "RequestAuthenticationInterface instance not set" errors from mixed builders.
+                 */
+                if (class_exists('\WordPress\AiClient\AiClient') && method_exists('\WordPress\AiClient\AiClient', 'prompt')) {
+                    $builder = \WordPress\AiClient\AiClient::prompt($content);
+                } elseif (function_exists('wp_ai_client_prompt')) {
+                    $builder = wp_ai_client_prompt($content);
+                } elseif (class_exists('\WordPress\AI_Client\AI_Client')) {
+                    if (! $is_anthropic && method_exists('\WordPress\AI_Client\AI_Client', 'prompt_with_wp_error')) {
+                        $builder = \WordPress\AI_Client\AI_Client::prompt_with_wp_error($content);
+                    } else {
+                        $builder = \WordPress\AI_Client\AI_Client::prompt($content);
+                    }
+                }
+
+                if (! is_object($builder)) {
+                    return new \WP_Error('atlt_prompt_builder_missing', __('Prompt builder is not available.', 'automatic-translator-addon-for-loco-translate'));
+                }
+
+                if (! $is_anthropic) {
+                    if (method_exists($builder, 'asJsonResponse')) {
+                        $builder = $builder->asJsonResponse();
+                    } elseif (method_exists($builder, 'as_json_response')) {
+                        $builder = $builder->as_json_response();
+                    }
+                }
+
+                if (method_exists($builder, 'usingProvider')) {
+                    $builder->usingProvider($provider);
+                } elseif (method_exists($builder, 'using_provider')) {
+                    $builder->using_provider($provider);
+                }
+
+                // Explicitly set HTTP timeouts on the prompt to avoid default 5s transport timeout.
+                $request_options_class = '\WordPress\AiClient\Providers\Http\DTO\RequestOptions';
+                if (class_exists($request_options_class)) {
+                    $request_options = new $request_options_class();
+                    if (is_object($request_options)) {
+                        if (method_exists($request_options, 'setTimeout')) {
+                            $request_options->setTimeout((float) $timeout);
+                        }
+                        if (method_exists($request_options, 'setConnectTimeout')) {
+                            $request_options->setConnectTimeout((float) min(20, max(5, (int) $timeout)));
+                        }
+
+                        if (method_exists($builder, 'usingRequestOptions')) {
+                            $builder->usingRequestOptions($request_options);
+                        } elseif (method_exists($builder, 'using_request_options')) {
+                            $builder->using_request_options($request_options);
+                        }
+                    }
+                }
+
+                if (! empty($selected_model) && is_string($selected_model)) {
+                    if (method_exists($builder, 'usingModelPreference')) {
+                        // Let the prompt builder resolve/bind authenticated model internally.
+                        $builder->usingModelPreference(array($provider, $selected_model));
+                    } elseif (method_exists($builder, 'using_model_preference')) {
+                        $builder->using_model_preference(array($provider, $selected_model));
+                    } else {
+                        $registry = \WordPress\AiClient\AiClient::defaultRegistry();
+                        if (is_object($registry) && method_exists($registry, 'getProviderModel')) {
+                            $model = $registry->getProviderModel($provider, $selected_model);
+                            if (is_object($model)) {
+                                if (method_exists($builder, 'usingModel')) {
+                                    $builder->usingModel($model);
+                                } elseif (method_exists($builder, 'using_model')) {
+                                    $builder->using_model($model);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (method_exists($builder, 'generateText')) {
+                    $text = $builder->generateText();
+                } else {
+                    $text = $builder->generate_text();
+                }
+                if (is_wp_error($text)) {
+                    return $text;
+                }
+
+                return is_string($text) ? $text : '';
+            } catch (\Throwable $e) {
+                return new \WP_Error(
+                    'atlt_openai_translate_error',
+                    __('Error during OpenAI translation.', 'automatic-translator-addon-for-loco-translate') . ' ' . sanitize_text_field($e->getMessage())
+                );
+            } finally {
+                remove_filter('wp_ai_client_default_request_timeout', $timeout_filter, 10);
+            }
+        }
+
+        /*
+		|----------------------------------------------------------------------
 		| Save string translation inside cache for later use
 		|----------------------------------------------------------------------
 		*/
@@ -824,7 +1041,60 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 new ATLT_FeedbackForm();
             }
         }
-
+        public function atlt_register_ai_client() {
+			$is_wp70 = function_exists( 'wp_ai_client_prompt' );
+			if ( ! $is_wp70 ) {
+				$plugin_autoload = ATLT_PATH . 'vendor/wordpress/wp-ai-client/autoload.php';
+				if ( file_exists( $plugin_autoload ) ) {
+					require_once $plugin_autoload;
+				}
+				$providers_autoload = ATLT_PATH . 'ai-providers/vendor/autoload.php';
+				if ( file_exists( $providers_autoload ) ) {
+					require_once $providers_autoload;
+				}
+				// If still not available, we cannot validate keys or register providers.
+				if ( ! class_exists( \WordPress\AI_Client\AI_Client::class ) || ! class_exists( \WordPress\AiClient\AiClient::class ) ) {
+					return;
+				}
+			}else{
+				if(!get_option('atlt_ai_credentials_migrated_to_wp70')){
+					$credentials = get_option('wp_ai_client_provider_credentials', array());
+					if ( ! is_array( $credentials ) ) {
+						$credentials = array();
+					}
+					
+					$allowed_providers = array('openai', 'google', 'anthropic');
+					$providers = array_intersect($allowed_providers, array_keys($credentials));
+					foreach ($providers as $provider) {
+					 update_option('connectors_ai_'.$provider.'_api_key', $credentials[$provider]);	
+					}
+					update_option( 'atlt_ai_credentials_migrated_to_wp70', true );
+				}
+			}
+			
+		
+			$providers_autoload = ATLT_PATH . 'ai-providers/vendor/autoload.php';
+			if ( file_exists( $providers_autoload ) ) {
+				require_once $providers_autoload;
+			}
+		
+			$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+			if ( class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' )
+				&& ! $registry->hasProvider( 'openai' )
+			) {
+				$registry->registerProvider( \WordPress\OpenAiAiProvider\Provider\OpenAiProvider::class );
+			}
+		
+			if ( ! $is_wp70 ) {
+				\WordPress\AI_Client\AI_Client::init();
+		
+				try {
+					$http_transporter = \WordPress\AiClient\Providers\Http\HttpTransporterFactory::createTransporter();
+					$registry->setHttpTransporter( $http_transporter );
+				} catch ( \Exception $e ) {
+				}
+			}
+		}
         public static function atlt_get_user_info()
         {
             global $wpdb;
@@ -944,7 +1214,13 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 $extraData['extra_class']      = is_rtl() ? 'atlt-rtl' : '';
 
                 $extraData['loco_settings_url'] = admin_url('admin.php?page=loco-config&action=apis');
-
+                $openai_connector_key           = get_option('connectors_ai_openai_api_key', '');
+                $openai_credentials             = get_option('wp_ai_client_provider_credentials', array());
+                $openai_credentials             = is_array($openai_credentials) ? $openai_credentials : array();
+                $openai_legacy_key              = isset($openai_credentials['openai']) && is_string($openai_credentials['openai']) ? $openai_credentials['openai'] : '';
+                $extraData['openai_api_key']    = (is_string($openai_connector_key) && trim($openai_connector_key) !== '')
+                    ? $openai_connector_key
+                    : $openai_legacy_key;
                 wp_localize_script('loco-addon-custom', 'extradata', $extraData);
                 // copy object
                 wp_add_inline_script(
