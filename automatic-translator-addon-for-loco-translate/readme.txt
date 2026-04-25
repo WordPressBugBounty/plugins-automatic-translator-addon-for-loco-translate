@@ -6,7 +6,7 @@ Requires at least:5.0
 Tested up to: 6.9
 Requires PHP: 7.2
 Loco Translate Tested Up to: 2.8.3
-Stable tag: 2.7.0
+Stable tag: 2.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -162,6 +162,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= Version 2.7.1 - 25/04/2026 =
+* **Fixed:** Yandex translator infinite loop.
 
 = Version 2.7.0 - 22/04/2026 =
 * **New:** Added support for OpenAI Translation.

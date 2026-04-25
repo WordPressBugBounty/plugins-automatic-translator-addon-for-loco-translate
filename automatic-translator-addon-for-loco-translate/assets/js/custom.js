@@ -112,7 +112,7 @@ const AutoTranslator = (function (window, $) {
         };
 
         defaultlang = langMapping[defaultcode] || defaultcode;
-        let modelContainer = $('div#atlt_strings_model.yandex-widget-container');
+        let modelContainer = $(`div#atlt_strings_model_yandex.yandex-widget-container`);
 
         modelContainer.find(".atlt_actions > .atlt_save_strings").prop("disabled", true);
         modelContainer.find(".atlt_stats").hide();
@@ -151,7 +151,7 @@ const AutoTranslator = (function (window, $) {
             'nn': 'no'
         };
         const defaultlang = langMapping[defaultcode] || defaultcode;
-        let modelContainer = $('div#atlt_strings_model.openai-widget-container');
+        let modelContainer = $(`div#atlt_strings_model_openai.openai-widget-container`);
         modelContainer.find(".atlt_actions > .atlt_save_strings").prop("disabled", true);
         $("#atlt-dialog").dialog("close");
         modelContainer.find(".atlt_stats").hide();
@@ -631,7 +631,7 @@ const AutoTranslator = (function (window, $) {
             total_strings: totalStrings,
         }
 
-        var projectId = container.find("#project_id").val();
+        var projectId = container.find("input[id='project_id']").val();
 
         //  Save Translated Strings
         saveTranslatedStrings(translatedObj, projectId, translationData);
@@ -927,7 +927,7 @@ const AutoTranslator = (function (window, $) {
             });
         }
 
-        $(".atlt_strings_table > tbody.atlt_strings_body").html(html);
+        $(`.${type}-widget-container .atlt_strings_table > tbody.atlt_strings_body`).html(html);
 
     }
 
@@ -1034,7 +1034,7 @@ const AutoTranslator = (function (window, $) {
         // Set wrapper, header, and body classes based on widgetType
         let { wrapperCls, headerCls, bodyCls, footerCls } = getWidgetClasses(widgetType);
         let modelHTML = `
-            <div id="atlt_strings_model" class="modal atlt_custom_model  ${wrapperCls} ${rtlClass}">
+            <div id="atlt_strings_model_${widgetType}" class="modal atlt_custom_model  ${wrapperCls} ${rtlClass}">
                 <div class="modal-content">
                     <input type="hidden" id="project_id" value="${projectId}"> 
                     ${modelHeaderHTML(widgetType, headerCls)}   
