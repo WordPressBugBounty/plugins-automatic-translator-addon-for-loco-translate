@@ -398,12 +398,6 @@
                         <?php
                              // Define all API-related settings in a single configuration array
                             $atlt_api_settings = [
-                                'gemini' => [
-                                    'name' => 'Gemini AI',
-                                    'doc_url' => 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/generate-gemini-api-key/',
-                                    'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                                    'is_pro' => true
-                                ],
                                 'openai' => [
                                     'name' => 'OpenAI',
                                     'doc_url' => 'https://locoaddon.com/docs/how-to-generate-open-api-key/',
@@ -411,6 +405,12 @@
                                     'is_pro' => false,
                                     'input_name' => 'wp_ai_client_provider_credentials[openai]',
                                     'value' => $atlt_openai_masked_key
+                                ],
+                                'gemini' => [
+                                    'name' => 'Gemini AI',
+                                    'doc_url' => 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/generate-gemini-api-key/',
+                                    'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                                    'is_pro' => true
                                 ]
                             ];
 
@@ -492,7 +492,7 @@
                             <label for="atlt_context_aware" class="api-settings-label">
                                 <?php
                                 // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                esc_html_e('Context Aware (Pro)', $atlt_text_domain);
+                                esc_html_e('Translation Context & Tone (Pro)', $atlt_text_domain);
                                 ?>
                             </label>
                             <textarea
@@ -501,7 +501,7 @@
                                 class="atlt-context-aware-textarea"
                                 placeholder="<?php
                                 // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                echo esc_attr__('Provide optional context about WordPress page or post to enhance translation accuracy (e.g. content purpose, target audience, SEO focus, tone)...', $atlt_text_domain);
+                                echo esc_attr__('Add your business context, tone, and audience details so translations match your brand voice and improve accuracy.', $atlt_text_domain);
                                 ?>"
                                 rows="4"
                                 disabled
@@ -509,9 +509,8 @@
                             <p class="api-settings-description" style="margin-block: 5px;">
                                 <?php
                                 // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                esc_html_e('This setting works with Pro version.', $atlt_text_domain);
+                                esc_html_e('Example: We run a business website. Keep the tone simple and professional. Audience includes customers and business users. Focus on keywords like services, pricing, and solutions.', $atlt_text_domain);
                                 ?>
-                                <a href="<?php echo esc_url('https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=context_aware'); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Upgrade to Pro', $atlt_text_domain); ?></a>
                             </p>
                         </div>
                         <!-- Feedback Opt-In -->

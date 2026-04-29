@@ -6,7 +6,7 @@ Requires at least:5.0
 Tested up to: 6.9
 Requires PHP: 7.2
 Loco Translate Tested Up to: 2.8.3
-Stable tag: 2.7.1
+Stable tag: 2.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,6 +47,7 @@ Loco Translate is primarily a manual translation tool for translating WordPress 
 ✅ **Yandex Translate Widget Support**: Available
 ✅ **Unlimited Free Translations**: Available (Only via Yandex)
 ✅ **API Key Required**: Not Required (Yandex Widget Support)
+✅ **OpenAI Translator Support**: Available
 ❌ **Google Translate Widget Support**: Not Available
 ❌ **DeepL Doc Translator Support**: Not Available
 ❌ **Premium Support**: Not Available
@@ -61,9 +62,10 @@ Loco Translate is primarily a manual translation tool for translating WordPress 
 ✅ **Google Translate Widget Support**: Available
 ✅ **Unlimited Free Translations**: Available
 ✅ **API Key Required**: Not Required
-(Chrome Built-in AI, Yandex, Google & DeepL Support)
+(Chrome Built-in AI, Yandex, OpenAI, Google & DeepL Support)
 ✅ **DeepL Doc Translator Support**: Available
 (Limited free docs translations/day or purchase DeepL Pro)
+✅ **Translation Context & Tone (Pro)**: Improve translation accuracy by adding your business context, tone, and target audience. This helps generate translations that match your brand voice and sound more natural and relevant to your users.
 ✅ **Premium Support**: **[Quick Support](https://coolplugins.net/support?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=support&utm_content=premium_support)**
 **(Support time:- 24-48 hours)**
 
@@ -161,6 +163,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 3. Free License v/s Premium License
 
 == Changelog ==
+
+= Version 2.7.2 - 29/04/2026 =
+* **Minor:** Textual Changes.
 
 = Version 2.7.1 - 25/04/2026 =
 * **Fixed:** Yandex translator infinite loop.

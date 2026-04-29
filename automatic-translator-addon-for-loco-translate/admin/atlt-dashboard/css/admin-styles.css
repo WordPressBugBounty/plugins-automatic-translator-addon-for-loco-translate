@@ -693,7 +693,6 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 
 .atlt-dashboard-api-settings .api-settings-label:not(:first-of-type) {
     border-top: 1px solid var(--border-color);
-    margin-top: 25px;
     padding-top: 18px;
 }
 
