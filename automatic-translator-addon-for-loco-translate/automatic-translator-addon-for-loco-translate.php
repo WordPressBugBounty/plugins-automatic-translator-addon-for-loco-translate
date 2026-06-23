@@ -2,7 +2,7 @@
 /*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.7.2
+Version: 2.7.4
 License: GPL2
 Text Domain: automatic-translator-addon-for-loco-translate
 Author: Cool Plugins
@@ -16,7 +16,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     define('ATLT_FILE', __FILE__);
     define('ATLT_URL', plugin_dir_url(ATLT_FILE));
     define('ATLT_PATH', plugin_dir_path(ATLT_FILE));
-    define('ATLT_VERSION', '2.7.2');
+    define('ATLT_VERSION', '2.7.4');
     ! defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API', "https://feedback.coolplugins.net/");
 
     /**
@@ -63,7 +63,9 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
             // Initialize feedback notice
             $this->init_feedback_notice();
-            add_action( 'init', array($this, 'atlt_register_ai_client') );
+            if (is_admin() || wp_doing_ajax()) {
+                add_action( 'init', array($this, 'atlt_register_ai_client') );
+            }
             // Add CPT Dashboard initialization
             if (! class_exists('Atlt_Dashboard')) {
                 require_once ATLT_PATH . 'admin/cpt_dashboard/cpt_dashboard.php';
@@ -92,6 +94,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 add_action('init', [$thisPlugin, 'atlt_verify_loco_version']);
 
                 add_action('init', [$thisPlugin, 'onInit']);
+                add_action('init', [$thisPlugin, 'atlt_ensure_provider_toggle_defaults']);
 
                 /*** Plugin Setting Page Link inside All Plugins List */
                 add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$thisPlugin, 'atlt_settings_page_link']);
@@ -106,7 +109,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
                 // Add the action to hide unrelated notices
                 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Checking admin page parameter, no data processing
-                $page = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
+                $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
                 if ($page === 'loco-atlt-dashboard') {
                     add_action('admin_print_scripts', [$thisPlugin, 'atlt_hide_unrelated_notices']);
                 }
@@ -114,8 +117,9 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 /* since version 2.1 */
                 add_filter('loco_api_providers', [$thisPlugin, 'atlt_register_api'], 10, 1);
                 add_action('loco_api_ajax', [$thisPlugin, 'atlt_ajax_init'], 0, 0);
-                add_action('wp_ajax_save_all_translations', [$thisPlugin, 'atlt_save_translations_handler']);
+                add_action('wp_ajax_atlt_save_all_translations', [$thisPlugin, 'atlt_save_translations_handler']);
                 add_action('wp_ajax_atlt_openai_ajax_handler', [$thisPlugin, 'atlt_openai_ajax_handler']);
+                add_action('wp_ajax_atlt_toggle_provider', [$thisPlugin, 'atlt_toggle_provider']);
 
                 /*
 				since version 2.0
@@ -135,14 +139,13 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
         public function atlt_install_plugin()
             {
+                check_ajax_referer('alt_install_nonce', '_wpnonce', true);
 
                 if (! current_user_can('install_plugins')) {
                     wp_send_json_error([
                         'errorMessage' => __('Sorry, you are not allowed to install plugins on this site.', 'automatic-translator-addon-for-loco-translate'),
                     ]);
                 }
-
-                check_ajax_referer('alt_install_nonce', '_wpnonce', true);
 
                 if (empty($_POST['slug'])) {
                     wp_send_json_error([
@@ -161,6 +164,8 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     'automatic-translate-addon-pro-for-translatepress',
                     'automatic-translate-addon-for-translatepress',
                     'translate-words',
+                    'wpml-translation-check',
+                    'automlp-ai-translation-for-wpml-pro'
                 ];
 
                 // Validate that the plugin slug is in the whitelist
@@ -181,6 +186,17 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
                 require_once ABSPATH . 'wp-admin/includes/plugin.php';
 
+                $atlt_is_wpml_active = static function() {
+                    // WPML can have multiple entry files; safest check is any active plugin inside its folder.
+                    $all_plugins = get_plugins();
+                    foreach (array_keys($all_plugins) as $plugin_file) {
+                        if (strpos($plugin_file, 'sitepress-multilingual-cms/') === 0 && is_plugin_active($plugin_file)) {
+                            return true;
+                        }
+                    }
+                    return false;
+                };
+
                 if ($plugin_slug === 'autopoly-ai-translation-for-polylang-pro') {
                     if (! current_user_can('activate_plugins')) {
                         wp_send_json_error(['message' => 'Permission denied']);
@@ -199,13 +215,16 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                         }
                         wp_send_json_success(['message' => 'Plugin activated successfully']);
                     }
+                    wp_send_json_error([
+                        'message' => __('Pro plugin not found on this site. Please upload/install the Polylang Pro addon ZIP, then click Activate again.', 'automatic-translator-addon-for-loco-translate'),
+                    ]);
 
                 } elseif ($plugin_slug === 'automatic-translate-addon-pro-for-translatepress') {
                     if (! current_user_can('activate_plugins')) {
                         wp_send_json_error(['message' => 'Permission denied']);
                     }
                     if (! is_plugin_active('translatepress-multilingual/index.php')) {
-                        wp_send_json_error(['message' => 'Please activate TranslatePress plugin first.']);
+                        wp_send_json_error(['message' => 'Please activate TranslatePress first.']);
                     }
                     $plugin_file = 'automatic-translate-addon-pro-for-translatepress/automatic-translate-addon-for-translatepress-pro.php';
                     // Check if plugin is already installed
@@ -218,7 +237,50 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                         }
                         wp_send_json_success(['message' => 'Plugin activated successfully']);
                     }
+                    wp_send_json_error([
+                        'message' => __('Pro plugin not found. Please upload/install the TranslatePress Pro addon ZIP, then click Activate again.', 'automatic-translator-addon-for-loco-translate'),
+                    ]);
+                } elseif ($plugin_slug === 'automlp-ai-translation-for-wpml-pro') {
+                    // Pro plugin is not hosted on WordPress.org: we can only activate if already installed.
+                    if (! current_user_can('activate_plugins')) {
+                        wp_send_json_error(['message' => 'Permission denied']);
+                    }
+                    if (! $atlt_is_wpml_active()) {
+                        wp_send_json_error(['message' => 'Please activate WPML plugin first.']);
+                    }
+
+                    // Try exact expected main file first.
+                    $plugin_file = 'automlp-pro/automlp-pro.php';
+
+                    // Fallback: pick first plugin file under the pro folder.
+                    if (! file_exists(WP_PLUGIN_DIR . '/' . $plugin_file)) {
+                        $all_plugins = get_plugins();
+                        foreach (array_keys($all_plugins) as $candidate_file) {
+                            if (strpos($candidate_file, 'automlp-pro/') === 0) {
+                                $plugin_file = $candidate_file;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (file_exists(WP_PLUGIN_DIR . '/' . $plugin_file)) {
+                        $network_wide = is_multisite();
+                        $result       = activate_plugin($plugin_file, '', $network_wide, true);
+                        if (is_wp_error($result)) {
+                            wp_send_json_error(['message' => $result->get_error_message()]);
+                        }
+                        wp_send_json_success(['message' => 'Plugin activated successfully']);
+                    }
+
+                    wp_send_json_error([
+                        'message' => __('Pro plugin not found on this site. Please upload/install the WPML Pro addon ZIP, then click Activate again.', 'automatic-translator-addon-for-loco-translate'),
+                    ]);
                 } else {
+                    // Gate WPML free addon install/activate behind WPML activation.
+                    if ($plugin_slug === 'wpml-translation-check' && ! $atlt_is_wpml_active()) {
+                        wp_send_json_error(['message' => 'Please activate WPML plugin first.']);
+                    }
+
                     $api = plugins_api('plugin_information', [
                         'slug'   => $plugin_slug,
                         'fields' => [
@@ -247,7 +309,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     } elseif (is_wp_error($skin->result)) {
                         if ($skin->result->get_error_message() === 'Destination folder already exists.') {
                             $install_status = install_plugin_install_status($api);
-                            $pagenow        = isset($_POST['pagenow']) ? sanitize_key($_POST['pagenow']) : '';
+                            $pagenow        = isset($_POST['pagenow']) ? sanitize_key(wp_unslash($_POST['pagenow'])) : '';
                             if (current_user_can('activate_plugin', $install_status['file'])) {
                                 $network_wide      = (is_multisite() && 'import' !== $pagenow);
                                 $activation_result = activate_plugin($install_status['file'], '', $network_wide, true); // ✅ FIXED: Added true
@@ -279,7 +341,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     }
 
                     $install_status = install_plugin_install_status($api);
-                    $pagenow        = isset($_POST['pagenow']) ? sanitize_key($_POST['pagenow']) : '';
+                    $pagenow        = isset($_POST['pagenow']) ? sanitize_key(wp_unslash($_POST['pagenow'])) : '';
 
                     // :arrows_counterclockwise: Auto-activate the plugin right after successful install
                     if (current_user_can('activate_plugin', $install_status['file']) && is_plugin_inactive($install_status['file'])) {
@@ -297,6 +359,66 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     wp_send_json_success($status);
                 }
             }
+
+        public function atlt_toggle_provider()
+        {
+            check_ajax_referer('atlt_dashboard_nonce', 'nonce', true);
+            
+            if (! current_user_can('manage_options')) {
+                wp_send_json_error(
+                    [
+                        'message' => __('Sorry, you are not allowed to do this action.', 'automatic-translator-addon-for-loco-translate'),
+                    ],
+                    403
+                );
+            }
+
+            $provider = isset($_POST['provider']) ? sanitize_key(wp_unslash($_POST['provider'])) : '';
+            $enabled  = isset($_POST['enabled']) ? (int) sanitize_text_field(wp_unslash($_POST['enabled'])) : 0;
+
+            if ($provider === '') {
+                wp_send_json_error(
+                    [
+                        'message' => __('Missing provider.', 'automatic-translator-addon-for-loco-translate'),
+                    ],
+                    400
+                );
+            }
+
+            $allowed_providers = [
+                'yandex',
+                'openai',
+                'chrome',
+                'chatgpt',
+                'gemini',
+                'google',
+                'deepl',
+            ];
+
+            if (! in_array($provider, $allowed_providers, true)) {
+                wp_send_json_error(
+                    [
+                        'message' => __('Invalid provider.', 'automatic-translator-addon-for-loco-translate'),
+                    ],
+                    400
+                );
+            }
+
+            $settings = get_option('atlt_dashboard_provider_toggles', []);
+            if (! is_array($settings)) {
+                $settings = [];
+            }
+
+            $settings[$provider] = (bool) $enabled;
+            update_option('atlt_dashboard_provider_toggles', $settings, false);
+
+            wp_send_json_success(
+                [
+                    'provider' => $provider,
+                    'enabled'  => (bool) $enabled,
+                ]
+            );
+        }
 
           public function atlt_add_docs_link_to_plugin_meta($links, $file){
             if (plugin_basename(__FILE__) === $file) {
@@ -488,90 +610,113 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 		|----------------------------------------------------------------------
 		*/
         public function atlt_openai_ajax_handler() {
-            check_ajax_referer('loco-addon-nonces', 'nonce');
+            try {
+                check_ajax_referer('loco-addon-nonces', 'nonce');
 
-            if (! current_user_can('manage_options')) {
-                wp_send_json_error(__('Unauthorized request.', 'automatic-translator-addon-for-loco-translate'));
-            }
-
-            if (! isset($_POST['source_data']) || ! is_array($_POST['source_data'])) {
-                wp_send_json_error(__('Invalid request payload.', 'automatic-translator-addon-for-loco-translate'));
-            }
-
-            $source_data = wp_unslash($_POST['source_data']);
-            if (! isset($source_data['source']) || ! is_array($source_data['source'])) {
-                wp_send_json_error(__('Source strings are missing.', 'automatic-translator-addon-for-loco-translate'));
-            }
-
-            $source = array();
-            foreach ($source_data['source'] as $key => $value) {
-                $sanitized_key = sanitize_key((string) $key);
-                $sanitized_value = sanitize_text_field((string) $value);
-                if ($sanitized_key !== '' && $sanitized_value !== '') {
-                    $source[$sanitized_key] = $sanitized_value;
+                if (! current_user_can('manage_options')) {
+                    wp_send_json_error(__('Unauthorized request.', 'automatic-translator-addon-for-loco-translate'));
                 }
-            }
 
-            if (empty($source)) {
-                wp_send_json_error(__('No valid source strings found.', 'automatic-translator-addon-for-loco-translate'));
-            }
-
-            $metadata = array(
-                'batchIndex'   => 0,
-                'requestIndex' => 0,
-            );
-            if (isset($_POST['metadata']) && is_array($_POST['metadata'])) {
-                $request_metadata = wp_unslash($_POST['metadata']);
-                if (isset($request_metadata['batchIndex'])) {
-                    $metadata['batchIndex'] = max(0, absint($request_metadata['batchIndex']));
+                if (! isset($_POST['source_data']) || ! is_array($_POST['source_data'])) {
+                    wp_send_json_error(__('Invalid request payload.', 'automatic-translator-addon-for-loco-translate'));
                 }
-                if (isset($request_metadata['requestIndex'])) {
-                    $metadata['requestIndex'] = max(0, absint($request_metadata['requestIndex']));
+
+                $source_data = wp_unslash($_POST['source_data']);
+                if (! isset($source_data['source']) || ! is_array($source_data['source'])) {
+                    wp_send_json_error(__('Source strings are missing.', 'automatic-translator-addon-for-loco-translate'));
                 }
+
+                $source = array();
+                foreach ($source_data['source'] as $key => $value) {
+                    $sanitized_key = sanitize_key((string) $key);
+                    $sanitized_value = sanitize_text_field((string) $value);
+                    if ($sanitized_key !== '' && $sanitized_value !== '') {
+                        $source[$sanitized_key] = $sanitized_value;
+                    }
+                }
+
+                if (empty($source)) {
+                    wp_send_json_error(__('No valid source strings found.', 'automatic-translator-addon-for-loco-translate'));
+                }
+
+                $metadata = array(
+                    'batchIndex'   => 0,
+                    'requestIndex' => 0,
+                );
+                if (isset($_POST['metadata']) && is_array($_POST['metadata'])) {
+                    $request_metadata = wp_unslash($_POST['metadata']);
+                    if (isset($request_metadata['batchIndex'])) {
+                        $metadata['batchIndex'] = max(0, absint($request_metadata['batchIndex']));
+                    }
+                    if (isset($request_metadata['requestIndex'])) {
+                        $metadata['requestIndex'] = max(0, absint($request_metadata['requestIndex']));
+                    }
+                }
+
+                $locale_label = 'English';
+                if (
+                    isset($source_data['locale']) &&
+                    is_array($source_data['locale']) &&
+                    isset($source_data['locale']['label'])
+                ) {
+                    $locale_label = sanitize_text_field((string) $source_data['locale']['label']);
+                }
+
+                $selected_model = get_option('atlt_selected_openai_model', '');
+                if (! is_string($selected_model) || trim($selected_model) === '') {
+                    $selected_model = 'gpt-4o-mini';
+                }
+
+                $encoded_source = wp_json_encode($source);
+                if (false === $encoded_source) {
+                    wp_send_json_error(__('Unable to encode source strings.', 'automatic-translator-addon-for-loco-translate'));
+                }
+                
+                $content = 'Instruction 1: [%s, %d, %S, %D, %s, %S, %d, %D, %س] These placeholders are special and should not be translated.' . "\n"
+                    . 'Instruction 2: Avoid repeating translations and skip any strings if necessary. If a string is skipped, maintain its original key. ' . "\n"
+                    . 'Instruction 3: The translation in the format of a JSON object with the keys being numeric values (matching the source keys), and the values being the translated strings' . "\n"
+                    . 'Instruction 4: Use "\\" to escape special characters like \" and " to ensure valid JSON format.' . "\n"
+                    . 'Instruction 5: Translate the provided JSON object into ' . $locale_label . ' language regardless of whether the values are the same. Ensure the JSON is well-formed and complete. Please ensure that the output follows the format: {"key(numeric value)": "(translations of the strings in ' . $locale_label . ' language)"}' . "\n"
+                    . 'Strings are: ' . $encoded_source;
+
+                $translated_text = $this->atlt_generate_text_with_ai($content, 'openai', $selected_model, 120);
+                if (is_wp_error($translated_text)) {
+                    wp_send_json_error($translated_text->get_error_message());
+                }
+
+                $clean_text = preg_replace('/(^```json\n|```$)/', '', (string) $translated_text);
+                $decoded_data = json_decode((string) $clean_text, true);
+                if (! is_array($decoded_data)) {
+                    wp_send_json_error(__('OpenAI returned invalid JSON output.', 'automatic-translator-addon-for-loco-translate'));
+                }
+
+                $sanitized_data = array();
+                foreach ($decoded_data as $key => $value) {
+                    if (! is_scalar($value)) {
+                        continue;
+                    }
+                    $sanitized_key = sanitize_key((string) $key);
+                    if ('' === $sanitized_key) {
+                        continue;
+                    }
+                    $sanitized_data[ $sanitized_key ] = sanitize_text_field((string) $value);
+                }
+
+                if (empty($sanitized_data)) {
+                    wp_send_json_error(__('OpenAI returned no usable translations.', 'automatic-translator-addon-for-loco-translate'));
+                }
+
+                wp_send_json_success(
+                    array(
+                        'data'     => $sanitized_data,
+                        'metadata' => $metadata,
+                    )
+                );
+            } catch (\Throwable $e) {
+                wp_send_json_error(
+                    __('OpenAI translation failed.', 'automatic-translator-addon-for-loco-translate') . ' ' . sanitize_text_field($e->getMessage())
+                );
             }
-
-            $locale_label = 'English';
-            if (
-                isset($source_data['locale']) &&
-                is_array($source_data['locale']) &&
-                isset($source_data['locale']['label'])
-            ) {
-                $locale_label = sanitize_text_field((string) $source_data['locale']['label']);
-            }
-
-            $selected_model = get_option('atlt_selected_openai_model', '');
-            if (! is_string($selected_model) || trim($selected_model) === '') {
-                $selected_model = 'gpt-4o-mini';
-            }
-
-            $content = sprintf(
-                'Instruction 1: [%%s, %%d, %%S, %%D, %%s, %%S, %%d, %%D, %%س] These placeholders are special and should not be translated.
-                Instruction 2: Avoid repeating translations and skip any strings if necessary. If a string is skipped, maintain its original key.
-                Instruction 3: Return translation as a JSON object with numeric keys matching source keys, values as translated strings.
-                Instruction 4: Use escaped characters where needed so output remains valid JSON.
-                Instruction 5: Translate provided JSON object into %s language. Output only valid JSON in format {"key":"translated string"}.
-                Strings are: %s',
-                $locale_label,
-                wp_json_encode($source)
-            );
-
-            $translated_text = $this->atlt_generate_text_with_ai($content, 'openai', $selected_model, 120);
-            if (is_wp_error($translated_text)) {
-                wp_send_json_error($translated_text->get_error_message());
-            }
-
-            $clean_text = preg_replace('/(^```json\n|```$)/', '', (string) $translated_text);
-            $decoded_data = json_decode((string) $clean_text, true);
-            if (! is_array($decoded_data)) {
-                wp_send_json_error(__('OpenAI returned invalid JSON output.', 'automatic-translator-addon-for-loco-translate'));
-            }
-
-            wp_send_json_success(
-                array(
-                    'data'     => $decoded_data,
-                    'metadata' => $metadata,
-                )
-            );
         }
 
         /**
@@ -706,13 +851,12 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
         // save translations inside transient cache for later use
         public function atlt_save_translations_handler()
         {
+            check_ajax_referer('loco-addon-nonces', 'wpnonce');
 
             // Capability check to restrict access to admins
             if (! current_user_can('manage_options')) {
                 wp_send_json_error('Unauthorized', 403);
             }
-
-            check_ajax_referer('loco-addon-nonces', 'wpnonce');
 
             if (isset($_POST['data']) && ! empty($_POST['data']) && isset($_POST['part'])) {
 
@@ -1037,7 +1181,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
                 $this->atlt_display_admin_notices();
 
-                require_once ATLT_PATH . 'includes/Feedback/class.feedback-form.php';
+                require_once ATLT_PATH . 'includes/Feedback/class-feedback-form.php';
                 new ATLT_FeedbackForm();
             }
         }
@@ -1048,7 +1192,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 				if ( file_exists( $plugin_autoload ) ) {
 					require_once $plugin_autoload;
 				}
-				$providers_autoload = ATLT_PATH . 'ai-providers/vendor/autoload.php';
+				$providers_autoload = ATLT_PATH . 'includes/wp-ai-providers/vendor/autoload.php';
 				if ( file_exists( $providers_autoload ) ) {
 					require_once $providers_autoload;
 				}
@@ -1066,14 +1210,21 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 					$allowed_providers = array('openai', 'google', 'anthropic');
 					$providers = array_intersect($allowed_providers, array_keys($credentials));
 					foreach ($providers as $provider) {
-					 update_option('connectors_ai_'.$provider.'_api_key', $credentials[$provider]);	
+						if ( ! isset( $credentials[ $provider ] ) || ! is_string( $credentials[ $provider ] ) ) {
+							continue;
+						}
+						update_option(
+							'connectors_ai_' . $provider . '_api_key',
+							sanitize_text_field( $credentials[ $provider ] ),
+							false
+						);
 					}
 					update_option( 'atlt_ai_credentials_migrated_to_wp70', true );
 				}
 			}
 			
 		
-			$providers_autoload = ATLT_PATH . 'ai-providers/vendor/autoload.php';
+			$providers_autoload = ATLT_PATH . 'includes/wp-ai-providers/vendor/autoload.php';
 			if ( file_exists( $providers_autoload ) ) {
 				require_once $providers_autoload;
 			}
@@ -1159,7 +1310,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
         {
             // Load assets for the dashboard page
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Checking page parameter for conditional script loading, no data processing
-            $page = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
+            $page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
             if ($page === 'loco-atlt-dashboard') {
                 wp_enqueue_style(
                     'atlt-dashboard-style',
@@ -1178,12 +1329,21 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     ATLT_VERSION,
                     true
                 );
+
+                wp_localize_script(
+                    'atlt-dashboard-script',
+                    'atltDashboard',
+                    [
+                        'nonce'    => wp_create_nonce('atlt_dashboard_nonce'),
+                        'ajax_url' => admin_url('admin-ajax.php'),
+                    ]
+                );
             }
             // Keep existing editor page scripts
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Checking action parameter for conditional script loading, no data processing
             $req_action = isset($_REQUEST['action']) ? sanitize_text_field(wp_unslash($_REQUEST['action'])) : '';
             if ($req_action === 'file-edit') {
-                wp_register_script('loco-addon-custom', ATLT_URL . 'assets/js/custom.js', ['loco-translate-admin'], ATLT_VERSION, true);
+                wp_register_script('loco-addon-custom', ATLT_URL . 'assets/js/custom.min.js', ['loco-translate-admin'], ATLT_VERSION, true);
                 wp_register_style(
                     'loco-addon-custom-css',
                     ATLT_URL . 'assets/css/custom.min.css',
@@ -1192,11 +1352,26 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                     'all'
                 );
                 // load yandex widget
-                wp_register_script('atlt-yandex-widget', ATLT_URL . 'assets/js/widget.js?widgetId=ytWidget&pageLang=en&widgetTheme=light&autoMode=false', ['loco-translate-admin'], ATLT_VERSION, true);
+                wp_register_script('atlt-yandex-widget', ATLT_URL . 'assets/js/widget.js', ['loco-translate-admin'], ATLT_VERSION, true);
+                wp_localize_script(
+                    'atlt-yandex-widget',
+                    'atltYandexWidgetConfig',
+                    [
+                        'widgetId'    => 'ytWidget',
+                        'pageLang'    => 'en',
+                        'widgetTheme' => 'light',
+                        'autoMode'    => 'false',
+                    ]
+                );
 
                 wp_enqueue_script('loco-addon-custom');
                 wp_enqueue_script('atlt-yandex-widget');
                 wp_enqueue_style('loco-addon-custom-css');
+
+                $openai_connector_key           = get_option('connectors_ai_openai_api_key', '');
+                $openai_credentials             = get_option('wp_ai_client_provider_credentials', array());
+                $openai_credentials             = is_array($openai_credentials) ? $openai_credentials : array();
+                $openai_provider_key              = isset($openai_credentials['openai']) && is_string($openai_credentials['openai']) ? $openai_credentials['openai'] : '';
 
                 $extraData['ajax_url']         = admin_url('admin-ajax.php');
                 $extraData['nonce']            = wp_create_nonce('loco-addon-nonces');
@@ -1212,15 +1387,9 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 $extraData['openai_preview']   = 'openai.png';
                 $extraData['error_preview']    = 'error-icon.svg';
                 $extraData['extra_class']      = is_rtl() ? 'atlt-rtl' : '';
-
+                $extraData['atlt_dashboard_provider_toggles'] = get_option('atlt_dashboard_provider_toggles', []);
                 $extraData['loco_settings_url'] = admin_url('admin.php?page=loco-config&action=apis');
-                $openai_connector_key           = get_option('connectors_ai_openai_api_key', '');
-                $openai_credentials             = get_option('wp_ai_client_provider_credentials', array());
-                $openai_credentials             = is_array($openai_credentials) ? $openai_credentials : array();
-                $openai_legacy_key              = isset($openai_credentials['openai']) && is_string($openai_credentials['openai']) ? $openai_credentials['openai'] : '';
-                $extraData['openai_api_key']    = (is_string($openai_connector_key) && trim($openai_connector_key) !== '')
-                    ? $openai_connector_key
-                    : $openai_legacy_key;
+                $extraData['has_openai_api_key']    = ($openai_connector_key || $openai_provider_key) ? true : false;
                 wp_localize_script('loco-addon-custom', 'extradata', $extraData);
                 // copy object
                 wp_add_inline_script(
@@ -1280,7 +1449,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
             }
 
             update_option('atlt-version', ATLT_VERSION);
-            update_option('atlt-installDate', gmdate('Y-m-d h:i:s'));
+            update_option('atlt-installDate', gmdate('Y-m-d H:i:s'));
             update_option('atlt-type', 'free');
 
             if (! get_option('atlt-install-date')) {
@@ -1297,7 +1466,37 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
                 wp_schedule_event(time(), 'every_30_days', 'atlt_extra_data_update');
             }
+        }
 
+        public function atlt_ensure_provider_toggle_defaults()
+        {
+            $defaults = [
+                'openai' => true,
+                'yandex' => true,
+            ];
+
+            $settings = get_option('atlt_dashboard_provider_toggles', null);
+
+            if ($settings === null) {
+                add_option('atlt_dashboard_provider_toggles', $defaults, '', false);
+                return;
+            }
+
+            if (! is_array($settings)) {
+                $settings = [];
+            }
+
+            $changed = false;
+            foreach ($defaults as $key => $value) {
+                if (! array_key_exists($key, $settings)) {
+                    $settings[$key] = $value;
+                    $changed        = true;
+                }
+            }
+
+            if ($changed) {
+                update_option('atlt_dashboard_provider_toggles', $settings, false);
+            }
         }
 
         /*
@@ -1367,30 +1566,21 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
         /**
          * Render the dashboard page with dynamic text domain support
          *
-         * @param string $text_domain The text domain for translations (default: 'automatic-translator-addon-for-loco-translate')
          */
         public function atlt_dashboard_page()
         {
 
-            $text_domain = 'automatic-translator-addon-for-loco-translate';
             $file_prefix = 'admin/atlt-dashboard/views/';
 
             $valid_tabs = [
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                'dashboard'       => __('Dashboard', $text_domain),
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                'ai-translations' => __('AI Translations', $text_domain),
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                'settings'        => __('Settings', $text_domain),
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                'license'         => __('License', $text_domain),
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                'free-vs-pro'     => __('Free vs Pro', $text_domain),
+                'dashboard'       => __('Dashboard', 'automatic-translator-addon-for-loco-translate'),
+                'settings'        => __('Settings', 'automatic-translator-addon-for-loco-translate'),
+                'license'         => __('License', 'automatic-translator-addon-for-loco-translate'),
+                'free-vs-pro'     => __('Free vs Pro', 'automatic-translator-addon-for-loco-translate'),
             ];
 
             // Get current tab with fallback
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Checking tab parameter for navigation, no data processing
-            $tab         = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'dashboard';
+            $tab         = isset($_GET['tab']) ? sanitize_key(wp_unslash($_GET['tab'])) : 'dashboard';
             $current_tab = array_key_exists($tab, $valid_tabs) ? $tab : 'dashboard';
 
             // Action buttons configuration
@@ -1398,15 +1588,13 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                 [
                     'url' => 'https://locoaddon.com/docs/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_header',
                     'img' => 'document.svg',
-                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                    'alt' => __('document', $text_domain),
+                    'alt' => __('document', 'automatic-translator-addon-for-loco-translate'),
                 ],
                 [
                     'url' => 'https://locoaddon.com/support/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=support&utm_content=dashboard_header',
                     'img' => 'contact.svg',
-                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                    'alt' => __('contact', $text_domain),
-                    'text' => __('Support', $text_domain),
+                    'alt' => __('contact', 'automatic-translator-addon-for-loco-translate'),
+                    'text' => __('Support', 'automatic-translator-addon-for-loco-translate'),
                 ],
             ];
 
@@ -1416,16 +1604,14 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     <div class="atlt-dashboard-header">
         <div class="atlt-dashboard-header-left">
             <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/loco-addon-logo.svg'); ?>" alt="<?php
-       // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                   esc_attr_e('Loco Translate Logo', $text_domain); ?>">
+            esc_attr_e('Loco Translate Logo', 'automatic-translator-addon-for-loco-translate'); ?>">
             <div class="atlt-dashboard-tab-title">
                 <span>↳</span> <?php echo esc_html($valid_tabs[$current_tab]); ?>
             </div>
         </div>
         <div class="atlt-dashboard-header-right">
             <span><?php
-                  // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                              esc_html_e('Auto translate plugins & themes.', $text_domain); ?></span>
+            esc_html_e('Auto translate plugins & themes.', 'automatic-translator-addon-for-loco-translate'); ?></span>
             <?php foreach ($buttons as $button): ?>
             <a href="<?php echo esc_url($button['url']); ?>" class="atlt-dashboard-btn" target="_blank"
                 aria-label="<?php echo isset($button['alt']) ? esc_attr($button['alt']) : ''; ?>">
@@ -1440,8 +1626,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     </div>
 
     <nav class="nav-tab-wrapper" aria-label="<?php
-                                             // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                                         esc_attr_e('Dashboard navigation', $text_domain); ?>">
+        esc_attr_e('Dashboard navigation', 'automatic-translator-addon-for-loco-translate'); ?>">
         <?php foreach ($valid_tabs as $tab_key => $tab_title): ?>
         <a href="<?php echo esc_url(admin_url('admin.php?page=loco-atlt-dashboard&tab=' . $tab_key)); ?>"
             class="nav-tab <?php echo esc_attr($tab === $tab_key ? 'nav-tab-active' : ''); ?>">
@@ -1451,11 +1636,11 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     </nav>
 
     <div class="tab-content">
+        <div class="atlt-dashboard-left-section">
         <?php
             // Secure file inclusion with strict whitelist validation
                         $allowed_templates = [
                             'dashboard'       => 'dashboard.php',
-                            'ai-translations' => 'ai-translations.php',
                             'settings'        => 'settings.php',
                             'license'         => 'license.php',
                             'free-vs-pro'     => 'free-vs-pro.php',
@@ -1485,6 +1670,13 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
                             }
                         }
 
+                        if (class_exists('Atlt_Dashboard')) {
+                            Atlt_Dashboard::render_footer();
+                        }
+
+                        ?>
+        </div>
+        <?php
                         // Include sidebar (with same security validation)
                         $sidebar_file      = ATLT_PATH . $file_prefix . 'sidebar.php';
                         $real_sidebar_path = realpath($sidebar_file);
@@ -1496,17 +1688,6 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
 
                     ?>
     </div>
-
-    <?php
-        // Secure footer inclusion
-                    $footer_file      = ATLT_PATH . $file_prefix . 'footer.php';
-                    $real_footer_path = realpath($footer_file);
-                    if ($real_footer_path && $expected_base_path &&
-                        strpos($real_footer_path, $expected_base_path) === 0 &&
-                        file_exists($footer_file)) {
-                        require_once $footer_file;
-                    }
-                ?>
 </div>
 <?php
     }

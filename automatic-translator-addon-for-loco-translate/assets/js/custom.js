@@ -3,7 +3,7 @@ const AutoTranslator = (function (window, $) {
     const locoConf = window.locoConf;
     // get plugin configuration object.
     const configData = window.extradata;
-    const { ajax_url: ajaxUrl, nonce: nonce, ATLT_URL: ATLT_URL, extra_class: rtlClass, openai_api_key: openaiApiKey} = configData;
+    const { ajax_url: ajaxUrl, nonce: nonce, ATLT_URL: ATLT_URL, extra_class: rtlClass, has_openai_api_key: hasOpenAiKey, atlt_dashboard_provider_toggles: atltDashboardProviderToggles = {} } = configData || {};
     let openAISourceValues = {};
     onLoad();
     function onLoad() {
@@ -58,6 +58,11 @@ const AutoTranslator = (function (window, $) {
         // save string inside cache for later use
         $(".atlt_save_strings").on("click", onSaveClick);
 
+        $(document).on('click.atltDismissAlert', '.atlt_custom_model .atlt-modern-alert-close', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).closest('.atlt-modern-alert').stop(true, true).fadeOut(150);
+        });
     }
 
     function destroyYandexTranslator() {
@@ -83,9 +88,10 @@ const AutoTranslator = (function (window, $) {
         } else {
             $("#ytWidget").hide();
             $(".notice-container")
-                .addClass('notice inline notice-warning')
+                .addClass('notice inline notice-warning atlt-modern-alert atlt-modern-alert--warning')
+                .show()
                 .html("There is no plain string available for translations.");
-            $(".atlt_string_container, .choose-lang, .translator-widget, .notice-info, .is-dismissible").hide();
+            $(".atlt_string_container, .choose-lang, .translator-widget, .notice-info, .is-dismissible,.atlt_actions > .atlt_save_strings").hide();
         }
     }
 
@@ -119,19 +125,21 @@ const AutoTranslator = (function (window, $) {
 
         localStorage.setItem("lang", defaultlang);
         localStorage.setItem("langName", langugeName);
-        modelContainer.find(".yandex-translation-info").text(`Translating Strings into ${localStorage.getItem("langName") || 'Selected Language'} Using Yandex Translator.`);
+        modelContainer.find(".yandex-translation-info")
+            .text(`Translating Strings into ${langugeName || 'Selected Language'} Using Yandex`);
         const supportedLanguages = ['kir', 'he', 'af', 'jv', 'no', 'am', 'ar', 'az', 'ba', 'be', 'bg', 'bn', 'bs', 'ca', 'ceb', 'cs', 'cy', 'da', 'de', 'el', 'en', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'ga', 'gd', 'gl', 'gu', 'he', 'hi', 'hr', 'ht', 'hu', 'hy', 'id', 'is', 'it', 'ja', 'jv', 'ka', 'kk', 'km', 'kn', 'ko', 'ky', 'la', 'lb', 'lo', 'lt', 'lv', 'mg', 'mhr', 'mi', 'mk', 'ml', 'mn', 'mr', 'mrj', 'ms', 'mt', 'my', 'ne', 'nl', 'no', 'pa', 'pap', 'pl', 'pt', 'ro', 'ru', 'si', 'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'tl', 'tr', 'tt', 'udm', 'uk', 'ur', 'uz', 'vi', 'xh', 'yi', 'zh'];
 
         if (!supportedLanguages.includes(defaultlang)) {
-            $("#atlt-dialog").dialog("close");
+            closeProviderModal();
             modelContainer.find(".notice-container")
-                .addClass('notice inline notice-warning')
+                .addClass('notice inline notice-warning atlt-modern-alert atlt-modern-alert--warning')
+                .show()
                 .html("Yandex Automatic Translator Does not support this language.");
             modelContainer.find(".atlt_string_container, .choose-lang, .atlt_save_strings, #ytWidget, .translator-widget, .notice-info, .is-dismissible").hide();
-            modelContainer.fadeIn("slow");
+            modelContainer.css("display", "flex").hide().fadeIn("slow");
         } else {
-            $("#atlt-dialog").dialog("close");
-            modelContainer.fadeIn("slow", function () {
+            closeProviderModal();
+            modelContainer.css("display", "flex").hide().fadeIn("slow", function () {
                 // Start Yandex automatically once popup is visible
                 $(document).trigger('atlt:yandex-start');
             });
@@ -153,12 +161,13 @@ const AutoTranslator = (function (window, $) {
         const defaultlang = langMapping[defaultcode] || defaultcode;
         let modelContainer = $(`div#atlt_strings_model_openai.openai-widget-container`);
         modelContainer.find(".atlt_actions > .atlt_save_strings").prop("disabled", true);
-        $("#atlt-dialog").dialog("close");
+        closeProviderModal();
         modelContainer.find(".atlt_stats").hide();
         localStorage.setItem("lang", defaultlang);
         localStorage.setItem("langName", langugeName);
-        modelContainer.find(".openai-translation-info").text(`Translating Strings into ${langugeName} Using OpenAI.`);
-        modelContainer.fadeIn("slow", function () {
+        modelContainer.find(".openai-translation-info")
+            .text(`Translating Strings into ${langugeName || 'Selected Language'} Using OpenAI`);
+        modelContainer.css("display", "flex").hide().fadeIn("slow", function () {
             startOpenAITranslation(locale, modelContainer);
         });
 
@@ -203,8 +212,10 @@ const AutoTranslator = (function (window, $) {
 
         if (!selectedStringsBatches.length || !Object.keys(openAISourceValues || {}).length) {
             container.find(".notice-container")
-                .addClass('notice inline notice-warning')
+                .addClass('notice inline notice-warning atlt-modern-alert atlt-modern-alert--warning')
+                .show()
                 .html('No translatable strings found for OpenAI.');
+            container.find(".atlt_string_container, .choose-lang, .translator-widget, .notice-info, .is-dismissible,.atlt_actions > .atlt_save_strings").hide();
             return;
         }
 
@@ -220,6 +231,7 @@ const AutoTranslator = (function (window, $) {
             stopProcess: true,
             stopResponse: false,
             uiUpdated: false,
+            lastErrorMessage: '',
             startTime: new Date()
         };
 
@@ -270,6 +282,68 @@ const AutoTranslator = (function (window, $) {
             container.find('.close-button').off('click.atltOpenAI').on("click.atltOpenAI", () => {
                 elements.warningMessage.fadeOut("slow");
             });
+        }
+
+        function hasPartialTranslations() {
+            return state.currentIndex > 0 || state.translatedResponse.some(Boolean);
+        }
+
+        function showTranslationWarning(primaryMessage, isPartial) {
+            elements.warningWrapper.empty();
+            elements.warningWrapper.append($('<h2>').text(primaryMessage));
+            if (isPartial) {
+                elements.warningWrapper.append(
+                    $('<p>').addClass('atlt-partial-translation-hint').text(
+                        'Some strings were translated successfully. Click "Merge Translation" to save the translated strings, then run auto translate again for the remaining strings.'
+                    )
+                );
+            }
+            elements.warningMessage.fadeIn('slow');
+            elements.progressIndicator.fadeOut('slow');
+        }
+
+        function stopTranslationWithError(errorMessage) {
+            const isPartial = hasPartialTranslations();
+            state.stopProcess = false;
+            state.stopResponse = true;
+            state.lastErrorMessage = errorMessage;
+            showTranslationWarning(errorMessage, isPartial);
+            state.ajaxStore.forEach((item) => {
+                if (item && typeof item.abort === 'function') {
+                    item.abort();
+                }
+            });
+        }
+
+        function finalizePartialTranslationUI() {
+            if (state.uiUpdated) {
+                return;
+            }
+
+            state.uiUpdated = true;
+            const progressValue = Math.min(
+                100,
+                Math.round((state.totalTranslatedCount / state.totalSourceCount) * 100)
+            );
+            elements.progressBar.css('width', `${progressValue}%`);
+            elements.progressText.text(`${progressValue}%`);
+            elements.progressIndicator.fadeOut('slow');
+            container.find('.atlt_save_strings').prop('disabled', false);
+
+            const endTime = new Date();
+            const timeTaken = Math.round((endTime - state.startTime) / 1000);
+            container.data('translation-time', timeTaken);
+            container.data('translation-provider', 'openai');
+
+            const partialStatsMsg = `Partial translation complete. <strong class="totalChars">${formatNumberShort(state.totalTranslatedCount)}</strong> characters translated. Merge the translated strings, then translate the remaining strings again.`;
+            const $body = elements.stats.find('.atlt-modern-alert-body');
+            if ($body.length) {
+                $body.html(partialStatsMsg);
+            } else {
+                elements.stats.html(partialStatsMsg);
+            }
+            elements.stats.fadeIn('slow');
+            container.removeData('atlt-openai-stop-handler');
         }
 
         function processTranslatedStrings(translatedStrings, metadata, sourceValues, selectedProvider) {
@@ -342,13 +416,31 @@ const AutoTranslator = (function (window, $) {
             elements.progressText.css('color', '#f3f3f3');
         }
 
+        function formatNumberShort(num) {
+            num = parseInt(num, 10);
+            if (isNaN(num)) return num;
+            if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+            return num;
+        }
+
         function handleSuccessfulTranslation() {
             const message = state.totalTranslatedCount < state.totalSourceCount
-                ? `Wahooo! You have saved your valuable time by using auto-translation. You have translated <strong class="totalChars">${state.totalTranslatedCount}</strong> characters Out of <strong class="totalChars">${state.totalSourceCount}</strong> characters using <strong><a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">LocoAI - Auto Translate for Loco Translate (Pro)</a></strong>`
-                : `Wahooo! You have saved your valuable time via auto translating <strong class="totalChars">${state.totalTranslatedCount}</strong> characters using <strong><a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">LocoAI - Auto Translate for Loco Translate (Pro)</a></strong>`;
-
-            elements.stats.html(message);
+                ? `Wahooo! You have saved your valuable time via auto translating <strong class="totalChars">${formatNumberShort(state.totalTranslatedCount)}</strong> characters using <strong><a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">LocoAI - Auto Translate for Loco Translate</a></strong>`
+                : `Wahooo! You have saved your valuable time via auto translating <strong class="totalChars">${formatNumberShort(state.totalTranslatedCount)}</strong> characters using <strong><a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">LocoAI - Auto Translate for Loco Translate</a></strong>`;
+            const $body = elements.stats.find('.atlt-modern-alert-body');
+            if ($body.length) {
+                $body.html(message);
+            } else {
+                elements.stats.html(message);
+            }
         }
+
+        const requestLocale = {
+            lang: locale && locale.lang ? String(locale.lang) : '',
+            region: locale && locale.region ? String(locale.region) : '',
+            label: locale && locale.label ? String(locale.label) : ''
+        };
 
         function makeAjaxRequest(chunk, batchIndex, requestIndex) {
             function getErrorMessageFromResponse(response) {
@@ -373,11 +465,34 @@ const AutoTranslator = (function (window, $) {
                 return 'OpenAI translation failed.';
             }
 
+            function getErrorMessageFromXhr(xhr) {
+                let message = 'OpenAI translation failed. Please check your connection and try again.';
+                if (!xhr) {
+                    return message;
+                }
+
+                try {
+                    const parsed = JSON.parse(xhr.responseText || '');
+                    const parsedMessage = getErrorMessageFromResponse(parsed);
+                    if (parsedMessage && parsedMessage !== 'OpenAI translation failed.') {
+                        return parsedMessage;
+                    }
+                } catch (parseError) {
+                    // Ignore invalid JSON bodies.
+                }
+
+                if (xhr.status === 500) {
+                    return 'OpenAI translation failed due to a server error. Please try again.';
+                }
+
+                return message;
+            }
+
             const data = {
                 action: 'atlt_openai_ajax_handler',
                 nonce: nonce,
                 source_data: {
-                    locale: locale,
+                    locale: requestLocale,
                     source: chunk,
                     selectedApi: selectedApi
                 },
@@ -394,12 +509,7 @@ const AutoTranslator = (function (window, $) {
                     data: data,
                     success: function (response) {
                         if (!state.stopResponse && !response.success) {
-                            state.stopProcess = false;
-                            state.stopResponse = true;
-                            elements.warningWrapper.html(`<h2>${getErrorMessageFromResponse(response)}</h2>`);
-                            elements.warningMessage.fadeIn("slow");
-                            elements.progressIndicator.fadeOut("slow");
-                            state.ajaxStore.forEach(item => item.abort());
+                            stopTranslationWithError(getErrorMessageFromResponse(response));
                             resolve();
                             return;
                         }
@@ -409,10 +519,17 @@ const AutoTranslator = (function (window, $) {
                             const { source, target } = result;
                             state.translatedResponse.push(Boolean(response.data.data));
 
-                            let tbody = '';
+                            const $rows = [];
                             for (let j = 0; j < source.length; j++) {
-                                tbody += `<tr id="${state.currentIndex}"><td>${state.currentIndex + 1}</td><td class="notranslate source">${encodeHtmlEntity(source[j])}</td>`;
-                                tbody += `<td class="target translate">${encodeHtmlEntity(target[j])}</td></tr>`;
+                                const $row = $('<tr></tr>').attr('id', String(state.currentIndex));
+                                $row.append($('<td></td>').text(state.currentIndex + 1));
+                                $row.append(
+                                    $('<td></td>').addClass('notranslate source').text(source[j])
+                                );
+                                $row.append(
+                                    $('<td></td>').addClass('target translate').text(target[j])
+                                );
+                                $rows.push($row);
                                 state.currentIndex++;
                             }
 
@@ -420,23 +537,26 @@ const AutoTranslator = (function (window, $) {
                             state.totalTranslatedWords += source.reduce((sum, str) => sum + str.trim().split(/\s+/).filter(word => word.length > 0).length, 0);
                             updateProgress();
 
-                            if (!state.isModalAppended && tbody) {
-                                elements.tbody.html('');
+                            if (!state.isModalAppended && $rows.length) {
+                                elements.tbody.empty();
                                 state.isModalAppended = true;
                             }
 
-                            if (tbody) {
-                                elements.tbody.append(tbody);
+                            if ($rows.length) {
+                                elements.tbody.append($rows);
                                 const stringContainer = container.find('.atlt_string_container');
                                 stringContainer.off('scroll').stop();
+                                const scrollSpeed = 650;
+                                const el = stringContainer.get(0);
+                                const maxScrollTop = el ? el.scrollHeight : 0;
 
-                                const tbodyScrollHeight = stringContainer.find('.atlt_strings_table tbody').prop('scrollHeight');
-                                const scrollSpeed = 3000;
-
-                                if (tbodyScrollHeight > 100 && container.css('display') === 'block') {
-                                    stringContainer.animate({
-                                        scrollTop: tbodyScrollHeight
-                                    }, scrollSpeed, 'linear');
+                                // Auto-scroll while translating (match Yandex feel).
+                                if (maxScrollTop > 0 && container.css('display') === 'block') {
+                                    stringContainer.stop(true, false).animate(
+                                        { scrollTop: maxScrollTop },
+                                        scrollSpeed,
+                                        'linear'
+                                    );
                                 }
                             } else {
                                 handleEmptyResponse();
@@ -444,7 +564,12 @@ const AutoTranslator = (function (window, $) {
                         }
                         resolve();
                     },
-                    error: reject
+                    error: function (xhr) {
+                        if (!state.stopResponse) {
+                            stopTranslationWithError(getErrorMessageFromXhr(xhr));
+                        }
+                        resolve();
+                    }
                 }));
             });
         }
@@ -487,8 +612,17 @@ const AutoTranslator = (function (window, $) {
                     }
                 }
 
+                function finalizeProgressUI() {
+                    // Some strings can be skipped (empty/invalid) so percentage-by-chars may not reach 100.
+                    // At the end of the run, force a completed UI state.
+                    elements.progressBar.css('width', '100%');
+                    elements.progressText.text('100%');
+                    elements.progressText.css('color', '#f3f3f3');
+                }
+
                 function updateTranslationUI() {
                     if (!state.uiUpdated) {
+                        finalizeProgressUI();
                         elements.progressBar.css({
                             'background-image': 'none',
                             'animation': 'none',
@@ -499,13 +633,6 @@ const AutoTranslator = (function (window, $) {
                         const timeTaken = Math.round((endTime - state.startTime) / 1000);
                         container.data('translation-time', timeTaken);
                         container.data('translation-provider', 'openai');
-
-                        function formatNumberShort(n) {
-                            n = Number(n);
-                            if (n >= 1e6) return (n / 1e6).toFixed(1).replace(/\.0$/, '') + 'M';
-                            if (n >= 1e3) return (n / 1e3).toFixed(1).replace(/\.0$/, '') + 'K';
-                            return n.toString();
-                        }
                         setTimeout(() => {
                             container.find(".atlt_save_strings").prop("disabled", false);
                             elements.stats.fadeIn("slow");
@@ -516,29 +643,19 @@ const AutoTranslator = (function (window, $) {
                     }
                 }
 
-                if (state.translatedResponse.some(Boolean) && !state.isTbodyEmpty) {
-                    const stringContainer = container.find('.atlt_string_container');
-                    const scrollHeight = stringContainer[0].scrollHeight;
-                    const offsetHeight = stringContainer[0].offsetHeight;
+                const hasTranslations = state.translatedResponse.some(Boolean) && state.currentIndex > 0;
 
-                    stringContainer.on('scroll', function () {
-                        const currentScrollHeight = stringContainer[0].scrollHeight;
-                        const scrollTop = stringContainer[0].scrollTop;
-                        const clientHeight = stringContainer[0].clientHeight;
-                        const tolerance = 5;
-                        const isComplete = (Math.ceil(scrollTop + clientHeight) >= currentScrollHeight - tolerance);
-
-                        if (isComplete) {
-                            updateTranslationUI();
-                        }
-                    });
-
-                    if (offsetHeight === scrollHeight) {
-                        updateTranslationUI();
-                    }
+                if (hasTranslations && !state.stopResponse) {
+                    setTimeout(() => updateTranslationUI(), 0);
+                } else if (hasTranslations && state.stopResponse) {
+                    finalizePartialTranslationUI();
                 } else {
-                    elements.progressIndicator.fadeOut("slow");
-                    handleEmptyResponse();
+                    elements.progressIndicator.fadeOut('slow');
+                    if (!elements.warningWrapper.find('h2').length) {
+                        handleEmptyResponse();
+                    } else {
+                        container.removeData('atlt-openai-stop-handler');
+                    }
                 }
             } catch (error) {
                 console.error('An error occurred during the AJAX processing:', error);
@@ -792,7 +909,7 @@ const AutoTranslator = (function (window, $) {
     // send ajax request and save data.
     function sendBatchRequest(stringData, projectId, part, translationData) {
         const data = {
-            'action': 'save_all_translations',
+            'action': 'atlt_save_all_translations',
             'data': JSON.stringify(stringData),
             'part': part,
             'project-id': projectId,
@@ -801,6 +918,10 @@ const AutoTranslator = (function (window, $) {
         };
 
         jQuery.post(ajaxUrl, data, function (response) {
+            if(!response || !response.success){ 
+                console.error(response.data.message || 'Saving translations failed. Please retry.'); 
+                return; 
+            }
             $('#loco-editor nav').find('button').each(function (i, el) {
                 var id = el.getAttribute('data-loco');
                 if (id == "auto") {
@@ -811,6 +932,8 @@ const AutoTranslator = (function (window, $) {
                     $(el).trigger("click");
                 }
             });
+        }).fail(function () {
+            console.error('Request failed.'); 
         });
     }
 
@@ -826,21 +949,164 @@ const AutoTranslator = (function (window, $) {
         // append custom created button.
         locoActions.append(autoTranslateBtn);
     }
-    // open settings model on auto translate button click
-    function openSettingsModel() {
-        $("#atlt-dialog").dialog({
-            dialogClass: rtlClass,
-            resizable: false,
-            height: "auto",
-            draggable: false,
-            width: 400,
-            modal: true,
-            buttons: {
-                Cancel: function () {
-                    $(this).dialog("close");
-                }
+    function isProviderModalOpen() {
+        return $("#atlt-provider-overlay").is(":visible");
+    }
+
+    function isProviderCardSelectable($card) {
+        if (!$card || !$card.length) {
+            return false;
+        }
+        const attr = $card.attr('data-provider-selectable');
+        if (attr === undefined || attr === null || attr === '') {
+            return true;
+        }
+        return attr === '1' || attr === 'true';
+    }
+
+    function selectProviderCard($card) {
+        if (!$card || !$card.length) {
+            return;
+        }
+        if (!isProviderCardSelectable($card)) {
+            return;
+        }
+        const $root = $("#atlt-dialog");
+        $root.find(".atlt-provider-card").removeClass("is-selected").attr("aria-checked", "false");
+        $card.addClass("is-selected").attr("aria-checked", "true");
+    }
+
+    function getProviderStartTarget($card) {
+        if (!$card || !$card.length) {
+            return null;
+        }
+        const key = $card.data("provider");
+        const $wrap = $('#atlt-dialog .atlt-hidden-action[data-provider="' + key + '"]');
+        if (!$wrap.length) {
+            return null;
+        }
+        const $btn = $wrap.find("button").first();
+        if ($btn.length) {
+            // when a provider isn't actually usable (e.g. missing API key).
+            if ($btn.prop("disabled") || $btn.attr("aria-disabled") === "true") {
+                return null;
+            }
+            return { type: "click", $el: $btn };
+        }
+        return null;
+    }
+
+    function refreshProviderStartButtonState() {
+        const $start = $("#atlt-provider-start");
+        if (!$start.length) {
+            return;
+        }
+        const $selected = $("#atlt-dialog").find(".atlt-provider-card.is-selected").first();
+        if ($selected.length && !isProviderCardSelectable($selected)) {
+            $start.prop("disabled", true);
+            return;
+        }
+        const target = getProviderStartTarget($selected);
+        $start.prop("disabled", !target);
+    }
+
+    function startSelectedProvider() {
+        const $selected = $("#atlt-dialog").find(".atlt-provider-card.is-selected").first();
+        if ($selected.length && !isProviderCardSelectable($selected)) {
+            return;
+        }
+        const target = getProviderStartTarget($selected);
+        if (!target) {
+            return;
+        }
+        if (target.type === "click") {
+            target.$el.trigger("click");
+            return;
+        }
+        if (target.type === "href" && target.href) {
+            if (target.target === "_blank") {
+                window.open(target.href, "_blank", "noopener,noreferrer");
+            } else {
+                window.location.href = target.href;
+            }
+        }
+    }
+
+    function openProviderModal() {
+        const $overlay = $("#atlt-provider-overlay");
+        if (!$overlay.length) {
+            return;
+        }
+        $("body").addClass("atlt-provider-modal-open");
+        $overlay.css("display", "flex").hide().fadeIn(120);
+
+        const $cards = $("#atlt-dialog .atlt-provider-card");
+        $cards.removeClass("is-selected").attr("aria-checked", "false");
+        const $selectableCards = $cards.filter(function () {
+            return isProviderCardSelectable($(this));
+        });
+        const $y = $selectableCards.filter('[data-provider="yandex"]').first();
+        const $pick = $y.length ? $y : $selectableCards.first();
+        if ($pick.length) {
+            selectProviderCard($pick);
+        }
+        refreshProviderStartButtonState();
+    }
+
+    function closeProviderModal() {
+        const $overlay = $("#atlt-provider-overlay");
+        if (!$overlay.length) {
+            return;
+        }
+        $overlay.fadeOut(120);
+        $("body").removeClass("atlt-provider-modal-open");
+    }
+
+    function bindProviderModalEvents() {
+        $(document).off('click.atltProviderCard').on('click.atltProviderCard', '#atlt-dialog .atlt-provider-card', function (e) {
+            const $interactiveTarget = $(e.target).closest('a, button, input, select, textarea');
+            if ($interactiveTarget.length && !$interactiveTarget.is(this)) {
+                return;
+            }
+            e.preventDefault();
+            selectProviderCard($(this));
+            refreshProviderStartButtonState();
+        });
+
+        $(document).off('keydown.atltProviderCard').on('keydown.atltProviderCard', '#atlt-dialog .atlt-provider-card', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectProviderCard($(this));
+                refreshProviderStartButtonState();
             }
         });
+
+        $(document).off('click.atltProviderStart').on('click.atltProviderStart', '#atlt-provider-start', function (e) {
+            e.preventDefault();
+            startSelectedProvider();
+        });
+
+        $(document).off('click.atltProviderClose').on('click.atltProviderClose', '#atlt-dialog .atlt-provider-selector__close', function (e) {
+            e.preventDefault();
+            closeProviderModal();
+        });
+
+        $(document).off('click.atltProviderOverlay').on('click.atltProviderOverlay', '#atlt-provider-overlay', function (e) {
+            if (e.target && e.target.id === 'atlt-provider-overlay') {
+                closeProviderModal();
+            }
+        });
+
+        $(document).off('keydown.atltProviderEsc').on('keydown.atltProviderEsc', function (e) {
+            if (e.key === 'Escape' && isProviderModalOpen()) {
+                closeProviderModal();
+            }
+        });
+    }
+
+    // open settings model on auto translate button click
+    function openSettingsModel() {
+        openProviderModal();
     }
 
     // String translate modal close handlers (works for Yandex + OpenAI modals)
@@ -876,26 +1142,12 @@ const AutoTranslator = (function (window, $) {
     });
 
 
-    function encodeHtmlEntity(str) {
-        var buf = [];
-        for (var i = str.length - 1; i >= 0; i--) {
-            buf.unshift(['&#', str[i].charCodeAt(), ';'].join(''));
-        }
-        return buf.join('');
-    }
-
-    /* function encodeHtmlEntity(str) {
-         return str
-             .split('')
-             .map(char => `&#${char.charCodeAt(0)};`)
-             .join('');
-     }*/
-
     // get object and append inside the popup
     function printStringsInPopup(jsonObj, type) {
-        let html = '';
         let totalTChars = 0;
         let index = 1;
+        const $tbody = $(`.${type}-widget-container .atlt_strings_table > tbody.atlt_strings_body`);
+        $tbody.empty();
 
         if (jsonObj) {
             let wordCount = 0;
@@ -907,31 +1159,39 @@ const AutoTranslator = (function (window, $) {
 
                     if (sourceText !== '') {
                         if ((type === "yandex") || (key <= 2500)) {
-                            html += `<tr id="${key}"><td>${index}</td><td class="notranslate source">${type === "yandex" ? encodeHtmlEntity(sourceText) : sourceText}</td>`;
+                            const $row = $('<tr></tr>').attr('id', String(key));
+                            $row.append($('<td></td>').text(index));
+                            $row.append(
+                                $('<td></td>').addClass('notranslate source').text(sourceText)
+                            );
 
                             if (type === "yandex") {
-                                html += `<td translate="yes" class="target translate">${sourceText}</td></tr>`;
+                                $row.append(
+                                    $('<td></td>')
+                                        .attr('translate', 'yes')
+                                        .addClass('target translate')
+                                        .text(sourceText)
+                                );
                             } else {
-                                html += '<td class="target translate"></td></tr>';
+                                $row.append($('<td></td>').addClass('target translate'));
                             }
 
+                            $tbody.append($row);
                             index++;
                             totalTChars += sourceText.length;
                         }
                     }
                 }
             }
-            
-            $(".atlt_stats").each(function () {                
-                $(this).find(".totalChars").html(totalTChars);
+
+            $(".atlt_stats").each(function () {
+                $(this).find(".totalChars").text(totalTChars);
             });
         }
-
-        $(`.${type}-widget-container .atlt_strings_table > tbody.atlt_strings_body`).html(html);
-
     }
 
     function settingsModel() {
+        const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const icons = {
             yandex: extradata['yt_preview'],
             google: extradata['gt_preview'],
@@ -945,88 +1205,140 @@ const AutoTranslator = (function (window, $) {
         };
     
         const url = 'https://locoaddon.com/docs/';
-        const ATLT_IMG = (key) => ATLT_URL + 'assets/images/' + icons[key];
+        const pricingUrl = 'https://locoaddon.com/pricing/';
+        const ATLT_IMG = (key) => escapeHtml(ATLT_URL + 'assets/images/' + icons[key]);
         const DOC_ICON = `<img src="${ATLT_IMG('docs')}" width="20" alt="Docs">`;
         const ERROR_ICON = `<img src="${ATLT_IMG('error')}" alt="error" style="height:16px; vertical-align:middle; margin-right:5px;">`;
         const rows = [
             {
+                key: 'yandex',
                 name: 'Yandex Translate',
                 icon: 'yandex',
                 info: 'https://translate.yandex.com/',
                 btn: `<button id="atlt_yandex_translate_btn" class="atlt-provider-btn translate">Translate</button>`,
-                doc: `${url}translate-plugin-theme-via-yandex-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_yandex`
+                doc: `${url}translate-plugin-theme-via-yandex-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_yandex`,
+                enabled: atltDashboardProviderToggles['yandex'] !== false,
+                selectable: true,
+                cta: ''
             },
             {
-                name: 'Google Translate',
-                icon: 'google',
-                info: 'https://translate.google.com/',
-                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_google" target="_blank"><button id="atlt_google_translate_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}auto-translations-via-google-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_google`
-            },
-            {
-                name: 'Chrome Built-in AI',
-                icon: 'chrome',
-                info: 'https://developer.chrome.com/docs/ai/translator-api',
-                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome" target="_blank"><button id="ChromeAiTranslator_settings_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chrome`
-            },
-            {
-                name: 'ChatGPT Translate',
-                icon: 'chatgpt',
-                info: 'https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/',
-                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank"><button id="atlt_chatGPT_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chatgpt`
-            },
-            {
-                name: 'Gemini AI Translate',
-                icon: 'gemini',
-                info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/',
-                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_gemini" target="_blank"><button id="atlt_geminiAI_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini`
-            },
-            {
+                key: 'openai',
                 name: 'OpenAI Translate',
                 icon: 'openai',
                 info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-open-ai-to-translate-plugins-or-themes/',
-                btn: `${openaiApiKey ? `<button id="atlt_openai_translate_btn" class="atlt-provider-btn translate">Translate</button>` : `<a href="admin.php?page=loco-atlt-dashboard&tab=settings" target="_blank"><button id="atlt_openai_btn" class="atlt-provider-btn error">${ERROR_ICON}Add API Key</button></a>`}`,
-                doc: `${url}open-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_openai`
+                btn: `${hasOpenAiKey
+                    ? `<button id="atlt_openai_translate_btn" class="atlt-provider-btn translate">Translate</button>`
+                    : `<button id="atlt_openai_btn" class="atlt-provider-btn error" disabled aria-disabled="true" title="Add an OpenAI API key to enable OpenAI translations">${ERROR_ICON}API Key Required</button>`}`,
+                doc: `${url}open-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_openai`,
+                enabled: atltDashboardProviderToggles['openai'] !== false,
+                selectable: hasOpenAiKey,
+                cta: hasOpenAiKey
+                    ? ''
+                    : '<a href="admin.php?page=loco-atlt-dashboard&tab=settings" target="_blank" class="atlt-provider-card__buypro atlt-provider-card__buypro--info" rel="noopener noreferrer">Add API Key</a>'
             },
             {
+                key: 'google',
+                name: 'Google Translate',
+                icon: 'google',
+                info: 'https://translate.google.com/',
+                btn: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_google" target="_blank"><button id="atlt_google_translate_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}auto-translations-via-google-translate/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_google`,
+                enabled: true,
+                selectable: false,
+                cta: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_google" target="_blank" class="atlt-provider-card__buypro" rel="noopener noreferrer">Buy Pro</a>`
+            },
+            {
+                key: 'chrome',
+                name: 'Chrome Built-in AI',
+                icon: 'chrome',
+                info: 'https://developer.chrome.com/docs/ai/translator-api',
+                btn: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome" target="_blank"><button id="ChromeAiTranslator_settings_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}how-to-use-chrome-ai-auto-translations/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chrome`,
+                enabled: true,
+                selectable: false,
+                cta: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome" target="_blank" class="atlt-provider-card__buypro" rel="noopener noreferrer">Buy Pro</a>`
+            },
+            {
+                key: 'chatgpt',
+                name: 'ChatGPT Translate',
+                icon: 'chatgpt',
+                info: 'https://locoaddon.com/docs/chatgpt-ai-translations-wordpress/',
+                btn: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank"><button id="atlt_chatGPT_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}chatgpt-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_chatgpt`,
+                enabled: true,
+                selectable: false,
+                cta: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chatgpt" target="_blank" class="atlt-provider-card__buypro" rel="noopener noreferrer">Buy Pro</a>`
+            },
+            {
+                key: 'gemini',
+                name: 'Gemini AI Translate',
+                icon: 'gemini',
+                info: 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/',
+                btn: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_gemini" target="_blank"><button id="atlt_geminiAI_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}gemini-ai-translations-wordpress/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_gemini`,
+                enabled: true,
+                selectable: false,
+                cta: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_gemini" target="_blank" class="atlt-provider-card__buypro" rel="noopener noreferrer">Buy Pro</a>`
+            },
+            {
+                key: 'deepl',
                 name: 'DeepL Translate',
                 icon: 'deepl',
                 info: 'https://www.deepl.com/en/translator',
-                btn: `<a href="https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_deepl" target="_blank"><button id="atlt_deepl_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
-                doc: `${url}translate-via-deepl-doc-translator/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_deepl`
+                btn: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_deepl" target="_blank"><button id="atlt_deepl_btn" class="atlt-provider-btn error">${ERROR_ICON}Buy Pro</button></a>`,
+                doc: `${url}translate-via-deepl-doc-translator/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=popup_deepl`,
+                enabled: true,
+                selectable: false,
+                cta: `<a href="${pricingUrl}?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_deepl" target="_blank" class="atlt-provider-card__buypro" rel="noopener noreferrer">Buy Pro</a>`
             }
         ];
     
-        const rowHTML = rows.map(row => `
-            <tr>
-                <td class="atlt-provider-name">
-                    <a href="${row.info}" target="_blank">
-                        <img src="${ATLT_IMG(row.icon)}" class="atlt-provider-icon" alt="${row.name}">
-                    </a>
-                    ${row.name}
-                </td>
-                <td>${row.btn}</td>
-                <td>
-                    <a href="${row.doc}" target="_blank" class="atlt-provider-docs-btn">${DOC_ICON}</a>
-                </td>
-            </tr>
+        const enabledRows = rows.filter((row) => row.enabled !== false);
+        const hiddenActionsHtml = enabledRows.map((row) => `
+            <div class="atlt-hidden-action" data-provider="${escapeHtml(row.key)}">${row.btn}</div>
         `).join('');
-    
+
+        const cardsHtml = enabledRows.map((row) => {
+            const isSelectable = row.selectable !== false;
+            const ctaHtml = row.cta || '';
+            return `
+            <div class="atlt-provider-card${isSelectable ? '' : ' atlt-provider-card--pro is-disabled'}" data-provider="${escapeHtml(row.key)}" role="radio" aria-checked="false" tabindex="${isSelectable ? '0' : '-1'}" aria-disabled="${isSelectable ? 'false' : 'true'}" data-provider-selectable="${isSelectable ? '1' : '0'}">
+                <div class="atlt-provider-card__top">
+                    <a class="atlt-provider-card__logo" href="${escapeHtml(row.info)}" target="_blank" rel="noopener noreferrer">
+                        <img src="${ATLT_IMG(row.icon)}" class="atlt-provider-card__icon" alt="${escapeHtml(row.name)}">
+                    </a>
+                    <div class="atlt-provider-card__name">${escapeHtml(row.name)}</div>
+                    <span class="atlt-provider-card__radio" aria-hidden="true"></span>
+                </div>
+                <div class="atlt-provider-card__footer">
+                    <a class="atlt-provider-card__docs" href="${escapeHtml(row.doc)}" target="_blank" rel="noopener noreferrer">${DOC_ICON}<span>Docs</span></a>
+                    ${ctaHtml}
+                </div>
+            </div>`;
+        }).join('');
+
         const modelHTML = `
-            <div class="atlt-provider-modal" id="atlt-dialog" title="Step 2 - Select Translation Provider" style="display:none;">
-                <table class="atlt-provider-table">
-                    <thead>
-                        <tr><th>Name</th><th>Translate</th><th>Docs</th></tr>
-                    </thead>
-                    <tbody>${rowHTML}</tbody>
-                </table>
+            <div class="atlt-provider-overlay ${rtlClass || ''}" id="atlt-provider-overlay" style="display:none;">
+                <div class="atlt-provider-modal atlt-provider-selector" id="atlt-dialog" role="dialog" aria-modal="true" aria-label="Select Translation Provider">
+                    <button type="button" class="atlt-provider-selector__close" aria-label="Close">&times;</button>
+                    <div class="atlt-provider-selector__header">
+                    <p class="atlt-provider-selector__step">Step 1 of 2</p>
+                        <h2 class="atlt-provider-selector__title">Select Translation Provider</h2>
+                        <p class="atlt-provider-selector__subtitle">Choose the translation provider you want to use for this translation batch.</p>
+                    </div>
+                    <div class="atlt-provider-selector__grid">${cardsHtml}</div>
+                    <div class="atlt-provider-selector__footer">
+                        <button type="button" class="button button-primary atlt-provider-selector__start" id="atlt-provider-start" disabled>Start Translation</button>
+                    </div>
+                    <div class="atlt-provider-hidden-actions" aria-hidden="true">${hiddenActionsHtml}</div>
+                </div>
             </div>
         `;
-    
+
+        $("#atlt-provider-overlay").remove();
+        $("#atlt-dialog").remove();
         $("body").append(modelHTML);
+        bindProviderModalEvents();
     }
 
     // modal to show strings
@@ -1036,13 +1348,20 @@ const AutoTranslator = (function (window, $) {
         let modelHTML = `
             <div id="atlt_strings_model_${widgetType}" class="modal atlt_custom_model  ${wrapperCls} ${rtlClass}">
                 <div class="modal-content">
-                    <input type="hidden" id="project_id" value="${projectId}"> 
                     ${modelHeaderHTML(widgetType, headerCls)}   
                     ${modelBodyHTML(widgetType, bodyCls)}   
                     ${modelFooterHTML(widgetType, footerCls)}   
             </div></div>`;
 
-        $("body").append(modelHTML);
+        const $modal = $(modelHTML);
+        const $projectInput = $('<input>', { type: 'hidden', id: 'project_id' });
+        $projectInput.val(projectId);
+        $modal.find('.modal-content').prepend($projectInput);
+        const langName = localStorage.getItem('langName') || 'Selected Language';
+        const providerLabel = widgetType === 'yandex' ? 'Yandex' : 'OpenAI';
+        $modal.find(`.${widgetType}-translation-info`)
+            .text(`Translating Strings into ${langName} Using ${providerLabel}`);
+        $('body').append($modal);
     }
 
     // Get widget classes based on widgetType
@@ -1079,15 +1398,23 @@ const AutoTranslator = (function (window, $) {
     function modelBodyHTML(widgetType, bodyCls) {
         const HTML = `
         <div class="modal-body  ${bodyCls}">
-            <div class="atlt_translate_progress">
-                Automatic translation is in progress....<br/>
-                It will take a few minutes, enjoy ☕ coffee in this time!<br/><br/>
-                Please do not leave this window or browser tab while the translation is in progress...
-
-                 <div class="progress-wrapper">
-                    <div class="progress-container">
-                        <div class="progress-bar" id="myProgressBar">
-                            <span id="progressText">0%</span>
+            <div class="atlt_translate_progress my_translate_progress">
+                <div class="my_translate_progress_content">
+                    <div class="atlt-progress-line">
+                        Automatic translation is in progress<span class="atlt-animated-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                    <div class="atlt-progress-line">
+                        It will take a few minutes, enjoy ☕ coffee in this time!
+                    </div>
+                    <div class="atlt-progress-spacer" aria-hidden="true"></div>
+                    <div class="atlt-progress-line">
+                        Please do not leave this window or browser tab while the translation is in progress<span class="atlt-animated-dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span>
+                    </div>
+                    <div class="progress-wrapper">
+                        <div class="progress-container">
+                            <div class="progress-bar" id="myProgressBar">
+                                <span id="progressText">0%</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1099,8 +1426,8 @@ const AutoTranslator = (function (window, $) {
                 </div>
             </div>
             ${translatorWidget(widgetType)}
-            <div class="atlt_string_container">
-                <div class ="${widgetType}-translation-info">Translating Strings into ${localStorage.getItem("langName") || 'Selected Language'} Using ${widgetType === "yandex" ? "Yandex" : "OpenAI"}</div>
+            <div class="atlt_string_container string_container">
+                <div class="${widgetType}-translation-info notranslate"></div>
                 <table class="scrolldown atlt_strings_table">
                     <thead>
                         <th class="notranslate">S.No</th>
@@ -1119,45 +1446,37 @@ const AutoTranslator = (function (window, $) {
 
     function modelHeaderHTML(widgetType, headerCls) {
         const HTML = `
-        <div class="modal-header  ${headerCls}">
-                        <span class="close">&times;</span>
-                        <h2 class="notranslate">Step 2 - Start Automatic Translation Process</h2>
-                        <div class="atlt_actions">
-                            <button class="notranslate atlt_save_strings button button-primary" disabled="true">Merge Translation</button>
-                        </div>
-                        <div style="display:none" class="atlt_stats hidden">
-                            Wahooo! You have saved your valuable time via auto translating 
-                            <strong class="totalChars"></strong> characters  using 
-                            <strong>
-                                <a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">
-                                    LocoAI – Auto Translate for Loco Translate
-                                </a>
-                            </strong>
-                        </div>
-                    </div>
-                    <div class="notice inline notice-info is-dismissible">
-                        Plugin will not translate any strings with HTML or special characters because Yandex Translator currently does not support HTML and special characters translations.
-                        You can edit translated strings inside Loco Translate Editor after merging the translations. Only special characters (%s, %d) fixed at the time of merging of the translations.
-                    </div>
-                    <div class="notice inline notice-info is-dismissible">
-                        Machine translations are not 100% correct.
-                        Please verify strings before using on the production website.
-                    </div>`;
+        <div class="atlt-modern-header modal-header ${headerCls}">
+            <div class="atlt-modern-header-top">
+                <div class="atlt-modern-step">STEP 2 OF 2</div>
+                <button type="button" class="close atlt-modern-close" aria-label="Close"></button>
+            </div>
+            <h2 class="notranslate atlt-modern-title">Start Automatic Translation Process</h2>
+        </div>
+        <div class="atlt-modern-alert atlt-modern-alert--warning notice inline notice-info is-dismissible">
+            <div class="atlt-modern-alert-body">
+                ⚠️ Machine translations are not 100% correct. Please verify strings before using on production website.
+            </div>
+            <button type="button" class="atlt-modern-alert-close notice-dismiss" aria-label="Dismiss"></button>
+        </div>`;
         return HTML;
     }
     function modelFooterHTML(widgetType, footerCls) {
         const HTML = ` <div class="modal-footer ${footerCls}">
-        <div class="atlt_actions">
-            <button class="notranslate atlt_save_strings button button-primary" disabled="true">Merge Translation</button>
-        </div>
-        <div style="display:none" class="atlt_stats">
-            Wahooo! You have saved your valuable time via auto translating 
-            <strong class="totalChars"></strong> characters  using 
-            <strong>
-                <a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">
-                    LocoAI – Auto Translate for Loco Translate
-                </a>
-            </strong>
+        <div class="atlt-modern-footer">
+            <div style="display:none" class="atlt_stats atlt-modern-alert atlt-modern-alert--info">
+                <div class="atlt-modern-alert-icon" aria-hidden="true">i</div>
+                <div class="atlt-modern-alert-body">
+                    <strong>Wahooo!</strong> You have saved your valuable time via auto translating
+                    <strong class="totalChars"></strong> characters using
+                    <a href="https://wordpress.org/support/plugin/automatic-translator-addon-for-loco-translate/reviews/#new-post" target="_new">
+                        LocoAI – Auto Translate for Loco Translate
+                    </a>.
+                </div>
+            </div>
+            <div class="atlt_actions save_btn_cont">
+                <button class="notranslate atlt_save_strings button button-primary atlt-modern-primary" disabled="true">Merge Translation</button>
+            </div>
         </div>
     </div>`;
         return HTML;

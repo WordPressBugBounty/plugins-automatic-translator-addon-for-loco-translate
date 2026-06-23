@@ -56,8 +56,8 @@
             let nonce = $('#_wpnonce').val();
             let reason = $('.cool-plugins-deactivate-feedback-dialog-input:checked').val();
             let message = '';
-            if( $('textarea[name="reason_'+reason+'"]').length>0 ){
-                let $textareas = $('textarea[name="reason_'+reason+'"]');
+            if( $('textarea[data-reason-key="'+reason+'"]').length>0 ){
+                let $textareas = $('textarea[data-reason-key="'+reason+'"]');
                 let allMessages = [];
                 
                 $textareas.each(function() {
@@ -74,6 +74,8 @@
                     message = allMessages.join(' | ');
                 }
             }
+
+            $('#cool-plugins-feedback-message').val(message);
 
             $.ajax({
                 url:ajaxurl,

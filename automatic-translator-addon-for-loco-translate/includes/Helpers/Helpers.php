@@ -6,17 +6,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * @package LocoAI – Auto Translate for Loco Translate
  */
-class Helpers{
-    public static function proInstalled(){
-        return defined('ATLT_PRO_FILE');
-    }
-    // return user type
-    public static function userType(){
-        $option_value = get_option('atlt-type', 'free');
-        $sanitized_type = sanitize_key($option_value);
-        if ($sanitized_type === 'pro') {
-            return 'pro';
+if (!class_exists('ATLT_Helpers')) {
+    class ATLT_Helpers{
+        public static function proInstalled(){
+            return defined('ATLT_PRO_FILE');
         }
-        return 'free';
+        // return user type
+        public static function userType(){
+            $option_value = get_option('atlt-type', 'free');
+            $sanitized_type = sanitize_key($option_value);
+            if ($sanitized_type === 'pro') {
+                return 'pro';
+            }
+            return 'free';
+        }
     }
 }

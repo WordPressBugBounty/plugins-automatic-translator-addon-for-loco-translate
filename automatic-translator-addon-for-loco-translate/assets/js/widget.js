@@ -32,21 +32,40 @@
                 if (wrapper.querySelector('#yt-widget')) {
                     return;
                 }
-                var fallbackMarkup =
-                    '<div id="yt-widget" class="yt-widget yt-state_invalid" tabindex="0" style="display: none;">' +
-                    '<button class="yt-button__icon yt-button__icon_type_left" type="button"></button>' +
-                    '<button class="yt-button__icon yt-button__icon_type_right" type="button"></button>' +
-                    '<button class="yt-button__icon yt-button__icon_type_close" type="button"></button>' +
-                    '<form class="yt-listbox" hidden></form>' +
-                    '</div>';
-                wrapper.insertAdjacentHTML('beforeend', fallbackMarkup);
+
+                var widget = doc.createElement('div');
+                widget.id = 'yt-widget';
+                widget.className = 'yt-widget yt-state_invalid';
+                widget.tabIndex = 0;
+                widget.style.display = 'none';
+
+                [
+                    'yt-button__icon yt-button__icon_type_left',
+                    'yt-button__icon yt-button__icon_type_right',
+                    'yt-button__icon yt-button__icon_type_close'
+                ].forEach(function (buttonClass) {
+                    var button = doc.createElement('button');
+                    button.className = buttonClass;
+                    button.type = 'button';
+                    widget.appendChild(button);
+                });
+
+                var listbox = doc.createElement('form');
+                listbox.className = 'yt-listbox';
+                listbox.hidden = true;
+                widget.appendChild(listbox);
+
+                wrapper.appendChild(widget);
             }
 
             ensureFallbackWidgetMarkup();
 
             // Custom UI mode: we do NOT load Yandex widget.html.
             if (!namespace || !namespace.PageTranslator) {
-                wrapper.innerHTML = '<div class="notice inline notice-warning">Yandex translator script did not initialize. Please check network/CSP blocking `yastatic.net`.</div>';
+                var initNotice = doc.createElement('div');
+                initNotice.className = 'notice inline notice-warning';
+                initNotice.textContent = 'Yandex translator script did not initialize. Please check network/CSP blocking `yastatic.net`.';
+                wrapper.replaceChildren(initNotice);
                 return;
             }
 
@@ -337,7 +356,10 @@
                 translator.on('error', function () {
                     atltTranslating = false;
                     clearProgressTick();
-                    wrapper.insertAdjacentHTML('afterbegin', '<div class="notice inline notice-warning">Yandex translation failed. Please retry or check network blocking.</div>');
+                    var notice = doc.createElement('div');
+                    notice.className = 'notice inline notice-warning';
+                    notice.textContent = 'Yandex translation failed. Please retry or check network blocking.';
+                    wrapper.insertAdjacentElement('afterbegin', notice);
                 });
             } catch (e) { }
             try {
@@ -441,4 +463,4 @@
     } else {
         doc.addEventListener('DOMContentLoaded', initWidget, false);
     }
-})(jQuery, this, this.document, this.navigator, { "pageLang": "en", "autoMode": "false", "widgetId": "ytWidget", "widgetTheme": "light" }, this.yt = this.yt || {});
+})(jQuery, this, this.document, this.navigator, (typeof atltYandexWidgetConfig !== 'undefined' ? atltYandexWidgetConfig : { pageLang: 'en', autoMode: 'false', widgetId: 'ytWidget', widgetTheme: 'light' }), this.yt = this.yt || {});

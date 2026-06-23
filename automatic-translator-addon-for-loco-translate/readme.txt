@@ -1,12 +1,12 @@
-=== LocoAI - Auto Translate For Loco Translate ===
+=== LocoAI – Auto Translate for Loco Translate ===
 Contributors: narinder-singh, satindersingh, coolplugins
 Donate link: https://paypal.me/CoolPlugins/10USD/
 Tags: AI translation, google translate, translate, chatgpt, multilingual
 Requires at least:5.0
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.2
-Loco Translate Tested Up to: 2.8.3
-Stable tag: 2.7.2
+Loco Translate Tested Up to: 2.8.5
+Stable tag: 2.7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -16,29 +16,31 @@ LocoAI - Auto Translate For Loco Translate is a powerful tool for developers loo
 
 ### LocoAI - Auto Translate For Loco Translate
 
-**[LocoAI - Auto Translate For Loco Translate](https://locoaddon.com/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=top_description)** is a WordPress plugin extension that enhances the functionality of the popular Loco Translate plugin by adding automatic translation capabilities using third-party machine translation services like **Google Translate, DeepL, ChatGPT, Gemini AI, and Chrome Built-in AI**.
+**[LocoAI - Auto Translate For Loco Translate](https://locoaddon.com/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=top_description)** is a WordPress plugin extension that enhances the functionality of the popular Loco Translate plugin by adding automatic translation capabilities using third-party machine translation services like **Google Translate, Yandex Translate, DeepL, ChatGPT, Gemini AI, OpenAI and Chrome Built-in AI**.
 
 https://www.youtube.com/watch?v=X_1RbSVgnOc
 
-Loco Translate is primarily a manual translation tool for translating WordPress themes and plugins from within the WordPress admin. However, it doesn’t include built-in support for automatic translations. That’s where our **Automatic Translate Addon** comes in.
+**Loco Translate** is primarily a manual translation tool for translating WordPress themes and plugins from within the WordPress admin. However, it doesn't include built-in support for automatic translations. That's where our **Automatic Translate Addon** comes in.
 
 [How It Works](https://locoaddon.com/how-it-works/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=how_it_works)
 
 ### Key Features
 
-* **AI-powered Translators:** Support advanced AI-powered translators like Chrome AI, ChatGPT, and Gemini AI to provide highly accurate, natural, and context-aware translations without any paid API.
-
-* **Machine Translators:** Utilize popular machine translation services like Yandex, DeepL to automate the plugin/theme string translation process and deliver fast and reliable bulk translation.
+* **AI-powered Translators:** Support advanced AI-powered translators like Yandex Translate, and OpenAI to provide highly accurate, natural, and context-aware translations without any paid API.
 
 * **Enhanced Accuracy:** This addon supports advanced AI-powered and machine translators for improved accuracy and context understanding.
 
 * **One-Click Automatic Translation:** Easily translate all translatable strings in any plugin or theme within a single click without any manual input.
 
-* **NO API Key Needed:** Translate unlimited characters without needing to configure or pay for any API keys. Just install the addon and start translating instantly.
+* **Unlimited Free Translations**: Automatically translate an unlimited number of plugin and theme strings using the supported translation providers.
 
-* **Edit Translations:** Refine and improve machine-translated strings directly within Loco Translate’s built-in editor for better accuracy and readability.
+* **Edit Translations:** Refine and improve machine-translated strings directly within Loco Translate's built-in editor for better accuracy and readability.
 
-> *“If you spend too much time thinking about a thing, you'll never get it done. Stop wasting time, complete work smartly & quickly!”*
+* **Loco Translate Integration**: LocoAI works directly inside the Loco Translate editor by adding automatic translation capabilities to the workflow you already know and use.
+
+* **Multiple Languages Support**: Translate WordPress plugin and theme strings into a wide range of languages supported by the available translation providers.
+
+> *"If you spend too much time thinking about a thing, you'll never get it done. Stop wasting time, complete work smartly & quickly!"*
 
 ### FREE v/s Premium Addon Comparison
 
@@ -47,48 +49,50 @@ Loco Translate is primarily a manual translation tool for translating WordPress 
 ✅ **Yandex Translate Widget Support**: Available
 ✅ **Unlimited Free Translations**: Available (Only via Yandex)
 ✅ **API Key Required**: Not Required (Yandex Widget Support)
-✅ **OpenAI Translator Support**: Available
+✅ **OpenAI Translation Support**: Available
 ❌ **Google Translate Widget Support**: Not Available
-❌ **DeepL Doc Translator Support**: Not Available
+❌ **DeepL Doc Translation Support**: Not Available
 ❌ **Premium Support**: Not Available
 ❌ **ChatGPT Translation Support**: Not Available
 ❌ **Gemini Translation Support**: Not Available
+❌ **Chrome AI Translation Support**: Not Available
 
 #### Premium License
 
 ✅ **Chrome Built-in AI Translation Support**: Available
 ✅ **ChatGPT Translation Support**: Available
-✅ **Gemini Translation Support**: Available
+✅ **Gemini Translation Support (API Key Required)**: Available
 ✅ **Google Translate Widget Support**: Available
-✅ **Unlimited Free Translations**: Available
-✅ **API Key Required**: Not Required
-(Chrome Built-in AI, Yandex, OpenAI, Google & DeepL Support)
-✅ **DeepL Doc Translator Support**: Available
+✅ **DeepL Doc Translation Support (API Key Required)**: Available
 (Limited free docs translations/day or purchase DeepL Pro)
+✅ **OpenAI Translation Support (API Key Required)**: Available
+✅ **Unlimited Free Translations**: Available
 ✅ **Translation Context & Tone (Pro)**: Improve translation accuracy by adding your business context, tone, and target audience. This helps generate translations that match your brand voice and sound more natural and relevant to your users.
 ✅ **Premium Support**: **[Quick Support](https://coolplugins.net/support?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=support&utm_content=premium_support)**
 **(Support time:- 24-48 hours)**
 
 **[Upgrade to Pro!](https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=buy_pro)**
 
-> DeepL Doc Translator provides a limited number of free docs translations per day, you can purchase their pro license to increase this limit.
+> **Note:** API usage charges, quotas, and limits are determined by the selected translation provider.
 
-> **Important Notice:** This addon only provides settings to use third-party auto-translation widgets and services(Yandex, Google, DeepL, Gemini, etc.), it does not provide any translation service. So we don’t guarantee 100% correctness, please check all translated text carefully before making it live on your production site. If any auto-translate provider stops providing auto-translation widgets or services in the future, in that case, the plugin will not support that translation provider.
+> **Important Notice:** This addon only provides settings to use third-party auto-translation widgets and services **(Yandex, Google, DeepL, Gemini, OpenAI, Chrome AI, ChatGPT etc.)**, it does not provide any translation service. So we don't guarantee 100% correctness, please check all translated text carefully before making it live on your production site. If any auto-translate provider stops providing auto-translation widgets or services in the future, in that case, the plugin will not support that translation provider.
 
 ### Check out our other advanced Automatic Translate Addons
 
-* **[AutoPoly - AI Translation For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=atfp_check_out)** duplicates your page or post titles, content, images, galleries, or meta fields, and automatically translates them into the selected language. Whether you’re using Elementor or Gutenberg, this addon makes the translation process easier.
+* **[AutoPoly - AI Translation For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=atfp_check_out)** duplicates your page or post titles, content, images, galleries, or meta fields, and automatically translates them into the selected language. Whether you're using Elementor or Gutenberg, this addon makes the translation process easier.
 
 * **[AI Translation for TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=tpa_check_out)** is a powerful addon that enhances the functionality of the TranslatePress plugin. This addon uses advanced translation services, like Google Translate, Yandex, and Chrome AI translator, to provide accurate and instant translations for your web pages automatically.
 
 * **[Linguator – Multilingual AI Translation](https://wordpress.org/plugins/translate-words/)** is a powerful multilingual plugin that helps you create and manage multilingual content on your WordPress website. Easily translate your **posts, pages, menus,** and **categories** into different languages using AI and connect with visitors worldwide.
+
+* **[AutoMLP – AI Translation for WPML](https://wordpress.org/plugins/wpml-translation-check/)** is WPML automatic translation addon. It allows you to translate your WordPress website using different AI services like OpenAI, Google Gemini, or Chrome AI at low cost.
 
 **Use of 3rd Party Services:** This plugin connects to the Cool Plugins feedback server only for optional usage data sharing and voluntary feedback submission (for example, during plugin deactivation). Data is transmitted solely after explicit user consent. No hidden tracking is performed, and no frontend visitor or site user data is collected.  For more details, please review our [Data Usage Policy](https://my.coolplugins.net/terms/usage-tracking/), [TOS](https://my.coolplugins.net/terms/), and [Privacy Policy](https://my.coolplugins.net/terms/privacy-policy/).
 
 ### Special THANKS!
 
 Special thanks to the famous **[Loco Translate](https://wordpress.org/plugins/loco-translate/)** plugin author, **Tim Whitlock**, for creating an awesome plugin for translations and also thanks to Yandex for providing a translate widget for websites.
-All automatic translations are powered by third-party auto-translate providers(**Google, Yandex, DeepL, Gemini, ChatGPT, or Chrome built-in AI**), so we don’t guarantee 100% correctness. Please check all translated text carefully before making it live on your production site.
+All automatic translations are powered by third-party auto-translate providers(**Google, Yandex, DeepL, Gemini, OpenAI, ChatGPT, or Chrome built-in AI**), so we don't guarantee 100% correctness. Please check all translated text carefully before making it live on your production site.
 
 
 ### Important Links & Information
@@ -108,18 +112,15 @@ All automatic translations are powered by third-party auto-translate providers(*
 
 4. Now edit any plugin or theme language file using the Loco built-in editor, you will find an auto translator button at the top to quickly translate all translatable strings with one click using Yandex Translate Widget.
 
-5. If you want to use Google Translate Widget, DeepL Doc Translator, ChatGPT or Gemini for translation then you need to purchase [premium license key](https://locoaddon.com/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=premium_license_key). The pro version also provides better translations using DeepL, Google, and AI's advanced machine translation technology.
+5. If you want to use Google Translate Widget, DeepL Doc Translator, Chrome AI, ChatGPT, or Gemini for translation then you need to purchase [premium license key](https://locoaddon.com/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=premium_license_key).
 
 == Frequently Asked Questions ==
 
 = Can this plugin automatically translate page content? =
 No, this plugin only translates plugin and themes strings automatically. To translate page content automatically, you can try the **[AI Translation for TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=tpa_faqs)** Or **[AutoPoly - AI Translation For Polylang](https://coolplugins.net/product/automatic-translations-for-polylang/?utm_source=atlt_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=atfp_faqs)**.
 
-= Are you using any language translation API? =
-No, there is no requirement for any paid API key to use this plugin free or pro version. It uses free page translation widgets and services for unlimited automatic translations.
-
 = Is there any translation limit? =
-There is no limit. You can translate unlimited characters without any paid API key.
+There is no limit.
 Free license users can translate unlimited characters only via the Yandex Page Translate Widget.
 Premium license Premium users can use Google, DeepL, ChatGPT, Chrome built-in AI, and Gemini AI for translations, with no character limits! Plus, priority support ensures you get help fast if you need it.
 
@@ -130,7 +131,7 @@ ChatGPT excels in understanding context and generating natural-sounding translat
 Gemini AI uses advanced deep learning techniques to provide translations that are highly accurate and contextually appropriate. It ensures that the translated text is fluent and professional.
 
 = Do I need any API key to use Gemini AI translations? =
-Yes, to access Gemini AI translations, you will need to obtain Free API key.
+Yes, to access Gemini AI translations, you will need to obtain API key.
 
 = Do I need any API key to use ChatGPT translations? =
 No, you can use ChatGPT translations for free by visiting the ChatGPT website.
@@ -139,30 +140,37 @@ No, you can use ChatGPT translations for free by visiting the ChatGPT website.
 With one-click machine translations, this addon allows you to quickly and efficiently translate your plugins and themes, saving time and effort on multilingual projects!
 
 = What makes the premium version worth it?
-Premium users can use Google Chrome AI, Google, DeepL, ChatGPT, and Gemini AI for translations, with no character limits! Plus, priority support ensures you get help fast if you need it.
+Premium users can use Google Chrome AI, Google Translate Widget, DeepL, ChatGPT, and Gemini AI for translations, with no character limits! Plus, priority support ensures you get help fast if you need it.
 
 = Can I edit translations easily?
-Absolutely! You can refine any translated strings in Loco Translate’s editor, allowing you to perfect your content’s tone and accuracy.
+Absolutely! You can refine any translated strings in Loco Translate's editor, allowing you to perfect your content's tone and accuracy.
 
 = Is any technical setup required?
-Not at all! Just install the addon alongside Loco Translate, and you’re ready to start translating. No API keys required for free users!
+Not at all! Just install the addon alongside Loco Translate, and you're ready to start translating. No API keys required for Yandex Translation (Free plugin)!
 
-= Will my content’s original style and meaning be preserved?
+= Will my content's original style and meaning be preserved?
 Yes, both ChatGPT and Gemini AI are designed to maintain the original tone and meaning, resulting in natural, coherent translations that match your content perfectly.
 
 = Can I rely on these translations for professional use?
-Definitely! The advanced AI in ChatGPT and Gemini AI ensures that your translations are accurate and polished, ideal for professional multilingual sites.
+Definitely! The advanced AI in the provided translators ensures that your translations are accurate and polished, ideal for professional multilingual sites.
 
 = How can I report security bugs? =
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability](https://patchstack.com/database/vdp/automatic-translator-addon-for-loco-translate)
 
 == Screenshots ==
 
-1. Automatic Translate (No paid API Required)
+1. Automatic Translate
 2. Translate Using Yandex Translate Widget
 3. Free License v/s Premium License
 
 == Changelog ==
+= Version 2.7.4 - 23/06/2026 =
+* **Tweak:** Removed unused files.
+
+= Version 2.7.3 - 23/06/2026 =
+* **Improved:** Dashboard UI Improvements.
+* **Improved:** Translation Popups UI Improvements.
+* **Improved:** Overall code improvements.
 
 = Version 2.7.2 - 29/04/2026 =
 * **Minor:** Textual Changes.
@@ -183,7 +191,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * **Improved:** Code Improvements.
 
 = Version 2.6 - 19/1/2026 =
-* **Fixed:** Fixed issues reported by “Plugin Check” plugin.
+* **Fixed:** Fixed issues reported by "Plugin Check" plugin.
 * **Improved:** Enhanced recommendations for other useful plugins.
 * **Removed:** Extra Code.
 

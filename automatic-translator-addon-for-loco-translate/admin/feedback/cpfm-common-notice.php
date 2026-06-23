@@ -16,15 +16,14 @@ class CPFM_Feedback_Notice {
     }
     
     public static function cpfm_register_notice($key, $args) {
-        
-        if (!current_user_can('manage_options')) {
-            
+        $key = sanitize_key((string) $key);
+
+        if ('' === $key || !current_user_can('manage_options')) {
             return;
         }
-        
-        $safe_key = sanitize_key($key);
-        
-        $notice = wp_parse_args($args, [
+
+        $args = is_array($args) ? $args : array();
+        $args = wp_parse_args($args, [
             'title'          => '',
             'message'        => '',
             'pages'          => [],
@@ -32,14 +31,26 @@ class CPFM_Feedback_Notice {
             'plugin_name'    => '',
         ]);
 
-        // Sanitize and coerce expected types
-        $notice['title']          = is_string($notice['title']) ? wp_strip_all_tags($notice['title']) : '';
-        $notice['message']        = is_string($notice['message']) ? wp_strip_all_tags($notice['message']) : '';
-        $notice['pages']          = array_values(array_filter(array_map('sanitize_key', (array) $notice['pages'])));
-        $notice['always_show_on'] = array_values(array_filter(array_map('sanitize_key', (array) $notice['always_show_on'])));
-        $notice['plugin_name']    = is_string($notice['plugin_name']) ? sanitize_key($notice['plugin_name']) : '';
+        $args['title']          = sanitize_text_field($args['title']);
+        $args['message']        = wp_kses_post($args['message']);
+        $args['pages']          = array_values(array_filter(array_map('sanitize_key', (array) $args['pages'])));
+        $args['always_show_on'] = array_values(array_filter(array_map('sanitize_key', (array) $args['always_show_on'])));
+        $args['plugin_name']    = sanitize_key($args['plugin_name']);
+        
+        if (!isset(self::$registered_notices[$key])) {
+            self::$registered_notices[$key] = wp_parse_args($args, [
+                'title'   => '',
+                'message' => '',
+                'pages'   => [],
+                'always_show_on' => [],
+            ]);
+        }
 
-        self::$registered_notices[$safe_key] = $notice;
+        if(!isset(self::$registered_notices[$key]['plugins'])){
+            self::$registered_notices[$key]['plugins'] = array();
+        }
+        
+        self::$registered_notices[$key]['plugins'][] = $args;
     }
     
     public function cpfm_listen_for_external_notice_registration() {
@@ -59,7 +70,7 @@ class CPFM_Feedback_Notice {
          *     'pages' => ['dashboard', 'cpfm_'],
          * ]);
          */
-        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Hook has cpfm_ prefix which is the feedback module prefix
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- cpfm is our unique prefix.
         do_action('cpfm_register_notice');
     }
 
@@ -71,10 +82,8 @@ class CPFM_Feedback_Notice {
 
         }
 
- 
-        $screen         = get_current_screen();
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking current admin page for display purposes, no action taken
-        $current_page   = isset($_GET['page'])? sanitize_key($_GET['page']):'';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here
+        $current_page   = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
     
         // Gather all unique pages from registered notices
         $allowed_pages = [];
@@ -122,27 +131,36 @@ class CPFM_Feedback_Notice {
 
         check_ajax_referer('dismiss_admin_notice', 'nonce');
 
-        $category           = isset($_POST['category']) ? sanitize_key( wp_unslash( $_POST['category'] ) ): '';
+        $category           = isset($_POST['category']) ? sanitize_text_field( wp_unslash( $_POST['category'] ) ): '';
         $opt_in_raw         = isset($_POST['opt_in']) ? sanitize_text_field( wp_unslash( $_POST['opt_in'] ) ) : '';
         $opt_in             = ($opt_in_raw === 'yes') ? 'yes' : 'no';
 
         if (!$category || !isset(self::$registered_notices[$category])) {
-
             wp_send_json_error('Invalid notice category.');
+        }
+
+        if(!isset(self::$registered_notices[$category]['plugins'])){
+            wp_send_json_error('Invalid notice category plugins.');
         }
 
         update_option("cpfm_opt_in_choice_{$category}", $opt_in);
 
         $review_option = get_option("cpfm_opt_in_choice_{$category}");
-        
-       
+
         if ($review_option === 'yes') {
-            $notice = self::$registered_notices[$category];
-            $plugin_name = isset($notice['plugin_name']) ? sanitize_key($notice['plugin_name']) : '';
-            if ($plugin_name) {
-                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Dynamic hook name with proper cpfm_ prefix
-                do_action('cpfm_after_opt_in_' . $plugin_name, $category);
+            
+             foreach (self::$registered_notices[$category]['plugins'] as $notice) {
+
+                    $plugin_name = isset($notice['plugin_name'])?sanitize_key($notice['plugin_name']):'';
+
+                    if($plugin_name){
+
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- cpfm is our unique prefix.
+                        do_action('cpfm_after_opt_in_' . $plugin_name, $category);
+                    }
+              
             }
+          
         }
 
         wp_send_json_success();
@@ -154,11 +172,9 @@ class CPFM_Feedback_Notice {
             return;
         }
 
-        $screen         = get_current_screen();
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Just checking current admin page for display purposes, no action taken
-        $current_page   = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Nonce verification is not required here
+        $current_page   = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
 
-       
         $unread_count   = 0;
         $auto_show      = false;
     
@@ -174,15 +190,14 @@ class CPFM_Feedback_Notice {
         $output .= '<div id="cpfNoticePanel" class="notice-panel"' . ($auto_show ? ' data-auto-show="true"' : '') . '>';
         $output .= '<div class="notice-panel-header">' . esc_html__('Help Improve Plugins', 'automatic-translator-addon-for-loco-translate') . ' <span class="dashicons dashicons-no" id="cpfm_remove_notice"></span></div>';
         $output .= '<div class="notice-panel-content">';
-    
-        foreach (self::$registered_notices as $key => $notice) {
 
+        foreach (self::$registered_notices as $key => $notice) {
             $choice = get_option("cpfm_opt_in_choice_{$key}");
 
             if ($choice !== false) continue;
     
             $should_show = false;
-            foreach ((array) $notice['pages'] as $match) {
+            foreach ($notice['pages'] as $match) {
                 
                 if ($current_page === $match || strpos($current_page, $match) === 0) {
                 
@@ -192,27 +207,22 @@ class CPFM_Feedback_Notice {
             }
     
             if (!$should_show) continue;
-            $unread_count++;
+            $unread_count++;  
     
             $output .= '<div class="notice-item unread" data-notice-id="' . esc_attr($key) . '">';
             $output .= '<strong>' . esc_html($notice['title']) . '</strong>';
+            
             $output .= '<div class="notice-message-with-toggle">';
             $output .= '<p>' . esc_html($notice['message']) . '<a href="#" class="cpf-toggle-extra">' . esc_html__(' More info', 'automatic-translator-addon-for-loco-translate') . '</a></p>';
             $output .= '</div>';
+            
             $output .= '<div class="cpf-extra-info">';
             $output .= '<p>' . esc_html__('Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We\'ll collect:', 'automatic-translator-addon-for-loco-translate') . '</p>';
             $output .= '<ul>';
             $output .= '<li>' . esc_html__('Your website home URL and WordPress admin email.', 'automatic-translator-addon-for-loco-translate') . '</li>';
-            
-            $output .= '<li>' .
-    sprintf(
-        wp_kses_post(
-            /* translators: %s: API provider name like OpenAI or Gemini */ __('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix. <a href="%s" target="_blank" rel="noopener noreferrer">Click here</a>.', 'automatic-translator-addon-for-loco-translate')
-        ),
-        esc_url('https://my.coolplugins.net/terms/usage-tracking/')
-    ) .
-'</li>';
-
+            $output .= '<li>' . esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix ', 'automatic-translator-addon-for-loco-translate');
+            $output .= '<a href="' . esc_url('https://my.coolplugins.net/terms/usage-tracking/') . '" target="_blank">' . esc_html__('Click Here', 'automatic-translator-addon-for-loco-translate') . '.</a> ';
+            $output .= '</li>';
             $output .= '</ul>';
             
             $output .= '</div>';
@@ -229,7 +239,17 @@ class CPFM_Feedback_Notice {
         $output .= '</div>'; 
      
         if ($unread_count > 0) {
-            echo wp_kses_post($output);
+            $allowed = array(
+                'div' => array('id' => array(), 'class' => array(), 'data-auto-show' => array(), 'data-notice-id' => array()),
+                'span' => array('id' => array(), 'class' => array()),
+                'strong' => array(),
+                'p' => array(),
+                'a' => array('href' => array(), 'class' => array(), 'target' => array(), 'rel' => array()),
+                'button' => array('class' => array(), 'data-category' => array(), 'id' => array(), 'value' => array()),
+                'ul' => array(),
+                'li' => array(), 'br' => array()
+            );
+            echo wp_kses($output, $allowed);
         }
     }
 }

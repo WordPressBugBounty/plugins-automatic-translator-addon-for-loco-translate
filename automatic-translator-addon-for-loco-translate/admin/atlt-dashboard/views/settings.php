@@ -30,14 +30,14 @@
         if ($api_key === '') {
             return '';
         }
-        return substr($api_key, 0, 8) . str_repeat('*', 24) . substr($api_key, -8) . ' ✅';
+        return str_repeat('*', 24) . substr($api_key, -4) . ' ✅';
     }
 
     function atlt_save_openai_api_key($openai_key) {
         $openai_key = is_string($openai_key) ? trim($openai_key) : '';
 
         if (function_exists('_wp_register_default_connector_settings')) {
-            update_option('connectors_ai_openai_api_key', $openai_key);
+            update_option('connectors_ai_openai_api_key', $openai_key, false);
 
             $legacy_credentials = get_option('wp_ai_client_provider_credentials', array());
             $legacy_credentials = is_array($legacy_credentials) ? $legacy_credentials : array();
@@ -46,7 +46,7 @@
             }
 
             if (! empty($legacy_credentials)) {
-                update_option('wp_ai_client_provider_credentials', $legacy_credentials);
+                update_option('wp_ai_client_provider_credentials', $legacy_credentials, false);
             } else {
                 delete_option('wp_ai_client_provider_credentials');
             }
@@ -56,7 +56,7 @@
         $credentials           = get_option('wp_ai_client_provider_credentials', array());
         $credentials           = is_array($credentials) ? $credentials : array();
         $credentials['openai'] = $openai_key;
-        update_option('wp_ai_client_provider_credentials', $credentials);
+        update_option('wp_ai_client_provider_credentials', $credentials, false);
         delete_option('connectors_ai_openai_api_key');
     }
 
@@ -70,7 +70,7 @@
         }
 
         if (! empty($credentials)) {
-            update_option('wp_ai_client_provider_credentials', $credentials);
+            update_option('wp_ai_client_provider_credentials', $credentials, false);
         } else {
             delete_option('wp_ai_client_provider_credentials');
         }
@@ -94,6 +94,106 @@
         );
 
         return array_values(array_unique($models));
+    }
+
+    /**
+     * Return a preferred (human readable) subset of models for a provider.
+     *
+     * @param string $provider_id
+     * @param array  $models List of model IDs.
+     * @return array Associative array: model_id => label.
+     */
+    function atlt_filtered_specific_models( $provider_id, $models ) {
+        $provider_id = is_string( $provider_id ) ? strtolower( trim( $provider_id ) ) : '';
+        $models      = is_array( $models ) ? $models : array();
+
+        $preferred = array();
+        if ( $provider_id === 'openai' ) {
+            $preferred = array(
+                'gpt-5.4'             => __( 'gpt-5.4 (Best Quality)', 'automatic-translator-addon-for-loco-translate' ),
+                'gpt-5.4-pro'         => __( 'gpt-5.4-pro (Highest Accuracy)', 'automatic-translator-addon-for-loco-translate' ),
+                'gpt-5.3-chat-latest' => __( 'gpt-5.3-chat-latest (Recommended)', 'automatic-translator-addon-for-loco-translate' ),
+                'gpt-5.2'             => __( 'gpt-5.2 (Balanced)', 'automatic-translator-addon-for-loco-translate' ),
+                'gpt-5-mini'          => __( 'gpt-5-mini (Fast)', 'automatic-translator-addon-for-loco-translate' ),
+                'gpt-5-nano'          => __( 'gpt-5-nano (Cheapest)', 'automatic-translator-addon-for-loco-translate' ),
+                'gpt-4o-mini'         => __( 'gpt-4o-mini (Fast & Cheap)', 'automatic-translator-addon-for-loco-translate' ),
+            );
+        }
+
+        if ( empty( $preferred ) ) {
+            return array();
+        }
+
+        if ( ! empty( $models ) ) {
+            $preferred = array_intersect_key(
+                $preferred,
+                array_flip( array_values( $models ) )
+            );
+        }
+
+        return $preferred;
+    }
+
+    /**
+     * Fetch provider model list using WP AI Client registry (cached).
+     * Mirrors the logic used in the Polylang addon.
+     *
+     * @param string $provider_id openai
+     * @return array Associative array: model_id => label
+     */
+    function atlt_get_ai_model_list( $provider_id ) {
+        $provider_id = is_string( $provider_id ) ? strtolower( trim( $provider_id ) ) : '';
+        if ( $provider_id !== 'openai' ) {
+            return array();
+        }
+
+        $cache_key = 'atlt_' . $provider_id . '_models';
+        $models    = get_transient( $cache_key );
+
+        if ( false !== $models && is_array( $models ) ) {
+            return atlt_filtered_specific_models( $provider_id, $models );
+        }
+
+        try {
+            if (
+                class_exists( '\WordPress\AiClient\AiClient' ) &&
+                class_exists( '\WordPress\AiClient\Providers\Models\DTO\ModelRequirements' ) &&
+                class_exists( '\WordPress\AiClient\Providers\Models\Enums\CapabilityEnum' )
+            ) {
+                $registry      = \WordPress\AiClient\AiClient::defaultRegistry();
+                $requirements  = new \WordPress\AiClient\Providers\Models\DTO\ModelRequirements(
+                    array( \WordPress\AiClient\Providers\Models\Enums\CapabilityEnum::textGeneration() ),
+                    array()
+                );
+                $models_meta   = $registry->findProviderModelsMetadataForSupport( $provider_id, $requirements );
+                $models        = array_map(
+                    static function ( $model ) {
+                        /** @var \WordPress\AiClient\Providers\Models\DTO\ModelMetadata $model */
+                        return $model->getId();
+                    },
+                    is_array( $models_meta ) ? $models_meta : array()
+                );
+
+                $models = array_values(
+                    array_filter(
+                        array_map(
+                            static function ( $id ) {
+                                return is_string( $id ) ? trim( $id ) : '';
+                            },
+                            $models
+                        )
+                    )
+                );
+
+                set_transient( $cache_key, $models, 24 * HOUR_IN_SECONDS );
+
+                return atlt_filtered_specific_models( $provider_id, $models );
+            }
+        } catch ( \Throwable $e ) {
+            return array();
+        }
+
+        return array();
     }
 
     function atlt_validate_provider_api_key($provider_id, $api_key) {
@@ -145,7 +245,7 @@
 
             if (! $provider_availability->isConfigured()) {
                 return array(
-                    'message' => __('API key is not configured for this provider.', 'automatic-translator-addon-for-loco-translate'),
+                    'message' => __('Invalid API key. Please check your API key and try again.', 'automatic-translator-addon-for-loco-translate'),
                 );
             }
 
@@ -206,15 +306,42 @@
 
     $atlt_openai_saved_key  = atlt_get_saved_openai_api_key();
     $atlt_openai_masked_key = atlt_mask_api_key($atlt_openai_saved_key);
-    $atlt_openai_models = atlt_get_openai_models();
-    if ($atlt_openai_saved_key !== '' && empty($atlt_openai_models)) {
-        $atlt_openai_models = array('gpt-4o-mini');
+    $atlt_openai_models = atlt_get_ai_model_list( 'openai' );
+    if ( $atlt_openai_saved_key !== '' && empty( $atlt_openai_models ) ) {
+        $atlt_openai_models = array(
+            'gpt-4o-mini' => 'gpt-4o-mini',
+        );
     }
-    $atlt_selected_openai_model = sanitize_text_field((string) get_option('atlt_selected_openai_model', ''));
+    $atlt_stored_openai_model   = sanitize_text_field( (string) get_option( 'atlt_selected_openai_model', '' ) );
+    $atlt_selected_openai_model = $atlt_stored_openai_model;
+
+    // Resolve display fallback when selection is missing/invalid; avoid update_option on every GET.
+    if ( $atlt_openai_saved_key !== '' ) {
+        $is_valid_selected = ( '' !== $atlt_selected_openai_model ) && array_key_exists( $atlt_selected_openai_model, $atlt_openai_models );
+        if ( ! $is_valid_selected ) {
+            $fallback_model = array_key_exists( 'gpt-4o-mini', $atlt_openai_models ) ? 'gpt-4o-mini' : '';
+            if ( '' === $fallback_model ) {
+                $keys           = array_keys( $atlt_openai_models );
+                $fallback_model = isset( $keys[0] ) ? (string) $keys[0] : '';
+            }
+            if ( '' !== $fallback_model ) {
+                $atlt_selected_openai_model = $fallback_model;
+
+                // One-time repair: persist only when a stale non-empty model was removed from the list.
+                if (
+                    '' !== $atlt_stored_openai_model
+                    && ! array_key_exists( $atlt_stored_openai_model, $atlt_openai_models )
+                ) {
+                    update_option( 'atlt_selected_openai_model', $fallback_model );
+                }
+            }
+        }
+    }
 
     // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is checked in guarded POST branch below.
     $atlt_post_action = isset($_POST['action']) ? sanitize_key(wp_unslash($_POST['action'])) : '';
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && $atlt_post_action === 'atlt_save_dashboard_settings') {
+    $request_method = isset($_SERVER['REQUEST_METHOD']) ? strtoupper(sanitize_text_field(wp_unslash($_SERVER['REQUEST_METHOD']))) : '';
+    if ($request_method === 'POST' && $atlt_post_action === 'atlt_save_dashboard_settings') {
         if (! current_user_can('manage_options')) {
             wp_die(esc_html__('You do not have permission to manage settings.', 'automatic-translator-addon-for-loco-translate'));
         }
@@ -251,6 +378,7 @@
                 atlt_delete_openai_api_key();
                 delete_option('atlt_openai_models');
                 delete_option('atlt_selected_openai_model');
+                delete_transient( 'atlt_openai_models' );
                 $did_save_any_setting = true;
             }
             $atlt_settings_success_message = __('OpenAI API key has been removed.', 'automatic-translator-addon-for-loco-translate');
@@ -289,10 +417,40 @@
                         atlt_save_openai_api_key($posted_openai_key);
                         $did_save_any_setting = true;
                         $atlt_settings_success_message = __('OpenAI API key saved successfully.', 'automatic-translator-addon-for-loco-translate');
+                        delete_transient( 'atlt_openai_models' );
+
+                        // Auto-select a good default model on first key add.
+                        // Prefer cheapest/fast options when available.
+                        $current_selected_model = sanitize_text_field((string) get_option('atlt_selected_openai_model', ''));
+                        $available_models       = atlt_get_ai_model_list( 'openai' );
+                        if ( empty( $available_models ) ) {
+                            $available_models = array(
+                                'gpt-4o-mini' => 'gpt-4o-mini',
+                            );
+                        }
+
+                        $default_model = array_key_exists( 'gpt-4o-mini', $available_models )
+                            ? 'gpt-4o-mini'
+                            : '';
+                        if ( '' === $default_model ) {
+                            $keys          = array_keys( $available_models );
+                            $default_model = isset( $keys[0] ) ? (string) $keys[0] : '';
+                        }
+
+                        if (
+                            '' !== $default_model
+                            && (
+                                '' === $current_selected_model
+                                || ! array_key_exists( $current_selected_model, $available_models )
+                            )
+                        ) {
+                            update_option( 'atlt_selected_openai_model', $default_model );
+                        }
                     } elseif ($posted_openai_key === '' && $existing_openai_key !== '') {
                         atlt_delete_openai_api_key();
                         delete_option('atlt_openai_models');
                         delete_option('atlt_selected_openai_model');
+                        delete_transient( 'atlt_openai_models' );
                         $did_save_any_setting = true;
                         $atlt_settings_success_message = __('OpenAI API key has been removed.', 'automatic-translator-addon-for-loco-translate');
                     }
@@ -305,16 +463,18 @@
             // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is validated above.
             $posted_selected_model = sanitize_text_field((string) wp_unslash($_POST['atlt_selected_openai_model']));
             $current_selected_model = sanitize_text_field((string) get_option('atlt_selected_openai_model', ''));
-            $available_models = atlt_get_openai_models();
-            if ($atlt_openai_saved_key !== '' && empty($available_models)) {
-                $available_models = array('gpt-4o-mini');
+            $available_models = atlt_get_ai_model_list( 'openai' );
+            if ( $atlt_openai_saved_key !== '' && empty( $available_models ) ) {
+                $available_models = array(
+                    'gpt-4o-mini' => 'gpt-4o-mini',
+                );
             }
 
             if ($posted_selected_model === '' && $current_selected_model !== '') {
                 delete_option('atlt_selected_openai_model');
                 $did_save_any_setting = true;
             } elseif ($posted_selected_model !== '' && $atlt_openai_saved_key !== '') {
-                if (in_array($posted_selected_model, $available_models, true)) {
+                if ( array_key_exists( $posted_selected_model, $available_models ) ) {
                     if ($posted_selected_model !== $current_selected_model) {
                         update_option('atlt_selected_openai_model', $posted_selected_model);
                         $did_save_any_setting = true;
@@ -331,9 +491,11 @@
 
         $atlt_openai_saved_key  = atlt_get_saved_openai_api_key();
         $atlt_openai_masked_key = atlt_mask_api_key($atlt_openai_saved_key);
-        $atlt_openai_models = atlt_get_openai_models();
-        if ($atlt_openai_saved_key !== '' && empty($atlt_openai_models)) {
-            $atlt_openai_models = array('gpt-4o-mini');
+        $atlt_openai_models = atlt_get_ai_model_list( 'openai' );
+        if ( $atlt_openai_saved_key !== '' && empty( $atlt_openai_models ) ) {
+            $atlt_openai_models = array(
+                'gpt-4o-mini' => 'gpt-4o-mini',
+            );
         }
         $atlt_selected_openai_model = sanitize_text_field((string) get_option('atlt_selected_openai_model', ''));
     }
@@ -365,27 +527,12 @@
             <div class="header">
                 
                 <h1><?php 
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                esc_html_e('LocoAI Settings', $atlt_text_domain); ?></h1>
-                <div class="atlt-dashboard-status">
-                    <span><?php 
-                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                    esc_html_e('Inactive', $atlt_text_domain); ?></span>
-                    <a href="<?php echo esc_url('https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=settings'); ?>" class='atlt-dashboard-btn' target="_blank" rel="noopener noreferrer">
-                        <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/upgrade-now.svg'); ?>" alt="<?php 
-                        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                        esc_attr_e('Upgrade Now', $atlt_text_domain); ?>">
-                        <?php 
-                        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                        esc_html_e('Upgrade Now', $atlt_text_domain); ?>
-                    </a>
-                </div>
+                esc_html_e('LocoAI Settings', 'automatic-translator-addon-for-loco-translate'); ?></h1>
             </div>
 
             <p class="description">
                 <?php
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                esc_html_e('Configure your settings for the LocoAI to optimize your translation experience. Enter your API keys and manage your preferences for seamless integration.', $atlt_text_domain); ?>
+                esc_html_e('Configure your settings for the LocoAI to optimize your translation experience. Enter your API keys and manage your preferences for seamless integration.', 'automatic-translator-addon-for-loco-translate'); ?>
             </p>
 
             <div class="atlt-dashboard-api-settings-container">
@@ -396,25 +543,40 @@
                         <input type="hidden" name="action" value="atlt_save_dashboard_settings">
 
                         <?php
+                            $atlt_provider_toggles = get_option('atlt_dashboard_provider_toggles', []);
+                            $atlt_provider_toggles = is_array($atlt_provider_toggles) ? $atlt_provider_toggles : [];
+
                              // Define all API-related settings in a single configuration array
                             $atlt_api_settings = [
                                 'openai' => [
                                     'name' => 'OpenAI',
-                                    'doc_url' => 'https://locoaddon.com/docs/how-to-generate-open-api-key/',
+                                    'doc_url' => 'https://locoaddon.com/docs/how-to-generate-open-api-key/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=open_api_key',
                                     'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
                                     'is_pro' => false,
                                     'input_name' => 'wp_ai_client_provider_credentials[openai]',
-                                    'value' => $atlt_openai_masked_key
+                                    'value' => $atlt_openai_masked_key,
+                                    'enabled' => ($atlt_provider_toggles['openai'] ?? true) !== false
                                 ],
                                 'gemini' => [
                                     'name' => 'Gemini AI',
-                                    'doc_url' => 'https://locoaddon.com/docs/pro-plugin/how-to-use-gemini-ai-to-translate-plugins-or-themes/generate-gemini-api-key/',
+                                    'doc_url' => 'https://locoaddon.com/docs/how-to-generate-google-gemini-api-key/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=gemini_api_key',
                                     'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-                                    'is_pro' => true
-                                ]
+                                    'is_pro' => true,
+                                    'enabled' => true
+                                ],
+                                'deepl' => [
+                                    'name' => 'DeepL',
+                                    'doc_url' => 'https://locoaddon.com/docs/generate-deepl-api-key-loco-ai/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=docs&utm_content=deepl_api_key',
+                                    'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+                                    'is_pro' => true,
+                                    'enabled' => true
+                                ],
                             ];
 
                         foreach ($atlt_api_settings as $atlt_key => $atlt_settings):
+                            if ($atlt_key === 'openai' && empty($atlt_settings['enabled'])) {
+                                continue;
+                            }
                             $atlt_disable_api_input = ! empty($atlt_settings['is_pro']);
                             if ($atlt_key === 'openai' && ! empty($atlt_openai_saved_key)) {
                                 $atlt_disable_api_input = true;
@@ -424,8 +586,26 @@
                                 <?php 
                                 
                                 
-                                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                               /* translators: %s: API provider name like OpenAI or Gemini */ printf( esc_html__('Add %s API key %s', $atlt_text_domain), esc_html($atlt_settings['name']), esc_html($atlt_settings['is_pro'] ? '(Pro)' : '') ); ?>
+                                echo wp_kses(
+                                    sprintf(
+                                        /* translators: %1$s: API provider name like OpenAI or Gemini, %2$s: Pro link */
+                                        __( 'Add %1$s API key %2$s', 'automatic-translator-addon-for-loco-translate' ),
+                                        esc_html( $atlt_settings['name'] ),
+                                        ! empty( $atlt_settings['is_pro'] )
+                                            ? '(<a href="' . esc_url( 'https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=api_key' ) . '" target="_blank" rel="noopener noreferrer">' .
+                                                esc_html__( 'Pro', 'automatic-translator-addon-for-loco-translate' ) .
+                                              '</a>)'
+                                            : ''
+                                    ),
+                                    array(
+                                        'a' => array(
+                                            'href'   => array(),
+                                            'target' => array(),
+                                            'rel'    => array(),
+                                        ),
+                                    )
+                                );
+                                ?>
                             </label>
                             <div class="input-group">
                                 <input 
@@ -441,8 +621,7 @@
                                 <?php if ( $atlt_key === 'openai' && ! empty($atlt_openai_saved_key) ) : ?>
                                     <button type="submit" name="reset_openai_api_key" class="button button-primary">
                                         <?php
-                                        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                        esc_html_e('Reset', $atlt_text_domain);
+                                        esc_html_e('Reset', 'automatic-translator-addon-for-loco-translate');
                                         ?>
                                     </button>
                                 <?php endif; ?>
@@ -451,20 +630,18 @@
                                 <div class="atlt-dashboard-api-settings-openai-model">
                                     <label for="atlt_selected_openai_model" class="api-settings-label">
                                         <?php
-                                        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                        esc_html_e('Select OpenAI Model', $atlt_text_domain);
+                                        esc_html_e('Select OpenAI Model', 'automatic-translator-addon-for-loco-translate');
                                         ?>
                                     </label>
                                     <select name="atlt_selected_openai_model" class="atlt-openai-model-select">
                                         <option value="">
                                             <?php
-                                            // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                            esc_html_e('Select model', $atlt_text_domain);
+                                            esc_html_e('Select model', 'automatic-translator-addon-for-loco-translate');
                                             ?>
                                         </option>
-                                        <?php foreach ($atlt_openai_models as $atlt_openai_model): ?>
-                                            <option value="<?php echo esc_attr($atlt_openai_model); ?>" <?php selected($atlt_selected_openai_model, $atlt_openai_model); ?>>
-                                                <?php echo esc_html($atlt_openai_model); ?>
+                                        <?php foreach ( $atlt_openai_models as $atlt_openai_model_id => $atlt_openai_model_label ) : ?>
+                                            <option value="<?php echo esc_attr( $atlt_openai_model_id ); ?>" <?php selected( $atlt_selected_openai_model, $atlt_openai_model_id ); ?>>
+                                                <?php echo esc_html( $atlt_openai_model_label ); ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -473,11 +650,9 @@
                             <?php
                             echo wp_kses(
                                 sprintf(
-                                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                     /* translators: %1$s: Click Here link, %2$s: API provider name like OpenAI or Gemini */  __('%1$s to See How to Generate %2$s API Key', $atlt_text_domain),
+                                     /* translators: %1$s: Click Here link, %2$s: API provider name like OpenAI or Gemini */  __('%1$s to See How to Generate %2$s API Key', 'automatic-translator-addon-for-loco-translate'),
                                     '<a href="' . esc_url($atlt_settings['doc_url']) . '" target="_blank" rel="noopener noreferrer">' . 
-                                    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                    esc_html__('Click Here', $atlt_text_domain) . '</a>',
+                                    esc_html__('Click Here', 'automatic-translator-addon-for-loco-translate') . '</a>',
                                     esc_html($atlt_settings['name'])
                                 ),
                                 array(
@@ -491,8 +666,22 @@
                         endforeach; ?>
                             <label for="atlt_context_aware" class="api-settings-label">
                                 <?php
-                                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                esc_html_e('Translation Context & Tone (Pro)', $atlt_text_domain);
+                                echo wp_kses(
+                                    sprintf(
+                                        /* translators: %s: Pro link */
+                                        __( 'Translation Context & Tone (%s)', 'automatic-translator-addon-for-loco-translate' ),
+                                        '<a href="' . esc_url( 'https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=context_aware' ) . '" target="_blank" rel="noopener noreferrer">' .
+                                        esc_html__( 'Pro', 'automatic-translator-addon-for-loco-translate' ) .
+                                        '</a>'
+                                    ),
+                                    array(
+                                        'a' => array(
+                                            'href'   => array(),
+                                            'target' => array(),
+                                            'rel'    => array(),
+                                        ),
+                                    )
+                                );
                                 ?>
                             </label>
                             <textarea
@@ -500,16 +689,14 @@
                                 name="atlt_context_aware"
                                 class="atlt-context-aware-textarea"
                                 placeholder="<?php
-                                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                echo esc_attr__('Add your business context, tone, and audience details so translations match your brand voice and improve accuracy.', $atlt_text_domain);
+                                echo esc_attr__('Add your business context, tone, and audience details so translations match your brand voice and improve accuracy.', 'automatic-translator-addon-for-loco-translate');
                                 ?>"
-                                rows="4"
+                                rows="6"
                                 disabled
                             ></textarea>
                             <p class="api-settings-description" style="margin-block: 5px;">
-                                <?php
-                                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                esc_html_e('Example: We run a business website. Keep the tone simple and professional. Audience includes customers and business users. Focus on keywords like services, pricing, and solutions.', $atlt_text_domain);
+                            <?php
+                                esc_html_e('Example: We run a business website. Keep the tone simple and professional. Audience includes customers and business users. Focus on keywords like services, pricing, and solutions.', 'automatic-translator-addon-for-loco-translate');
                                 ?>
                             </p>
                         </div>
@@ -523,31 +710,25 @@
                                           name="atlt-dashboard-feedback-checkbox"
                                           <?php checked(get_option('atlt_feedback_opt_in'), 'yes'); ?>>
                                       <p><?php 
-                                      // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                      esc_html_e('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', $atlt_text_domain); ?></p>
-                                      <a href="#" class="atlt-see-terms">[See terms]</a>
+                                      esc_html_e('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'automatic-translator-addon-for-loco-translate'); ?></p><a href="#" class="atlt-see-terms">[See terms]</a>
+                                      
                                   </div>
                                   <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
                                           <p><?php 
-                                          // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                          echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect: ", $atlt_text_domain); ?><a href="<?php echo esc_url('https://my.coolplugins.net/terms/usage-tracking/'); ?>" target="_blank" rel="noopener noreferrer"><?php 
-                                          // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                          esc_html_e('Click here', $atlt_text_domain); ?></a></p>
+                                          echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect: ", 'automatic-translator-addon-for-loco-translate'); ?><a href="<?php echo esc_url('https://my.coolplugins.net/terms/usage-tracking/'); ?>" target="_blank" rel="noopener noreferrer"><?php 
+                                          esc_html_e('Click here', 'automatic-translator-addon-for-loco-translate'); ?></a></p>
                                           <ul style="list-style-type:auto;">
                                               <li><?php 
-                                              // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                              esc_html_e('Your website home URL and WordPress admin email.', $atlt_text_domain); ?></li>
+                                              esc_html_e('Your website home URL and WordPress admin email.', 'automatic-translator-addon-for-loco-translate'); ?></li>
                                               <li><?php 
-                                              // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                                              esc_html_e('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.',$atlt_text_domain); ?></li>
+                                              esc_html_e('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'automatic-translator-addon-for-loco-translate'); ?></li>
                                           </ul>
                                   </div>
                               </div>
                         <?php endif; ?>
                         <div class="atlt-dashboard-save-btn-container">
                         <button type="submit" class="button button-primary"><?php 
-                        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                        esc_html_e('Save', $atlt_text_domain); ?></button>
+                        esc_html_e('Save', 'automatic-translator-addon-for-loco-translate'); ?></button>
                         </div>
                     </form>
                 </div>

@@ -91,7 +91,7 @@ if(!class_exists('Atlt_Dashboard')){
                     $atlt_all_data[$prefix][] = array_map('sanitize_text_field', $data);
                 }
 
-                update_option('cpt_dashboard_data', $atlt_all_data);
+                update_option('cpt_dashboard_data', $atlt_all_data, false);
             }
         }
 
@@ -155,12 +155,32 @@ if(!class_exists('Atlt_Dashboard')){
         }
 
         public static function format_number_count($number){
+            $number = absint($number);
             if ($number >= 1000000) {
                 return round($number / 1000000, 1) . 'M';
             } elseif ($number >= 1000) {
                 return round($number / 1000, 1) . 'K';
             }
             return $number;
+        }
+
+        /**
+         * Render the dashboard footer on all admin tabs.
+         */
+        public static function render_footer() {
+            $file_prefix  = 'admin/atlt-dashboard/views/';
+            $footer_file  = ATLT_PATH . $file_prefix . 'footer.php';
+            $real_footer_path   = realpath($footer_file);
+            $expected_base_path = realpath(ATLT_PATH . $file_prefix);
+
+            if (
+                $real_footer_path &&
+                $expected_base_path &&
+                strpos($real_footer_path, $expected_base_path) === 0 &&
+                file_exists($footer_file)
+            ) {
+                require_once $footer_file;
+            }
         }
 
         public static function review_notice($prefix, $plugin_name, $url){
@@ -202,14 +222,14 @@ if(!class_exists('Atlt_Dashboard')){
             add_action('admin_notices', function() use ($message, $prefix, $url , $plugin_name){
 
                 $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">'.esc_html__('Rate Now!', 'automatic-translator-addon-for-loco-translate') . ' ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
                 
                 echo wp_kses_post($html);
             });
 
             add_action('atlt_display_admin_notices', function() use ($message, $prefix, $url, $plugin_name){
                 $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">'.esc_html__('Rate Now!', 'automatic-translator-addon-for-loco-translate') . ' ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
                 
                 echo wp_kses_post($html);
             });

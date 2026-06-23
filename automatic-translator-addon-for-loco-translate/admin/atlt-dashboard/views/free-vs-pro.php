@@ -3,39 +3,21 @@
     <div class="atlt-dashboard-free-vs-pro-container">
     <div class="header">
         <h1><?php
-        // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-        esc_html_e('Free VS Pro', $text_domain); ?></h1>
-        <div class="atlt-dashboard-status">
-            <span class="status"><?php 
-            // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-            esc_html_e('Inactive', $text_domain); ?></span>
-            <a href="<?php echo esc_url('https://locoaddon.com/pricing/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=freevspro'); ?>" class='atlt-dashboard-btn' target="_blank" rel="noopener noreferrer">
-              <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/upgrade-now.svg'); ?>" alt="<?php 
-              // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-              echo esc_attr(__('Upgrade Now', $text_domain)); ?>">
-                <?php
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                echo esc_html(__('Upgrade Now', $text_domain)); ?>
-            </a>
-        </div>
+        esc_html_e('Free VS Pro', 'automatic-translator-addon-for-loco-translate'); ?></h1>
     </div>
     
     <p><?php
-    // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-    echo esc_html(__('Compare the Free and Pro versions to choose the best option for your translation needs.', $text_domain)); ?></p>
+    echo esc_html(__('Compare the Free and Pro versions to choose the best option for your translation needs.', 'automatic-translator-addon-for-loco-translate')); ?></p>
 
     <table>
         <thead>
             <tr>
                 <th><?php 
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                echo esc_html(__('Dynamic Content', $text_domain)); ?></th>
+                echo esc_html(__('Dynamic Content', 'automatic-translator-addon-for-loco-translate')); ?></th>
                 <th><?php 
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                echo esc_html(__('Free', $text_domain)); ?></th>
+                echo esc_html(__('Free', 'automatic-translator-addon-for-loco-translate')); ?></th>
                 <th><?php 
-                // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralDomain
-                echo esc_html(__('Pro', $text_domain)); ?></th>
+                echo esc_html(__('Pro', 'automatic-translator-addon-for-loco-translate')); ?></th>
             </tr>
         </thead>
         <tbody>
@@ -44,9 +26,9 @@
                     'Yandex Translate Widget Support' => [true, true],
                     'No API Key Required' => [true, true],
                     'Unlimited Translations' => [true, true],
+                    'AI Translator Support (OpenAI)' => [true, true],
                     'Google Translate Widget Support' => [false, true],
                     'Chrome Built-in AI Support' => [false, true],
-                    'AI Translator Support (OpenAI)' => [true, true],
                     'AI Translator Support (Gemini)' => [false, true],
                     'ChatGPT Translator Support' => [false, true],
                     'DeepL Doc Translator Support' => [false, true],
