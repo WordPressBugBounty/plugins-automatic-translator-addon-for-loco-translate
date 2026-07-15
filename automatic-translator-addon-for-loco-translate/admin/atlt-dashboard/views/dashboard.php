@@ -46,7 +46,7 @@
                         <img decoding="async" src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/video.svg'); ?>" class="play-icon" alt="">
                         <picture>
                             <source srcset="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/loco-addon-video.avifs'); ?>" type="image/avif">
-                            <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/loco-addon-video.jpg'); ?>" class="loco-video" alt="<?php
+                            <img src="<?php echo esc_url(ATLT_URL . 'admin/atlt-dashboard/images/loco-addon-video.avifs'); ?>" class="loco-video" alt="<?php
                                 echo esc_attr__('LocoAI — watch the tutorial', 'automatic-translator-addon-for-loco-translate'); ?>">
                         </picture>
                     </a>

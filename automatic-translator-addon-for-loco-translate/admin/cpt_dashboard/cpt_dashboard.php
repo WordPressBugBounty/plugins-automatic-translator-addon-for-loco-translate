@@ -14,11 +14,32 @@ if(!class_exists('Atlt_Dashboard')){
          */
         private static $init;
 
-        /**
-         * Tabs data
-         * @var array
-         */
-        private $tabs_data=array();
+        private static $cpt_dashboard_data = null;
+        private static $cpt_review_notice_dismissed = null;
+
+        private static function get_cpt_dashboard_data() {
+            if (self::$cpt_dashboard_data === null) {
+                self::$cpt_dashboard_data = get_option('cpt_dashboard_data', array());
+            }
+            return self::$cpt_dashboard_data;
+        }
+
+        private static function update_cpt_dashboard_data($data) {
+            self::$cpt_dashboard_data = $data;
+            update_option('cpt_dashboard_data', $data, false);
+        }
+
+        private static function get_cpt_review_notice_dismissed() {
+            if (self::$cpt_review_notice_dismissed === null) {
+                self::$cpt_review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
+            }
+            return self::$cpt_review_notice_dismissed;
+        }
+
+        private static function update_cpt_review_notice_dismissed($data) {
+            self::$cpt_review_notice_dismissed = $data;
+            update_option('cpt_review_notice_dismissed', $data);
+        }
 
         /**
          * Instance
@@ -36,20 +57,6 @@ if(!class_exists('Atlt_Dashboard')){
         }
 
         /**
-         * Sort column data
-         * @param array $columns
-         * @param array $value
-         * @return array
-         */
-        public function sort_column_data($columns, $value){
-            $result = array();
-            foreach($columns as $key => $label) {
-                $result[$key] = isset($value[$key]) ? sanitize_text_field($value[$key]) : '';
-            }
-            return $result;
-        }
-
-        /**
          * Store options
          * @param string $plugin_name
          * @param string $prefix
@@ -59,7 +66,7 @@ if(!class_exists('Atlt_Dashboard')){
         public static function store_options($prefix='', $unique_key='', $old_data='update', array $data = array()){
             if(!empty($prefix) && isset($data['string_count']) && isset($data['character_count'])){
                 $prefix = sanitize_key($prefix);
-                $atlt_all_data = get_option('cpt_dashboard_data', array());
+                $atlt_all_data = self::get_cpt_dashboard_data();
                 
                 if(isset($atlt_all_data[$prefix])){
                     $data_update = false;
@@ -91,7 +98,7 @@ if(!class_exists('Atlt_Dashboard')){
                     $atlt_all_data[$prefix][] = array_map('sanitize_text_field', $data);
                 }
 
-                update_option('cpt_dashboard_data', $atlt_all_data, false);
+                self::update_cpt_dashboard_data($atlt_all_data);
             }
         }
 
@@ -102,7 +109,7 @@ if(!class_exists('Atlt_Dashboard')){
          */
         public static function get_translation_data($prefix, $key_exists=array()){
             $prefix = sanitize_key($prefix);
-            $atlt_all_data = get_option('cpt_dashboard_data', array());
+            $atlt_all_data = self::get_cpt_dashboard_data();
             $data = array();
 
             if(isset($atlt_all_data[$prefix])){
@@ -215,28 +222,26 @@ if(!class_exists('Atlt_Dashboard')){
             );
 
             $prefix = sanitize_key($prefix);
-            $message = wp_kses_post($message);
             $url = esc_url($url);
             $plugin_name = sanitize_text_field($plugin_name);
 
-            add_action('admin_notices', function() use ($message, $prefix, $url , $plugin_name){
+            $render_notice = function() use ($message, $prefix, $url) {
+                echo wp_kses_post(self::build_review_notice_html($message, $prefix, $url));
+            };
 
-                $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">'.esc_html__('Rate Now!', 'automatic-translator-addon-for-loco-translate') . ' ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
-                
-                echo wp_kses_post($html);
-            });
+            add_action('admin_notices', $render_notice);
+            add_action('atlt_display_admin_notices', $render_notice);
+        }
 
-            add_action('atlt_display_admin_notices', function() use ($message, $prefix, $url, $plugin_name){
-                $html= '<div class="notice notice-info cpt-review-notice notice notice-info is-dismissible">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.wp_kses_post($message).'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">'.esc_html__('Rate Now!', 'automatic-translator-addon-for-loco-translate') . ' ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
-                
-                echo wp_kses_post($html);
-            });
+        private static function build_review_notice_html($message, $prefix, $url){
+            $html= '<div class="notice notice-info cpt-review-notice is-dismissible">';
+            $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="atlt-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('atlt_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">'.esc_html__('Rate Now!', 'automatic-translator-addon-for-loco-translate') . ' ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'automatic-translator-addon-for-loco-translate').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'automatic-translator-addon-for-loco-translate').'</button></div></div></div>';
+            
+            return $html;
         }
 
         public static function atlt_hide_review_notice_status($prefix){
-            $review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
+            $review_notice_dismissed = self::get_cpt_review_notice_dismissed();
             return isset($review_notice_dismissed[$prefix]) ? $review_notice_dismissed[$prefix] : false;
         }
 
@@ -253,9 +258,9 @@ if(!class_exists('Atlt_Dashboard')){
             if ( empty( $prefix ) ) {
                 wp_send_json_error('Missing prefix', 400);
             }
-            $review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
+            $review_notice_dismissed = self::get_cpt_review_notice_dismissed();
             $review_notice_dismissed[$prefix] = true;
-            update_option('cpt_review_notice_dismissed', $review_notice_dismissed);
+            self::update_cpt_review_notice_dismissed($review_notice_dismissed);
             wp_send_json_success();
         }
     }

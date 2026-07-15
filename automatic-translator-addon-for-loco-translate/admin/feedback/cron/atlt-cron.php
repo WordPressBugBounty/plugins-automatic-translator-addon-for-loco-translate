@@ -6,11 +6,6 @@ if (!class_exists('ATLT_cronjob')) {
     class ATLT_cronjob
     {
 
-        public function __construct()
-        {
-         
-        }
-
         public function atlt_cron_init_hooks()
         {
 
@@ -49,10 +44,8 @@ if (!class_exists('ATLT_cronjob')) {
             $opt_in = get_option('atlt_feedback_opt_in');
             $opt_in = is_string($opt_in) ? strtolower($opt_in) : 'no';
             
-            if ($opt_in === 'yes' || $opt_in === true || $opt_in === '1') {
-                if (class_exists('ATLT_cronjob')) {
-                    ATLT_cronjob::atlt_send_data();
-                }
+            if (in_array($opt_in, ['yes', '1'], true)) {
+                ATLT_cronjob::atlt_send_data();
             }
             
         }

@@ -20,51 +20,6 @@
   border-radius: 0 0 4px 4px;
 }
 
-#atlt-dialog .atlt-heading {
-  margin-bottom: 10px;
-  display: inline-block;
-  color: #000000;
-  font-size: 15px;
-  line-height: 1.4em;
-}
-
-
-#atlt-dialog .atlt-translater-icon{
-  display: flex;
-  justify-content: flex-end;
-  gap: 7px;
-  margin-bottom: 10px;
-}
-
-#atlt-dialog .atlt-translater-icon img{
-  width: 18px;
-  height: 18px;
-}
-
-
-.inputGroup img{
-  margin-top: 5px;
-  height: 21px !important;
-  width: auto !important;
-}
-
-.pro-features-img{
-  /* width: 50%; */
-  margin-bottom: 10px;
-}
-
-span.proonly-button {
-  background: #555;
-  color: #fff;
-  font-size: 12px;
-  font-weight: bold;
-  font-family: monospace;
-  padding: 3px;
-  border-radius: 3px;
-  display: inline-block;
-  margin: 3px 0px 4px 4px;
-}
-
 div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-widget-header {
   border: none !important; 
   background: none !important;
@@ -126,10 +81,12 @@ body.rtl div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-button.ui-dialog-
   margin: 0 auto;
   overflow-x: hidden;
   overflow-y: auto;
-  border-radius: 5px;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   animation-name: animatetop;
   animation-duration: 0.4s;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
 }
 
 /* Keyframes */
@@ -172,8 +129,8 @@ body.rtl div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-button.ui-dialog-
 .atlt_custom_model .modal-body {
   padding: 2px 16px;
   position: relative;
+  padding-top: 14px;
 }
-
 .atlt_custom_model .notice-dismiss {
   padding: 0;
 }
@@ -305,11 +262,7 @@ body.rtl div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-button.ui-dialog-
 }
 
 /* Strings modal */
-.atlt_custom_model .modal-content {
-  border-radius: 14px;
-  overflow: hidden;
-  border: 1px solid #e5e7eb;
-}
+
 
 .atlt_custom_model .atlt-modern-header {
   background: #ffffff !important;
@@ -445,10 +398,7 @@ body.rtl div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-button.ui-dialog-
   color: #7c2d12;
 }
 
-.atlt_custom_model .modal-body {
-  padding-top: 14px;
-  position: relative;
-}
+
 
 .atlt_custom_model .my_translate_progress,
 .atlt_custom_model .my_translate_progress.atlt_translate_progress {
@@ -514,8 +464,8 @@ body.rtl div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-button.ui-dialog-
       rgba(0, 0, 0, 0.04) 75%,
       rgba(0, 0, 0, 0.04)
   );
-  background-size: 36px 36px;
-  animation: atlt-progress-stripes 1.05s linear infinite;
+  background-size: 40px 40px;
+  animation: progress-stripes 1s linear infinite;
 }
 
 .atlt_custom_model .my_translate_progress .progress-bar {
@@ -555,15 +505,6 @@ body.rtl div.ui-dialog[aria-describedby="loco-apis-batch"] .ui-button.ui-dialog-
   40% {
     opacity: 1;
     transform: translateY(-2px);
-  }
-}
-
-@keyframes atlt-progress-stripes {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 36px 0;
   }
 }
 
@@ -733,10 +674,6 @@ html.merge-translations:before {
   display: none;
 }
 
-.progress-percentage {
-  margin-top: 10px;
-}
-
 .yandex-widget-container .translator-widget,
 .openai-widget-container .translator-widget {
   display: flex;
@@ -867,9 +804,9 @@ html.merge-translations:before {
 }
 
 .atlt-provider-card.is-selected .atlt-provider-card__radio {
-  border-color: #2271b1;
+  border-color: var(--wp-admin-theme-color, #2271b1);
   box-shadow: inset 0 0 0 3px #fff;
-  background: radial-gradient(circle, #2271b1 0%, #2271b1 45%, #fff 46%, #fff 100%);
+  background: radial-gradient(circle, var(--wp-admin-theme-color, #2271b1) 0%, var(--wp-admin-theme-color, #2271b1) 45%, #fff 46%, #fff 100%);
 }
 
 .atlt-provider-card__logo {

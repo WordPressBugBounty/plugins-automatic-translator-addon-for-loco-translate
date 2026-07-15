@@ -48,22 +48,34 @@
             }, [ 'string_count' => 0, 'character_count' => 0, 'time_taken' => 0, 'plugins_themes' => [], 'service_providers' => [], 'provider_character_count' => [] ] );
 
             $atlt_service_provider_keys = array_keys( $totals['service_providers'] ?? [] );
-            $atlt_service_provider_labels = array_map( static function( $key ) {
+            $atlt_service_provider_label_map = [
+                'google'  => 'Google',
+                'openai'  => 'OpenAI',
+                'deepl'   => 'DeepL',
+                'geminiai'  => 'Gemini AI',
+                'yandex'  => 'Yandex',
+                'chrome'  => 'Chrome AI',
+                'chatgpt' => 'ChatGPT',
+            ];
+             $atlt_service_provider_labels = array_map( static function( $key ) use ( $atlt_service_provider_label_map ) {
+                if ( isset( $atlt_service_provider_label_map[ $key ] ) ) {
+                    return $atlt_service_provider_label_map[ $key ];
+                }
                 $label = str_replace( [ '-', '_' ], ' ', (string) $key );
                 return ucwords( $label );
             }, $atlt_service_provider_keys );
             $atlt_translated_by_display = empty( $atlt_service_provider_labels ) ? __( '—', 'automatic-translator-addon-for-loco-translate' ) : '';
             // Update the time taken string using the new function
-            $atlt_time_taken_str = atlt_format_time_taken($totals['time_taken']);
+            $atlt_time_taken_str = ATLT_Addons_Helper::format_time_taken($totals['time_taken']);
             ?>
             <span><?php 
-            echo esc_html(atlt_format_number($totals['string_count'])); ?></span>
+            echo esc_html(ATLT_Addons_Helper::format_number($totals['string_count'])); ?></span>
             <span><?php 
             esc_html_e('Total Strings Translated!', 'automatic-translator-addon-for-loco-translate'); ?></span>
         </div>
         <ul class="atlt-dashboard-sts-btm">
             <li><span><?php 
-            esc_html_e('Total Characters', 'automatic-translator-addon-for-loco-translate'); ?></span> <span><?php echo esc_html(atlt_format_number($totals['character_count'])); ?></span></li>
+            esc_html_e('Total Characters', 'automatic-translator-addon-for-loco-translate'); ?></span> <span><?php echo esc_html(ATLT_Addons_Helper::format_number($totals['character_count'])); ?></span></li>
             <li><span><?php 
             esc_html_e('Total Plugins / Themes', 'automatic-translator-addon-for-loco-translate'); ?></span> <span><?php echo esc_html(count($totals['plugins_themes'] ?? [])); ?></span></li>
             <li><span><?php 
@@ -91,53 +103,7 @@
 
         $atlt_installed_plugins = get_plugins();
 
-        $atlt_addons = [
-            [
-                'slug_free'       => 'automatic-translations-for-polylang',
-                'slug_pro'        => 'autopoly-ai-translation-for-polylang-pro',
-                'plugin_file_free'=> 'automatic-translations-for-polylang/automatic-translation-for-polylang.php',
-                'plugin_file_pro' => 'autopoly-ai-translation-for-polylang-pro/autopoly-ai-translation-for-polylang-pro.php',
-                'desc'            => __( 'Translate your entire WordPress website faster than ever with AI-powered translation built for Polylang. - Autopoly', 'automatic-translator-addon-for-loco-translate' ),
-                'image'           => ATLT_URL . 'admin/atlt-dashboard/images/polylang-addon.png',
-                'image_alt'       => __( 'Polylang Addon', 'automatic-translator-addon-for-loco-translate' ),
-                'display_slug'    => 'automatic-translations-for-polylang',
-                'parent_plugin'   => ['polylang', 'polylang-pro'],
-            ],
-            [
-                'slug_free'       => 'automatic-translate-addon-for-translatepress',
-                'slug_pro'        => 'automatic-translate-addon-pro-for-translatepress',
-                'plugin_file_free'=> 'automatic-translate-addon-for-translatepress/automatic-translate-addon-for-translatepress.php',
-                'plugin_file_pro' => 'automatic-translate-addon-pro-for-translatepress/automatic-translate-addon-for-translatepress-pro.php',
-                'desc'            => __( 'Make WordPress translation faster, smarter, and easier with AI-powered automation for TranslatePress.', 'automatic-translator-addon-for-loco-translate' ),
-                'image'           => ATLT_URL . 'admin/atlt-dashboard/images/translatepress-addon.png',
-                'image_alt'       => __( 'TranslatePress Addon', 'automatic-translator-addon-for-loco-translate' ),
-                'display_slug'    => 'automatic-translate-addon-for-translatepress',
-                'parent_plugin'   => 'translatepress-multilingual',
-            ],
-            [
-                'slug_free'       => 'wpml-translation-check',
-                'slug_pro'        => 'automlp-ai-translation-for-wpml-pro',
-                'plugin_file_free'=> 'wpml-translation-check/index.php',
-                'plugin_file_pro' => 'automlp-pro/automlp-pro.php',
-                'desc'            => __( 'Translate your entire WordPress website faster than ever with AI-powered translation built for WPML- AUTOMLP.', 'automatic-translator-addon-for-loco-translate' ),
-                'image'           => ATLT_URL . 'admin/atlt-dashboard/images/automlp-ai-translation-for-wpml.png',
-                'image_alt'       => __( 'AutoMLP – AI Translation for WPML', 'automatic-translator-addon-for-loco-translate' ),
-                'display_slug'    => 'automlp-ai-translation-for-wpml',
-                'parent_plugin'   => 'sitepress-multilingual-cms',
-            ],
-        ];
-
-        /**
-         * Allow other plugins/addons to extend dashboard addon cards.
-         *
-         * Each addon should be an array with keys like:
-         * slug_free, slug_pro, plugin_file_free, plugin_file_pro, desc, image, image_alt, display_slug.
-         */
-        $atlt_addons = apply_filters( 'atlt_dashboard_addons', $atlt_addons, 'automatic-translator-addon-for-loco-translate' );
-
-        if ( ! is_array( $atlt_addons ) ) {
-            $atlt_addons = [];
-        }
+        $atlt_addons = ATLT_Addons_Helper::get_addon_definitions();
 
         $atlt_parent_exists = static function( $parent ) use ( $atlt_installed_plugins ) {
             if ( empty( $parent ) ) {
@@ -201,8 +167,8 @@
             }
 
             // Final fallback: rely on slug-specific installed check (pro-only for pro slugs).
-            if ( ! $atlt_pro_installed && '' !== $atlt_slug_pro && function_exists( 'atlt_is_plugin_installed' ) ) {
-                $atlt_pro_installed = (bool) atlt_is_plugin_installed( $atlt_slug_pro, 'pro' );
+            if ( ! $atlt_pro_installed && '' !== $atlt_slug_pro && method_exists( 'ATLT_Addons_Helper', 'is_plugin_installed' ) ) {
+                $atlt_pro_installed = (bool) ATLT_Addons_Helper::is_plugin_installed( $atlt_slug_pro, 'pro', $atlt_installed_plugins );
             }
 
             // If installed but we don't know the exact main file, pick the first file in that folder for active checks.
@@ -244,7 +210,7 @@
                             } else {
                                 $atlt_name_slug = $atlt_btn_slug ?: $atlt_display_slug;
                             }
-                            echo esc_html( atlt_get_plugin_display_name( $atlt_name_slug ) );
+                            echo esc_html( ATLT_Addons_Helper::get_plugin_display_name( $atlt_name_slug, $atlt_installed_plugins ) );
                             ?>
                         </strong>
 
@@ -311,209 +277,3 @@
         esc_html_e('Leave a Review ★★★★★', 'automatic-translator-addon-for-loco-translate'); ?></a>
     </div>
 </div>
-
-<?php
-
-function atlt_format_time_taken($time_taken) {
-    
-    if ($time_taken === 0) 
-    return __('0', 'automatic-translator-addon-for-loco-translate');
-    
-    if ($time_taken < 60) {
-        
-        /* translators: %d: number of seconds */ return sprintf(__('%d sec', 'automatic-translator-addon-for-loco-translate'), $time_taken);
-    }
-    if ($time_taken < 3600) {
-        $min = floor($time_taken / 60);
-        $sec = $time_taken % 60;
-        
-        /* translators: 1: number of minutes, 2: number of seconds */ return sprintf(__('%1$d min %2$d sec', 'automatic-translator-addon-for-loco-translate'), $min, $sec);
-    }
-    $hours = floor($time_taken / 3600);
-    $min = floor(($time_taken % 3600) / 60);
-    
-    /* translators: 1: number of hours, 2: number of minutes */ return sprintf(__('%1$d hours %2$d min', 'automatic-translator-addon-for-loco-translate'), $hours, $min);
-}
-
-function atlt_is_plugin_installed( $plugin_slug, $variant = 'any' ) {
-    $plugins = get_plugins();
-
-    $plugin_files = [
-        'automatic-translate-addon-for-translatepress' => [
-            'free' => [ 'automatic-translate-addon-for-translatepress/automatic-translate-addon-for-translatepress.php' ],
-            'pro'  => [ 'automatic-translate-addon-pro-for-translatepress/automatic-translate-addon-for-translatepress-pro.php' ],
-        ],
-        'automatic-translations-for-polylang' => [
-            'free' => [ 'automatic-translations-for-polylang/automatic-translation-for-polylang.php' ],
-            'pro'  => [ 'autopoly-ai-translation-for-polylang-pro/autopoly-ai-translation-for-polylang-pro.php' ],
-        ],
-        'autopoly-ai-translation-for-polylang-pro' => [
-            'pro' => [ 'autopoly-ai-translation-for-polylang-pro/autopoly-ai-translation-for-polylang-pro.php' ],
-        ],
-        'automatic-translate-addon-pro-for-translatepress' => [
-            'pro' => [ 'automatic-translate-addon-pro-for-translatepress/automatic-translate-addon-for-translatepress-pro.php' ],
-        ],
-        'wpml-translation-check' => [
-            'free' => [ 'wpml-translation-check/index.php' ],
-            'pro'  => [ 'automlp-pro/automlp-pro.php' ],
-        ],
-        'automlp-ai-translation-for-wpml-pro' => [
-            'pro' => [ 'automlp-pro/automlp-pro.php' ],
-        ],
-    ];
-
-    if ( isset( $plugin_files[ $plugin_slug ] ) ) {
-        $variants = [];
-
-        if ( 'pro' === $variant ) {
-            $variants = $plugin_files[ $plugin_slug ]['pro'] ?? [];
-        } elseif ( 'free' === $variant ) {
-            $variants = $plugin_files[ $plugin_slug ]['free'] ?? [];
-        } else {
-            $variants = array_merge(
-                $plugin_files[ $plugin_slug ]['free'] ?? [],
-                $plugin_files[ $plugin_slug ]['pro'] ?? []
-            );
-        }
-
-        foreach ( $variants as $plugin_file ) {
-            if ( isset( $plugins[ $plugin_file ] ) ) {
-                return true;
-            }
-
-            $plugin_dir = trailingslashit( dirname( $plugin_file ) );
-            foreach ( array_keys( $plugins ) as $candidate_file ) {
-                if ( 0 === strpos( (string) $candidate_file, $plugin_dir ) ) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    // Generic: check any installed plugin file under "<slug>/".
-    foreach ( array_keys( $plugins ) as $plugin_file ) {
-        if ( strpos( $plugin_file, $plugin_slug . '/' ) === 0 ) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-function atlt_get_plugin_display_name($plugin_slug) {
-    $plugins = get_plugins();
-
-    // Define free and pro plugin paths (one entry per addon family).
-    $plugin_paths = [
-        'automatic-translations-for-polylang' => [
-            'free' => 'automatic-translations-for-polylang/automatic-translation-for-polylang.php',
-            'pro'  => 'autopoly-ai-translation-for-polylang-pro/autopoly-ai-translation-for-polylang-pro.php',
-            'free_name' => __('AutoPoly - AI Translation For Polylang', 'automatic-translator-addon-for-loco-translate'),
-            'pro_name'  => __('AutoPoly - AI Translation For Polylang (Pro)', 'automatic-translator-addon-for-loco-translate'),
-        ],
-        'automatic-translate-addon-for-translatepress' => [
-            'free' => 'automatic-translate-addon-for-translatepress/automatic-translate-addon-for-translatepress.php',
-            'pro'  => 'automatic-translate-addon-pro-for-translatepress/automatic-translate-addon-for-translatepress-pro.php',
-            'free_name' => __('AI Translation for TranslatePress', 'automatic-translator-addon-for-loco-translate'),
-            'pro_name'  => __('AI Translation for TranslatePress (Pro)', 'automatic-translator-addon-for-loco-translate'),
-        ],
-        'automlp-ai-translation-for-wpml' => [
-            'free' => 'wpml-translation-check/index.php',
-            'pro'  => 'automlp-pro/automlp-pro.php',
-            'free_name' => __('AutoMLP – AI Translation for WPML', 'automatic-translator-addon-for-loco-translate'),
-            'pro_name'  => __('AutoMLP – AI Translation for WPML (Pro)', 'automatic-translator-addon-for-loco-translate'),
-        ],
-    ];
-
-    $atlt_pro_slug_keys = [
-        'autopoly-ai-translation-for-polylang-pro',
-        'automatic-translate-addon-pro-for-translatepress',
-        'automlp-ai-translation-for-wpml-pro',
-    ];
-    $atlt_slug_aliases = [
-        'autopoly-ai-translation-for-polylang-pro'      => 'automatic-translations-for-polylang',
-        'automatic-translate-addon-pro-for-translatepress' => 'automatic-translate-addon-for-translatepress',
-        'wpml-translation-check'                        => 'automlp-ai-translation-for-wpml',
-        'automlp-ai-translation-for-wpml-pro'           => 'automlp-ai-translation-for-wpml',
-    ];
-
-    $atlt_is_pro_slug   = in_array( $plugin_slug, $atlt_pro_slug_keys, true );
-    $atlt_canonical_slug = $atlt_slug_aliases[ $plugin_slug ] ?? $plugin_slug;
-
-    if ( $atlt_is_pro_slug && isset( $plugin_paths[ $atlt_canonical_slug ]['pro_name'] ) ) {
-        return $plugin_paths[ $atlt_canonical_slug ]['pro_name'];
-    }
-
-    // If slug isn't mapped, try to read its real name from installed plugins
-    if (!isset($plugin_paths[$atlt_canonical_slug])) {
-        foreach ($plugins as $plugin_file => $plugin_data) {
-            if (strpos($plugin_file, $plugin_slug . '/') === 0 && !empty($plugin_data['Name'])) {
-                return sanitize_text_field($plugin_data['Name']);
-            }
-        }
-        return __('Unknown plugin', 'automatic-translator-addon-for-loco-translate');
-    }
-
-    $free_installed = isset($plugins[$plugin_paths[$atlt_canonical_slug]['free']]);
-    $has_pro = isset($plugin_paths[$atlt_canonical_slug]['pro']);
-
-    $pro_path = $has_pro ? (string) $plugin_paths[ $atlt_canonical_slug ]['pro'] : '';
-    $pro_installed = ( '' !== $pro_path ) && isset( $plugins[ $pro_path ] );
-
-    if ( ! $pro_installed && '' !== $pro_path ) {
-        $pro_dir = trailingslashit( dirname( $pro_path ) );
-        foreach ( array_keys( $plugins ) as $plugin_file ) {
-            if ( 0 === strpos( (string) $plugin_file, $pro_dir ) ) {
-                $pro_installed = true;
-                $pro_path      = (string) $plugin_file;
-                break;
-            }
-        }
-    }
-
-    // Prefer showing the ACTIVE version (Pro > Free), otherwise fall back to installed (Pro > Free).
-    $free_active = false;
-    $pro_active  = false;
-    if ( ! function_exists( 'is_plugin_active' ) ) {
-        require_once ABSPATH . 'wp-admin/includes/plugin.php';
-    }
-    if ( '' !== $pro_path ) {
-        $pro_active = is_plugin_active( $pro_path );
-    }
-    if ( ! empty( $plugin_paths[ $atlt_canonical_slug ]['free'] ) ) {
-        $free_active = is_plugin_active( $plugin_paths[ $atlt_canonical_slug ]['free'] );
-    }
-
-    if ( $pro_active && isset( $plugin_paths[ $atlt_canonical_slug ]['pro_name'] ) ) {
-        return $plugin_paths[ $atlt_canonical_slug ]['pro_name'];
-    }
-    if ( $free_active && isset( $plugin_paths[ $atlt_canonical_slug ]['free_name'] ) ) {
-        return $plugin_paths[ $atlt_canonical_slug ]['free_name'];
-    }
-    if ( $pro_installed && isset( $plugin_paths[ $atlt_canonical_slug ]['pro_name'] ) ) {
-        return $plugin_paths[ $atlt_canonical_slug ]['pro_name'];
-    }
-    if ( $free_installed && isset( $plugin_paths[ $atlt_canonical_slug ]['free_name'] ) ) {
-        return $plugin_paths[ $atlt_canonical_slug ]['free_name'];
-    }
-    
-    return $plugin_paths[$atlt_canonical_slug]['free_name'] ?? __('Unknown plugin', 'automatic-translator-addon-for-loco-translate');
-}
-
-function atlt_format_number($number) {
-    $formats = [
-        1000000000 => __('B+', 'automatic-translator-addon-for-loco-translate'),
-        1000000 => __('M+', 'automatic-translator-addon-for-loco-translate'),  
-        1000 => __('K+', 'automatic-translator-addon-for-loco-translate')
-    ];
-    
-    foreach ($formats as $threshold => $suffix) {
-        if ($number >= $threshold) {
-            return floor($number / $threshold * 10) / 10 . $suffix;
-        }
-    }
-    return $number;
-}
-

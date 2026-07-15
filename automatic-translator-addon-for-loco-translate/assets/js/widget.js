@@ -1,4 +1,4 @@
-(function ($, win, doc, nav, params, namespace, undefined) {
+(function ($, win, doc, params, namespace, undefined) {
     'use strict';
 
     var util = {
@@ -154,17 +154,9 @@
             }
             setupYandexRequestTracking();
 
-            function formatNumberShort(num) {
-                num = parseInt(num, 10);
-                if (isNaN(num)) return num;
-                if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
-                if (num >= 1e3) return (num / 1e3).toFixed(1) + 'K';
-                return num;
-            }
-
             function showYandexTranslationSuccess(container) {
                 var charCount = container.find('.atlt_stats .totalChars').first().text().trim();
-                var formattedCharCount = formatNumberShort(charCount);
+                var formattedCharCount = win.ATLT.formatNumberShort(charCount);
                 var message = 'Wahooo! You have saved your valuable time via auto translating ' + formattedCharCount + ' characters using Yandex Translator';
                 if (!container.data('message-added')) {
                     container.data('message-added', true);
@@ -453,7 +445,6 @@
             });
 
             // Expose for direct calling if needed
-            win.atltStartYandexTranslation = startAtltTranslation;
             win.atltDestroyYandexTranslation = cancelAtltTranslation;
         });
     };
@@ -463,4 +454,4 @@
     } else {
         doc.addEventListener('DOMContentLoaded', initWidget, false);
     }
-})(jQuery, this, this.document, this.navigator, (typeof atltYandexWidgetConfig !== 'undefined' ? atltYandexWidgetConfig : { pageLang: 'en', autoMode: 'false', widgetId: 'ytWidget', widgetTheme: 'light' }), this.yt = this.yt || {});
+})(jQuery, this, this.document, (typeof atltYandexWidgetConfig !== 'undefined' ? atltYandexWidgetConfig : { pageLang: 'en', autoMode: 'false', widgetId: 'ytWidget', widgetTheme: 'light' }), this.yt = this.yt || {});

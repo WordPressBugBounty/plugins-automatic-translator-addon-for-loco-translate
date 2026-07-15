@@ -112,15 +112,7 @@ jQuery(function ($) {
         }
 
         // Whitelist of allowed plugin slugs - Security validation
-        const allowedPlugins = [
-            'autopoly-ai-translation-for-polylang-pro',
-            'automatic-translations-for-polylang',
-            'automatic-translate-addon-pro-for-translatepress',
-            'automatic-translate-addon-for-translatepress',
-            'translate-words',
-            'wpml-translation-check',
-            'automlp-ai-translation-for-wpml-pro'
-        ];
+        const allowedPlugins = (typeof atltDashboard !== 'undefined' && atltDashboard.allowed_plugins) ? atltDashboard.allowed_plugins : [];
 
         // Validate that the plugin slug is in the whitelist
         if (allowedPlugins.indexOf(slug) === -1) {
@@ -155,43 +147,38 @@ jQuery(function ($) {
             }else {
                 let errorMessage = 'Activation failed. Please try again.';
             
-                // Special case for TranslatePress addons
+                // Try to get message from response first
+                if (response && response.data) {
+                    if (typeof response.data === 'string') {
+                        errorMessage = response.data;
+                    } else if (response.data.message) {
+                        errorMessage = response.data.message;
+                    } else if (response.data.errorMessage) {
+                        errorMessage = response.data.errorMessage;
+                    }
+                } else if (
+                    slug === 'automatic-translate-addon-for-translatepress' ||
+                    slug === 'automatic-translate-addon-pro-for-translatepress'
+                ) {
+                    // Special case for TranslatePress addons: fall back to hardcoded message
+                    errorMessage = 'Please activate TranslatePress Multilingual first.';
+                }
+
+                // Special case button handling for TranslatePress addons
                 if (
                     slug === 'automatic-translate-addon-for-translatepress' ||
                     slug === 'automatic-translate-addon-pro-for-translatepress'
                 ) {
-
-                    
-                    // Check if TranslatePress main plugin is active
-                    
-                    errorMessage = 'Please activate TranslatePress Multilingual first.';
-
                     button
                         .text('Activate')
                         .data('action', 'activate')
                         .prop('disabled', false);
-                
-                    $wrapper.find('.atlt-install-message').text(errorMessage);
-                    $('.atlt-install-plugin').not(button).prop('disabled', false);
-          
-                    return; 
-                    
                 } else {
-                    // Normal case: try to get message from response
-                    if (response && response.data) {
-                        if (typeof response.data === 'string') {
-                            errorMessage = response.data;
-                        } else if (response.data.message) {
-                            errorMessage = response.data.message;
-                        } else if (response.data.errorMessage) {
-                            errorMessage = response.data.errorMessage;
-                        }
-                    }
+                    button.text(originalText).prop('disabled', false);
                 }
             
-                // Show the notice and re-enable the button
+                // Show the notice
                 $wrapper.find('.atlt-install-message').text(errorMessage);
-                button.text(originalText).prop('disabled', false);
             }
             
     

@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
@@ -37,17 +37,7 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 			}
 		}
 
-		/*
-		|-----------------------------------------------------------------|
-		|   HTML for creating feedback popup form                         |
-		|-----------------------------------------------------------------|
-		*/
-		public function show_deactivate_feedback_popup() {
-			$screen = get_current_screen();
-			if ( ! isset( $screen ) || $screen->id != 'plugins' ) {
-				return;
-			}
-
+		function atlt_feedback_deactivate_reasons() {
 			$deactivate_reasons = array(
 				'didnt_work_as_expected'         => array(
 					'title'             => __( 'The plugin didn\'t work as expected', 'automatic-translator-addon-for-loco-translate' ),
@@ -70,6 +60,20 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 					'input_placeholder' => __( 'Please share the reason', 'automatic-translator-addon-for-loco-translate' ),
 				),
 			);
+			return $deactivate_reasons;
+		}
+		/*
+		|-----------------------------------------------------------------|
+		|   HTML for creating feedback popup form                         |
+		|-----------------------------------------------------------------|
+		*/
+		public function show_deactivate_feedback_popup() {
+			$screen = get_current_screen();
+			if ( ! isset( $screen ) || $screen->id != 'plugins' ) {
+				return;
+			}
+
+			$deactivate_reasons = $this->atlt_feedback_deactivate_reasons();
 
 			?>
 		<div id="cool-plugins-deactivate-feedback-dialog-wrapper" class="hide-feedback-popup" data-slug="<?php echo esc_attr( $this->plugin_slug ); ?>">
@@ -150,34 +154,13 @@ if ( ! class_exists( 'ATLT_FeedbackForm' ) ) {
 				}
 
 				$reason             = isset( $_POST['reason'] ) ? sanitize_key( wp_unslash( $_POST['reason'] ) ) : '';
-				$deactivate_reasons = array(
-					'didnt_work_as_expected'         => array(
-						'title'             => __( 'The plugin didn\'t work as expected', 'automatic-translator-addon-for-loco-translate' ),
-						'input_placeholder' => __('What did you expect?', 'automatic-translator-addon-for-loco-translate'),
-					),
-					'found_a_better_plugin'          => array(
-						'title'             => __( 'I found a better plugin', 'automatic-translator-addon-for-loco-translate' ),
-						'input_placeholder' => __( 'Please share which plugin', 'automatic-translator-addon-for-loco-translate' ),
-					),
-					'couldnt_get_the_plugin_to_work' => array(
-						'title'             => __( 'The plugin is not working', 'automatic-translator-addon-for-loco-translate' ),
-						'input_placeholder' => __('Please share your issue. So we can fix that for other users.', 'automatic-translator-addon-for-loco-translate'),
-					),
-					'temporary_deactivation'         => array(
-						'title'             => __( 'It\'s a temporary deactivation', 'automatic-translator-addon-for-loco-translate' ),
-						'input_placeholder' => '',
-					),
-					'other'                          => array(
-						'title'             => __( 'Other', 'automatic-translator-addon-for-loco-translate' ),
-						'input_placeholder' => __( 'Please share the reason', 'automatic-translator-addon-for-loco-translate' ),
-					),
-				);
+				$deactivate_reasons = $this->atlt_feedback_deactivate_reasons();
+				$deativation_reason = array_key_exists( $reason, $deactivate_reasons ) ? $reason : 'other';
 
 				$plugin_initial     = get_option( 'atlt_initial_save_version' );
-				$deativation_reason = array_key_exists( $reason, $deactivate_reasons ) ? $reason : 'other';
 				// admin-feedback.js copies the selected reason textarea into POST.message.
 				$raw_message       = isset( $_POST['message'] ) ? sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) : '';
-				$sanitized_message = $raw_message === '' ? 'N/A' : $raw_message;
+				$sanitized_message = $raw_message === '' ? 'N/A' : esc_textarea( $raw_message );
 				$admin_email       = sanitize_email( get_option( 'admin_email' ) );
 				$site_url          = esc_url( site_url() );
 				$install_date      = get_option( 'atlt-install-date' );

@@ -82,7 +82,6 @@ span#cool-plugins-feedback-form-title {
     top: 38%;
     position: absolute;
     left: 42%;
-    text-align: center;
   }
 .cool-plugins-deactivation-response img.cool-plugins-preloader {
     width: 40px;
@@ -116,7 +115,4 @@ a.cool-plugins-button:hover {
 #cool-plugins-form-wrapper input#cool-plugins-GDPR-data-notice-atlt{
     float: left;
     margin-top: 4px !important;
-}
-#cool-plugins-deactivate-feedback-dialog-form-body .cool-plugins-deactivate-feedback-dialog-input:not(:checked)~:where(.cool-plugins-feedback-text, .cool-plugins-extra-links) {
-    display: none;
 }

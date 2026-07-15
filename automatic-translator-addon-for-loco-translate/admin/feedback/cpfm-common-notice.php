@@ -38,19 +38,13 @@ class CPFM_Feedback_Notice {
         $args['plugin_name']    = sanitize_key($args['plugin_name']);
         
         if (!isset(self::$registered_notices[$key])) {
-            self::$registered_notices[$key] = wp_parse_args($args, [
-                'title'   => '',
-                'message' => '',
-                'pages'   => [],
-                'always_show_on' => [],
-            ]);
+            self::$registered_notices[$key] = $args;
+            self::$registered_notices[$key]['plugins'] = [];
         }
 
-        if(!isset(self::$registered_notices[$key]['plugins'])){
-            self::$registered_notices[$key]['plugins'] = array();
+        if (!in_array($args['plugin_name'], self::$registered_notices[$key]['plugins'], true)) {
+            self::$registered_notices[$key]['plugins'][] = $args['plugin_name'];
         }
-        
-        self::$registered_notices[$key]['plugins'][] = $args;
     }
     
     public function cpfm_listen_for_external_notice_registration() {
@@ -149,16 +143,11 @@ class CPFM_Feedback_Notice {
 
         if ($review_option === 'yes') {
             
-             foreach (self::$registered_notices[$category]['plugins'] as $notice) {
-
-                    $plugin_name = isset($notice['plugin_name'])?sanitize_key($notice['plugin_name']):'';
-
-                    if($plugin_name){
-
+             foreach (self::$registered_notices[$category]['plugins'] as $plugin_name) {
+                    if ($plugin_name) {
                         // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- cpfm is our unique prefix.
                         do_action('cpfm_after_opt_in_' . $plugin_name, $category);
                     }
-              
             }
           
         }

@@ -11,6 +11,7 @@ LocoAI Dashboard - Admin Panel Styles
     --border-color: #ddd;
     --text-color: #222;
     --text-color-light: #666;
+    --link-color: #0073aa;
     --shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     --font-size-base: 16px;
     --line-height-base: 1.5;
@@ -111,10 +112,6 @@ LocoAI Dashboard - Admin Panel Styles
     color: var(--text-color);
 }
 
-.atlt-dashboard-btn.svg-hover:hover svg path {
-    stroke: var(--primary-color);
-}
-
 /* ================================================
    Header Section
 ================================================ */
@@ -134,7 +131,9 @@ LocoAI Dashboard - Admin Panel Styles
     box-shadow: var(--shadow);
     height: 70px;
 }
-.atlt-dashboard-header-left {
+.atlt-dashboard-header-left,
+.atlt-dashboard-info-links p,
+.feedback-row {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -252,7 +251,8 @@ a.atlt-dashboard-docs:hover {
 }
 
 a.atlt-dashboard-docs:focus,
-a.atlt-dashboard-video-link:focus {
+a.atlt-dashboard-video-link:focus,
+.atlt-pro-toggle-link:focus {
     box-shadow: none;
     outline: none;
 }
@@ -450,7 +450,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 
 .atlt-dashboard-free-vs-pro p {
     font-size: 14px;
-    color: #666;
+    color: var(--text-color-light);
     margin-bottom: 20px;
 }
 
@@ -505,7 +505,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 
 .atlt-dashboard-ai-translations .description {
     font-size: 14px;
-    color: #666;
+    color: var(--text-color-light);
     margin: 10px 0 35px 0;
 }
 
@@ -581,12 +581,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 .atlt-pro-toggle-link .atlt-switch-label.is-disabled .atlt-switch-slider{
     cursor: pointer;
 }
-.atlt-pro-toggle-link:focus{
-    box-shadow: none;
-    outline: none;
-}
-
-.atlt-switch-label:not(.atlt-switch-with-label) {
+.atlt-switch-label {
     position: relative;
     display: inline-block;
     width: 44px;
@@ -706,7 +701,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     background: white;
     font-family: Arial, sans-serif;
     color: #333;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     padding: 24px;
     border-radius: 5px;
 }
@@ -732,7 +727,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 }
 
 .atlt-dashboard-upgrade-box a {
-    color: #0073aa;
+    color: var(--link-color);
     text-decoration: none;
     font-weight: bold;
 }
@@ -759,7 +754,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 .atlt-dashboard-settings-container{
     padding: 24px;
     background: #fff;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
 }
 
@@ -815,6 +810,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 }
 .atlt-openai-model-select {
     height: 32px;
+    width: 200px;
     border-radius: 5px;
     border: 1px solid #ccc;
     font-size: 15px;
@@ -822,20 +818,10 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     margin-bottom: 10px;
 }
 
-.atlt-openai-model-select {
-    width: 200px;
-    height: 32px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 15px;
-    vertical-align: middle;
-}
-
-
 .atlt-dashboard-api-settings-form a { 
     display: inline-block;
     font-size: 14px;
-    color: #0073aa;
+    color: var(--link-color);
     text-decoration: none;
     margin-bottom: 18px;
 }
@@ -880,12 +866,6 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     font-size: 14px;
 }
 
-.atlt-dashboard-info-links p{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
 .atlt-dashboard-info .logo {
     width: 109px;
     height: 7px;
@@ -897,7 +877,7 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 }
 
 .atlt-dashboard-info-links a {
-    color: #0073aa;
+    color: var(--link-color);
     text-decoration: none;
 }
 
@@ -915,17 +895,14 @@ ul.atlt-dashboard-sts-btm li span:first-child {
         display: flex;
         flex-direction: column;
     }
-    .atlt-dashboard-btns-row {
+    .atlt-dashboard-btns-row,
+    ul.atlt-dashboard-sts-btm li {
         flex-direction: column;
         align-items: start;
     }
     .feedback-row {
         flex-direction: column;
         align-items: start !important;
-    }
-    ul.atlt-dashboard-sts-btm li {
-        flex-direction: column;
-        align-items: start ;
     }
     .atlt-dashboard-provider-labels {
         justify-content: start;
@@ -936,8 +913,6 @@ ul.atlt-dashboard-sts-btm li span:first-child {
     }
     .atlt-dashboard-wrapper .tab-content {
         padding: 0px 20px 0px 20px;
-    }
-    .atlt-dashboard-wrapper .tab-content{
         flex-direction: column;
         gap: 0px;
     }
@@ -1005,12 +980,6 @@ ul.atlt-dashboard-sts-btm li span:first-child {
 ================================================ */
 .atlt-dashboard-feedback-container {
     margin: 25px 0px 18px 0px;
-}
-
-.feedback-row {
-    display: flex;
-    align-items: center;
-    gap: 10px; /* space between checkbox and message */
 }
 
 .feedback-row p {
