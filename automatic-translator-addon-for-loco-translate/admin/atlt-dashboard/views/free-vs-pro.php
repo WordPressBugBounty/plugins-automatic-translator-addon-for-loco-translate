@@ -23,16 +23,16 @@
         <tbody>
             <?php
                 $atlt_features = [
-                    'Yandex Translate Widget Support' => [true, true],
-                    'No API Key Required' => [true, true],
-                    'Unlimited Translations' => [true, true],
-                    'AI Translator Support (OpenAI)' => [true, true],
-                    'Google Translate Widget Support' => [false, true],
-                    'Chrome Built-in AI Support' => [false, true],
-                    'AI Translator Support (Gemini)' => [false, true],
-                    'ChatGPT Translator Support' => [false, true],
-                    'DeepL Doc Translator Support' => [false, true],
-                    'Premium Support' => [false, true],
+                    __('Yandex Translate Widget Support', 'automatic-translator-addon-for-loco-translate') => [true, true],
+                    __('No API Key Required', 'automatic-translator-addon-for-loco-translate') => [true, true],
+                    __('Unlimited Translations', 'automatic-translator-addon-for-loco-translate') => [true, true],
+                    __('AI Translator Support (OpenAI)', 'automatic-translator-addon-for-loco-translate') => [true, true],
+                    __('Google Translate Widget Support', 'automatic-translator-addon-for-loco-translate') => [false, true],
+                    __('Chrome Built-in AI Support', 'automatic-translator-addon-for-loco-translate') => [false, true],
+                    __('AI Translator Support (Gemini)', 'automatic-translator-addon-for-loco-translate') => [false, true],
+                    __('ChatGPT Translator Support', 'automatic-translator-addon-for-loco-translate') => [false, true],
+                    __('DeepL Doc Translator Support', 'automatic-translator-addon-for-loco-translate') => [false, true],
+                    __('Premium Support', 'automatic-translator-addon-for-loco-translate') => [false, true],
                 ];
              foreach ($atlt_features as $atlt_feature => $atlt_availability): ?>
                 <tr>

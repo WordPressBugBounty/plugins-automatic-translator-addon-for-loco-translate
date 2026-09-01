@@ -2,11 +2,12 @@
 /*
 Plugin Name: LocoAI – Auto Translate for Loco Translate
 Description: Auto translation addon for Loco Translate – translate plugin & theme strings using Yandex Translate.
-Version: 2.7.5
+Version: 2.7.6
 License: GPL2
 Text Domain: automatic-translator-addon-for-loco-translate
 Author: Cool Plugins
 Requires Plugins: loco-translate
+Domain Path: /languages
 Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list
 */
 
@@ -17,7 +18,7 @@ Author URI: https://coolplugins.net/?utm_source=atlt_plugin&utm_medium=inside&ut
     define('ATLT_FILE', __FILE__);
     define('ATLT_URL', plugin_dir_url(ATLT_FILE));
     define('ATLT_PATH', plugin_dir_path(ATLT_FILE));
-    define('ATLT_VERSION', '2.7.5');
+    define('ATLT_VERSION', '2.7.6');
     ! defined('ATLT_FEEDBACK_API') && define('ATLT_FEEDBACK_API', "https://feedback.coolplugins.net/");
 
     /**

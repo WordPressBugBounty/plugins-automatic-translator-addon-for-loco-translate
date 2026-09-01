@@ -1,0 +1,869 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: LocoAI – Auto Translate for Loco Translate\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-08-19 05:04+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: \n"
+"Language: \n"
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Loco-Version: 2.8.8; wp-7.0.4; php-8.2.23\n"
+"X-Domain: automatic-translator-addon-for-loco-translate"
+
+#: admin/feedback/cpfm-common-notice.php:205
+msgid " More info"
+msgstr ""
+
+#. 1: number of hours, 2: number of minutes
+#: includes/class-atlt-addons-helper.php:29
+#, php-format
+msgid "%1$d hours %2$d min"
+msgstr ""
+
+#. 1: number of minutes, 2: number of seconds
+#: includes/class-atlt-addons-helper.php:23
+#, php-format
+msgid "%1$d min %2$d sec"
+msgstr ""
+
+#. %1$s: Click Here link, %2$s: API provider name like OpenAI or Gemini
+#: admin/atlt-dashboard/views/settings.php:334
+#, php-format
+msgid "%1$s to See How to Generate %2$s API Key"
+msgstr ""
+
+#. %d: number of seconds
+#: includes/class-atlt-addons-helper.php:16
+msgid "%d sec"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:12
+msgid "0"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:229
+#: admin/atlt-dashboard/views/sidebar.php:245
+msgid "Activate"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:234
+msgid "Activated"
+msgstr ""
+
+#. %1$s: API provider name like OpenAI or Gemini, %2$s: Pro link
+#: admin/atlt-dashboard/views/settings.php:273
+#, php-format
+msgid "Add %1$s API key %2$s"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:373
+msgid ""
+"Add your business context, tone, and audience details so translations match "
+"your brand voice and improve accuracy."
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:248
+msgid "AI authentication class is not available."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:174
+#: includes/class-atlt-settings-service.php:227
+msgid "AI client is not available."
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:220
+msgid "AI Translation for TranslatePress"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:221
+msgid "AI Translation for TranslatePress (Pro)"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:60
+msgid "AI Translations"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:32
+msgid "AI Translator Support (Gemini)"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:29
+msgid "AI Translator Support (OpenAI)"
+msgstr ""
+
+#: admin/cpt_dashboard/cpt_dashboard.php:238
+msgid "Already Reviewed"
+msgstr ""
+
+#: admin/atlt-dashboard/views/license.php:24
+msgid ""
+"As a valued user, you automatically receive an exclusive discount on the "
+"Annual License and an even greater discount on the POPULAR Lifetime License "
+"at checkout!"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:120
+msgid "Auto translate plugins & themes."
+msgstr ""
+
+#. Description of the plugin
+msgid ""
+"Auto translation addon for Loco Translate – translate plugin & theme strings "
+"using Yandex Translate."
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:9
+msgid "Auto Translation status"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:11
+msgid "Automate the Translation Process"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:230
+#: includes/class-atlt-addons-helper.php:233
+msgid "AutoMLP – AI Translation for WPML"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:234
+msgid "AutoMLP – AI Translation for WPML (Pro)"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:207
+msgid "AutoPoly - AI Translation For Polylang"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:208
+msgid "AutoPoly - AI Translation For Polylang (Pro)"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:182
+msgid "B+"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:103
+msgid "ChatGPT Translations"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:33
+msgid "ChatGPT Translator Support"
+msgstr ""
+
+#: automatic-translator-addon-for-loco-translate.php:389
+#: automatic-translator-addon-for-loco-translate.php:397
+msgid "Cheatin&#8217; huh?"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:25
+msgid "Choose the language for translation."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:93
+msgid "Chrome Built-in AI"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:31
+msgid "Chrome Built-in AI Support"
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:213
+#: admin/atlt-dashboard/views/settings.php:336
+msgid "Click Here"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:400
+msgid "Click here"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:28
+msgid ""
+"Click the Auto Translate button and choose your preferred translation "
+"provider."
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:10
+msgid ""
+"Compare the Free and Pro versions to choose the best option for your "
+"translation needs."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:216
+msgid ""
+"Configure your settings for the LocoAI to optimize your translation "
+"experience. Enter your API keys and manage your preferences for seamless "
+"integration."
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:102
+msgid "contact"
+msgstr ""
+
+#. Author of the plugin
+msgid "Cool Plugins"
+msgstr ""
+
+#: admin/atlt-dashboard/views/footer.php:10
+msgid "Cool Plugins Logo"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:81
+msgid "Dashboard"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:135
+msgid "Dashboard navigation"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:34
+msgid "DeepL Doc Translator Support"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:133
+msgid "DeepL Translations"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:97
+msgid "document"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:16
+msgid "Dynamic Content"
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:280
+msgid "Error during OpenAI translation."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:380
+msgid ""
+"Example: We run a business website. Keep the tone simple and professional. "
+"Audience includes customers and business users. Focus on keywords like "
+"services, pricing, and solutions."
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:266
+msgid ""
+"Facing any issue with AI translation? Create a support thread and our team "
+"will assist you."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:104
+msgid "Fast and accurate ChatGPT translations."
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:18
+msgid "Free"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:6
+msgid "Free VS Pro"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:84
+msgid "Free vs Pro"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:113
+msgid "Gemini AI Translations"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:268
+msgid "Get Support →"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:30
+msgid "Google Translate Widget Support"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:123
+msgid "Google Translations"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:95
+msgid "gpt-4o-mini (Fast & Cheap)"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:93
+msgid "gpt-5-mini (Fast)"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:94
+msgid "gpt-5-nano (Cheapest)"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:92
+msgid "gpt-5.2 (Balanced)"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:91
+msgid "gpt-5.3-chat-latest (Recommended)"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:89
+msgid "gpt-5.4 (Best Quality)"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:90
+msgid "gpt-5.4-pro (Highest Accuracy)"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:273
+msgid "Happy with LocoAI? ✨"
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:180
+msgid "Help Improve Plugins"
+msgstr ""
+
+#: automatic-translator-addon-for-loco-translate.php:122
+#: admin/atlt-dashboard/views/settings.php:394
+msgid ""
+"Help us make this plugin more compatible with your site by sharing non-"
+"sensitive site data."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:134
+msgid "High-quality and accurate DeepL translations."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:18
+msgid "How it works:"
+msgstr ""
+
+#. Author URI of the plugin
+msgid ""
+"https://coolplugins.net/?"
+"utm_source=atlt_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:115
+msgid ""
+"I agree to share anonymous usage data and basic site details (such as server,"
+" PHP, and WordPress versions) to support LocoAI – Auto Translate for Loco "
+"Translate improvement efforts. Additionally, I allow Cool Plugins to store "
+"all information provided through this form and to respond to my inquiry"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:47
+msgid "I found a better plugin"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:100
+msgid ""
+"If you have a moment, please share why you are deactivating this plugin."
+msgstr ""
+
+#. %s: API provider name like OpenAI or Gemini
+#: includes/class-atlt-admin-notices.php:256
+#, php-format
+msgid ""
+"In order to use <strong>%1$s</strong> (version <strong>%2$s</strong>), "
+"Please update <a href=\"%3$s\" class=\"thickbox\" title=\"%4$s\">%5$s</a> "
+"official plugin to a latest version (2.4.0 or upper)"
+msgstr ""
+
+#. 1: Current plugin name, 2: Plugin install URL, 3: Required plugin title attribute, 4: Required plugin name
+#: includes/class-atlt-admin-notices.php:47
+#, php-format
+msgid ""
+"In order to use <strong>%1$s</strong> plugin, please install and activate "
+"the latest version  of <a href=\"%2$s\" class=\"thickbox\" title=\"%3$s\">"
+"%4$s</a>"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:245
+msgid "Install"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:124
+msgid "Instant translations using Google tools."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:74
+msgid "Instant translations without API key."
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:234
+msgid "Invalid AI provider."
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:264
+msgid "Invalid API key. Please check your API key and try again."
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:284
+msgid "Invalid API key. Please check your credentials."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:173
+msgid "Invalid OpenAI model selected."
+msgstr ""
+
+#: includes/class-atlt-provider-settings.php:66
+msgid "Invalid provider."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:82
+msgid "Invalid request payload."
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:55
+msgid "It's a temporary deactivation"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:184
+msgid "K+"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:277
+msgid "Leave a Review ★★★★★"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:83
+msgid "License"
+msgstr ""
+
+#: admin/atlt-dashboard/views/license.php:6
+msgid "License Key"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:258
+msgid "Linguator Addon"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:261
+msgid "Linguator Multilingual AI Translation"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:113
+msgid "Loco Translate Logo"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:211
+msgid "LocoAI Settings"
+msgstr ""
+
+#. Name of the plugin
+#: automatic-translator-addon-for-loco-translate.php:121
+msgid "LocoAI – Auto Translate for Loco Translate"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:50
+msgid "LocoAI — watch the tutorial"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:183
+msgid "M+"
+msgstr ""
+
+#: admin/atlt-dashboard/views/footer.php:6
+msgid "Made with ❤️ by"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:215
+msgid ""
+"Make WordPress translation faster, smarter, and easier with AI-powered "
+"automation for TranslatePress."
+msgstr ""
+
+#: includes/class-atlt-provider-settings.php:47
+msgid "Missing provider."
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:264
+msgid "Need Help? 🤝"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:27
+msgid "No API Key Required"
+msgstr ""
+
+#: includes/class-atlt-installer.php:60
+msgid "No plugin specified."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:101
+msgid "No valid source strings found."
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:221
+msgid "No, Thanks"
+msgstr ""
+
+#: admin/cpt_dashboard/cpt_dashboard.php:238
+msgid "Not Interested"
+msgstr ""
+
+#: admin/feedback/cron/atlt-cron.php:30
+msgid "Once every 30 days"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:15
+msgid ""
+"Open Loco Translate from the links below, pick a plugin or theme, and "
+"translate thousands of strings in one workflow — at no extra cost."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:83
+#: admin/atlt-dashboard/views/settings.php:150
+msgid "OpenAI API key has been removed."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:119
+msgid "OpenAI API key saved successfully."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:46
+msgid "OpenAI returned invalid JSON output."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:62
+msgid "OpenAI returned no usable translations."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:158
+msgid "OpenAI translation failed."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:83
+msgid "OpenAI Translations"
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:209
+msgid ""
+"Opt in to receive email updates about security improvements, new features, "
+"helpful tutorials, and occasional special offers. We'll collect:"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:399
+msgid ""
+"Opt in to receive email updates about security improvements, new features, "
+"helpful tutorials, and occasional special offers. We'll collect: "
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:59
+msgid "Other"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:60
+msgid "Please share the reason"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:48
+msgid "Please share which plugin"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:52
+msgid "Please share your issue. So we can fix that for other users."
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:241
+msgid "Please wait a few seconds before testing again."
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:204
+msgid "Polylang Addon"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:35
+msgid "Premium Support"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:175
+#: admin/atlt-dashboard/views/free-vs-pro.php:20
+#: admin/atlt-dashboard/views/settings.php:277
+#: admin/atlt-dashboard/views/settings.php:355
+msgid "Pro"
+msgstr ""
+
+#: includes/class-atlt-installer.php:124
+msgid ""
+"Pro plugin not found on this site. Please upload/install the Polylang Pro "
+"addon ZIP, then click Activate again."
+msgstr ""
+
+#: includes/class-atlt-installer.php:138
+msgid ""
+"Pro plugin not found on this site. Please upload/install the WPML Pro addon "
+"ZIP, then click Activate again."
+msgstr ""
+
+#: includes/class-atlt-installer.php:131
+msgid ""
+"Pro plugin not found. Please upload/install the TranslatePress Pro addon ZIP,"
+" then click Activate again."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:209
+msgid "Prompt builder is not available."
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:221
+msgid "Provider and API key are required."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:114
+msgid "Quick and accurate Gemini translations."
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:85
+msgid "Quick Feedback"
+msgstr ""
+
+#: includes/class-atlt-settings-service.php:279
+msgid "Rate limit exceeded. Please try again later."
+msgstr ""
+
+#: admin/cpt_dashboard/cpt_dashboard.php:238
+msgid "Rate Now!"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:41
+msgid "Read Plugin Docs"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:94
+msgid "Real-time translations using Chrome AI."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:305
+msgid "Reset"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:31
+msgid "Review the translated content and click Save to apply the changes."
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:412
+msgid "Save"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:320
+msgid "Select model"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:314
+msgid "Select OpenAI Model"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:22
+msgid "Select the plugin or theme you want to translate."
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:82
+msgid "Settings"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:179
+msgid "Settings saved successfully."
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:119
+msgid "Skip and Deactivate"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:84
+msgid "Smart and fast AI translations."
+msgstr ""
+
+#: includes/class-atlt-provider-settings.php:35
+msgid "Sorry, you are not allowed to do this action."
+msgstr ""
+
+#: includes/class-atlt-installer.php:52
+msgid "Sorry, you are not allowed to install plugins on this site."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:88
+msgid "Source strings are missing."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:21
+msgid "Step 1:"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:24
+msgid "Step 2:"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:27
+msgid "Step 3:"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:30
+msgid "Step 4:"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:118
+msgid "Submit and Deactivate"
+msgstr ""
+
+#: includes/class-atlt-admin-dashboard.php:103
+msgid "Support"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:43
+msgid "The plugin didn't work as expected"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:51
+msgid "The plugin is not working"
+msgstr ""
+
+#: includes/class-atlt-installer.php:74
+msgid "This plugin is not allowed to be installed via this interface."
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:82
+msgid "Time Taken"
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:212
+msgid ""
+"To check plugin compatibility, we will collect the following: list of active "
+"plugins and themes, server type, MySQL version, WordPress version, memory "
+"limit, site language and database prefix "
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:405
+msgid ""
+"To check plugin compatibility, we will collect the following: list of active "
+"plugins and themes, server type, MySQL version, WordPress version, memory "
+"limit, site language and database prefix."
+msgstr ""
+
+#: admin/atlt-dashboard/views/license.php:19
+msgid "To unlock more features, consider"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:78
+msgid "Total Characters"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:80
+msgid "Total Plugins / Themes"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:74
+msgid "Total Strings Translated!"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:36
+msgid "Translate Plugins"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:38
+msgid "Translate Themes"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:256
+msgid ""
+"Translate your entire WordPress website faster than ever with AI-powered "
+"translation - Linguator."
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:202
+msgid ""
+"Translate your entire WordPress website faster than ever with AI-powered "
+"translation built for Polylang - Autopoly"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:228
+msgid ""
+"Translate your entire WordPress website faster than ever with AI-powered "
+"translation built for WPML- AUTOMLP."
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:84
+msgid "Translated By"
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:217
+msgid "TranslatePress Addon"
+msgstr ""
+
+#. %s: Pro link
+#: admin/atlt-dashboard/views/settings.php:353
+#, php-format
+msgid "Translation Context & Tone (%s)"
+msgstr ""
+
+#: includes/class-atlt-installer.php:267
+msgid "Unable to connect to the filesystem. Please confirm your credentials."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:135
+msgid "Unable to encode source strings."
+msgstr ""
+
+#: includes/class-atlt-openai-translator.php:78
+msgid "Unauthorized request."
+msgstr ""
+
+#: includes/class-atlt-addons-helper.php:131
+#: includes/class-atlt-addons-helper.php:177
+msgid "Unknown plugin"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:28
+msgid "Unlimited Translations"
+msgstr ""
+
+#: admin/atlt-dashboard/views/license.php:21
+msgid "upgrading to Pro"
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:275
+msgid ""
+"We'd love your feedback! Hope this addon made auto-translations easier for "
+"you."
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:13
+msgid "Welcome to LocoAI — AI translation for Loco Translate"
+msgstr ""
+
+#: includes/Feedback/class-feedback-form.php:44
+msgid "What did you expect?"
+msgstr ""
+
+#: admin/atlt-dashboard/views/free-vs-pro.php:26
+msgid "Yandex Translate Widget Support"
+msgstr ""
+
+#: admin/atlt-dashboard/views/dashboard.php:73
+msgid "Yandex Translations"
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:220
+msgid "Yes, I Agree"
+msgstr ""
+
+#: admin/atlt-dashboard/views/settings.php:45
+msgid "You do not have permission to manage settings."
+msgstr ""
+
+#: admin/atlt-dashboard/views/license.php:13
+msgid ""
+"You're using <strong>LocoAI – Auto Translate for Loco Translate (free)"
+"</strong> - no license needed. Enjoy! 😊"
+msgstr ""
+
+#: admin/atlt-dashboard/views/license.php:9
+msgid "Your license key provides access to pro version updates and support."
+msgstr ""
+
+#: admin/feedback/cpfm-common-notice.php:211
+#: admin/atlt-dashboard/views/settings.php:403
+msgid "Your website home URL and WordPress admin email."
+msgstr ""
+
+#: admin/atlt-dashboard/views/sidebar.php:67
+msgid "—"
+msgstr ""
